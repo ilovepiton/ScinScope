@@ -137,12 +137,6 @@ h1 {
   background: #faf8f5;
 }
 
-.result-score {
-  font-size: 54px;
-  font-weight: 800;
-  margin: 24px 0;
-}
-
 .account-list {
   display: grid;
   gap: 14px;
@@ -157,6 +151,125 @@ h1 {
   border-radius: 16px;
   background: #faf8f5;
   border: 1px solid #e5e0d8;
+}
+
+.dashboard-page {
+  min-height: calc(100vh - 82px);
+  padding: 46px 8% 60px;
+  background: #f3f1ee;
+}
+
+.face-preview {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 34px;
+}
+
+.face-circle {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d9d4cc, #ffffff);
+  border: 4px solid #ffffff;
+  box-shadow: 0 18px 50px rgba(31, 41, 51, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5b6472;
+  font-weight: 800;
+}
+
+.face-preview h1 {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.face-preview .hero-text {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.metrics-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.metric-card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 24px;
+  min-height: 170px;
+  box-shadow: 0 18px 50px rgba(31, 41, 51, 0.07);
+  border: 1px solid #ebe6de;
+}
+
+.metric-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #5b6472;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.metric-card strong {
+  display: block;
+  font-size: 58px;
+  line-height: 1;
+  margin-bottom: 22px;
+  color: #111827;
+}
+
+.bar {
+  height: 10px;
+  border-radius: 999px;
+  background: #d5d5d5;
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.bar.yellow span {
+  background: #f4ea63;
+}
+
+.bar.green span {
+  background: #54d987;
+}
+
+.bar.red span {
+  background: #f27588;
+}
+
+.advice-card {
+  grid-column: span 1;
+}
+
+.advice-card h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+}
+
+.advice-card p {
+  color: #5b6472;
+  line-height: 1.6;
+  font-size: 18px;
+}
+
+.dashboard-actions {
+  max-width: 1180px;
+  margin: 30px auto 0;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 ul {
@@ -195,5 +308,31 @@ ul {
   .account-item {
     flex-direction: column;
     gap: 6px;
+  }
+
+  .dashboard-page {
+    padding: 30px 5% 46px;
+  }
+
+  .face-circle {
+    width: 120px;
+    height: 120px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card {
+    min-height: 150px;
+    padding: 22px;
+  }
+
+  .metric-top {
+    font-size: 20px;
+  }
+
+  .metric-card strong {
+    font-size: 48px;
   }
 }
