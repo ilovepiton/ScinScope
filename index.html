@@ -8,9 +8,21 @@
 
   <link rel="stylesheet" href="/ScinScope/css/main.css" />
 </head>
-<body>
+<body class="home-video-page">
 
-  <header class="site-header">
+  <div class="video-wallpaper">
+    <iframe
+      id="home-video"
+      src="https://www.youtube.com/embed/KVb7cMVOPnM?autoplay=1&mute=1&controls=0&loop=1&playlist=KVb7cMVOPnM&modestbranding=1&playsinline=1&rel=0"
+      title="SkinScope wallpaper video"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <div class="home-video-overlay"></div>
+
+  <header class="site-header transparent-header">
     <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
 
     <nav>
@@ -21,66 +33,83 @@
     </nav>
   </header>
 
-  <main class="home-hero">
-    <section class="home-left">
+  <main class="home-menu-layout">
+    <section class="home-glass-card">
       <p class="beta-label">Free beta</p>
 
       <h1>Your daily AI skin coach</h1>
 
       <p class="hero-text">
-        Scan your face every day and get simple skincare, food, hydration,
-        sleep, product advice, and progress tracking based on your skin condition.
+        Scan your face, check skincare products, and track visible skin results with simple daily AI advice.
       </p>
 
       <div class="hero-buttons">
         <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
-        <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
+        <a class="secondary-button glass-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
       </div>
 
-      <div class="auth-box">
+      <div class="auth-box glass-auth">
         <p>Save your progress and daily results.</p>
 
         <div class="auth-buttons">
-          <a class="secondary-button small-button" href="/ScinScope/pages/account.html">Login</a>
+          <a class="secondary-button small-button glass-button" href="/ScinScope/pages/account.html">Login</a>
           <a class="primary-button small-button" href="/ScinScope/pages/account.html">Register</a>
         </div>
       </div>
+
+      <button type="button" class="sound-button" onclick="enableHomeSound()">
+        Sound On
+      </button>
     </section>
 
-    <section class="home-right">
-      <div class="result-showcase-card">
-        <div class="showcase-header">
-          <span>AI skin result preview</span>
+    <section class="home-results-strip">
+      <div class="result-image-card">
+        <img src="https://i.pinimg.com/736x/27/cd/a5/27cda5917ee7ccff4a2a3427750a3c98.jpg" alt="Skin result 1">
+        <div class="result-image-label">
+          <span>Texture</span>
+          <strong>82</strong>
+        </div>
+      </div>
+
+      <div class="result-image-card result-image-card-main">
+        <img src="https://i.pinimg.com/736x/0e/11/ed/0e11edbb092ce83ca658177fb66d8cfd.jpg" alt="Skin result 2">
+        <div class="result-image-label">
+          <span>Skin Score</span>
           <strong>74/100</strong>
         </div>
+      </div>
 
-        <div class="before-after-image">
-          <img src="/ScinScope/assets/skin-result-1.png" alt="Skin result before and after" />
+      <div class="result-image-card">
+        <img src="https://i.pinimg.com/736x/a0/ed/8f/a0ed8f6c762b494d4a51738655d50f7f.jpg" alt="Skin result 3">
+        <div class="result-image-label">
+          <span>Hydration</span>
+          <strong>70</strong>
         </div>
-
-        <div class="showcase-stats">
-          <div>
-            <span>Hydration</span>
-            <strong>70</strong>
-          </div>
-
-          <div>
-            <span>Texture</span>
-            <strong>82</strong>
-          </div>
-
-          <div>
-            <span>Redness</span>
-            <strong>Low</strong>
-          </div>
-        </div>
-
-        <p class="showcase-note">
-          Track visible skin changes and get daily advice for better results.
-        </p>
       </div>
     </section>
   </main>
+
+  <section class="home-extra-results">
+    <div class="result-wide-card">
+      <img src="https://i.pinimg.com/736x/ae/e8/db/aee8dbec372cda0120c4a073627707e2.jpg" alt="Skin result 4">
+      <div>
+        <p class="beta-label">AI result preview</p>
+        <h2>Track visible progress over time</h2>
+        <p>
+          Compare daily scans, understand what your skin needs, and build better routines with clear product and lifestyle advice.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function enableHomeSound() {
+      const iframe = document.getElementById("home-video");
+
+      iframe.src =
+        "https://www.youtube.com/embed/KVb7cMVOPnM?autoplay=1&mute=0&controls=0&loop=1&playlist=KVb7cMVOPnM&modestbranding=1&playsinline=1&rel=0";
+    }
+  </script>
 
 </body>
 </html>
