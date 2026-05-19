@@ -153,6 +153,8 @@ h1 {
   border: 1px solid #e5e0d8;
 }
 
+/* RESULT DASHBOARD */
+
 .dashboard-page {
   min-height: calc(100vh - 82px);
   padding: 46px 8% 60px;
@@ -247,10 +249,6 @@ h1 {
 
 .bar.red span {
   background: #f27588;
-}
-
-.advice-card {
-  grid-column: span 1;
 }
 
 .advice-card h2 {
