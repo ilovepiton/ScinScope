@@ -25,17 +25,25 @@
     <section class="card scan-card">
       <p class="beta-label">Beta product scan</p>
 
-      <h1>Check if a product fits your skin</h1>
+      <h1>Take or upload a product photo</h1>
 
       <p class="hero-text">
-        Upload a photo of a skincare product. SkinScope will show a demo compatibility report.
+        Take a clear photo of a skincare product or upload it from your device. SkinScope will create a demo compatibility report.
       </p>
 
-      <label class="scan-choice-button product-upload-box" for="product-photo-input">
-        <span>🧴</span>
-        <strong>Upload Product Photo</strong>
-        <small>Take or choose a photo of the product</small>
-      </label>
+      <div class="scan-actions">
+        <button type="button" id="open-product-camera-button" class="scan-choice-button">
+          <span>📸</span>
+          <strong>Take Product Photo</strong>
+          <small>Use camera inside the app</small>
+        </button>
+
+        <label class="scan-choice-button" for="product-photo-input">
+          <span>🧴</span>
+          <strong>Upload Product File</strong>
+          <small>Choose product photo from your device</small>
+        </label>
+      </div>
 
       <input
         id="product-photo-input"
@@ -44,7 +52,7 @@
         accept="image/*"
       />
 
-      <div id="product-preview-box" class="product-preview-box" hidden>
+      <div id="product-preview-box" class="product-bottle-preview" hidden>
         <img id="product-preview-image" src="" alt="Product preview" />
       </div>
 
@@ -59,6 +67,36 @@
       </button>
     </section>
   </main>
+
+  <div id="product-camera-modal" class="camera-modal" hidden>
+    <div class="camera-window">
+      <h2>Fit the product inside the guide</h2>
+
+      <p class="camera-tip">
+        For better results, use good lighting and make sure the product label is clearly visible.
+      </p>
+
+      <div class="camera-frame">
+        <video id="product-camera-video" autoplay playsinline muted></video>
+
+        <div class="face-guide">
+          <div class="product-outline"></div>
+        </div>
+      </div>
+
+      <canvas id="product-camera-canvas" hidden></canvas>
+
+      <div class="camera-actions">
+        <button type="button" id="take-product-photo-button" class="primary-button button-reset">
+          Take Photo
+        </button>
+
+        <button type="button" id="close-product-camera-button" class="secondary-button button-reset">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="/ScinScope/js/product.js"></script>
 </body>
