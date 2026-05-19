@@ -1,63 +1,73 @@
 let cameraStream = null;
 
-function setupPhotoPreview() {
-  const input = document.getElementById("face-photo");
-
-  if (!input) return;
-
-  input.addEventListener("change", function () {
-    const file = input.files[0];
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-      const photoData = event.target.result;
-
-      localStorage.setItem("skinscopeFacePhoto", photoData);
-      showSelectedPhoto(photoData);
-    };
-
-    reader.readAsDataURL(file);
-  });
+function saveFacePhoto(photoData) {
+  localStorage.setItem("skinscopeFacePhoto", photoData);
+  showFacePreview(photoData);
+  enableAnalyzeButton();
 }
 
-function showSelectedPhoto(photoData) {
-  const previewBox = document.getElementById("photo-preview");
-  const previewImage = document.getElementById("preview-image");
-  const actions = document.getElementById("selected-photo-actions");
+function showFacePreview(photoData) {
+  const previewBox = document.getElementById("photo-preview-box");
+  const previewImage = document.getElementById("photo-preview-image");
+  const controlButtons = document.getElementById("photo-control-buttons");
 
-  if (!previewBox || !previewImage || !actions) return;
+  if (!previewBox || !previewImage || !controlButtons) return;
 
   previewImage.src = photoData;
   previewBox.classList.remove("hidden");
-  actions.classList.remove("hidden");
+  controlButtons.classList.remove("hidden");
+}
+
+function enableAnalyzeButton() {
+  const analyzeButton = document.getElementById("analyze-photo-button");
+
+  if (!analyzeButton) return;
+
+  analyzeButton.classList.remove("disabled-button");
+}
+
+function disableAnalyzeButton() {
+  const analyzeButton = document.getElementById("analyze-photo-button");
+
+  if (!analyzeButton) return;
+
+  analyzeButton.classList.add("disabled-button");
 }
 
 function clearSelectedPhoto() {
-  const input = document.getElementById("face-photo");
-  const previewBox = document.getElementById("photo-preview");
-  const previewImage = document.getElementById("preview-image");
-  const actions = document.getElementById("selected-photo-actions");
+  const input = document.getElementById("face-photo-input");
+  const previewBox = document.getElementById("photo-preview-box");
+  const previewImage = document.getElementById("photo-preview-image");
+  const controlButtons = document.getElementById("photo-control-buttons");
 
   localStorage.removeItem("skinscopeFacePhoto");
 
   if (input) input.value = "";
   if (previewImage) previewImage.src = "";
   if (previewBox) previewBox.classList.add("hidden");
-  if (actions) actions.classList.add("hidden");
+  if (controlButtons) controlButtons.classList.add("hidden");
+
+  disableAnalyzeButton();
 }
 
-function analyzeFacePhoto() {
-  const savedPhoto = localStorage.getItem("skinscopeFacePhoto");
+function setupUploadFile() {
+  const input = document.getElementById("face-photo-input");
 
-  if (!savedPhoto) {
-    alert("Please take or upload a face photo first.");
-    return;
-  }
+  if (!input) return;
 
-  window.location.href = "result.html?v=30";
+  input.addEventListener("change", function () {
+    const file = input.files && input.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      saveFacePhoto(event.target.result);
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
 async function openCameraModal() {
@@ -69,7 +79,9 @@ async function openCameraModal() {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
       video: {
-        facingMode: "user"
+        facingMode: "user",
+        width: { ideal: 900 },
+        height: { ideal: 900 }
       },
       audio: false
     });
@@ -77,7 +89,7 @@ async function openCameraModal() {
     video.srcObject = cameraStream;
     modal.classList.remove("hidden");
   } catch (error) {
-    alert("Camera is not available. Please upload a photo instead.");
+    alert("Camera is not available. Please use Upload File.");
   }
 }
 
@@ -103,17 +115,59 @@ function takeCameraPhoto() {
 
   if (!video || !canvas) return;
 
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  if (!video.videoWidth || !video.videoHeight) {
+    alert("Camera is still loading. Wait one second and try again.");
+    return;
+  }
+
+  const size = Math.min(video.videoWidth, video.videoHeight);
+  const startX = (video.videoWidth - size) / 2;
+  const startY = (video.videoHeight - size) / 2;
+
+  canvas.width = 900;
+  canvas.height = 900;
 
   const context = canvas.getContext("2d");
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  const photoData = canvas.toDataURL("image/png");
+  context.drawImage(
+    video,
+    startX,
+    startY,
+    size,
+    size,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
 
-  localStorage.setItem("skinscopeFacePhoto", photoData);
-  showSelectedPhoto(photoData);
+  const photoData = canvas.toDataURL("image/jpeg", 0.92);
+
+  saveFacePhoto(photoData);
   closeCameraModal();
+}
+
+function analyzeFacePhoto() {
+  const savedPhoto = localStorage.getItem("skinscopeFacePhoto");
+
+  if (!savedPhoto) {
+    alert("Take a photo or upload a file first.");
+    return;
+  }
+
+  window.location.href = "result.html?v=40";
+}
+
+function loadSavedPhotoOnScanPage() {
+  const savedPhoto = localStorage.getItem("skinscopeFacePhoto");
+
+  if (!savedPhoto) {
+    disableAnalyzeButton();
+    return;
+  }
+
+  showFacePreview(savedPhoto);
+  enableAnalyzeButton();
 }
 
 function loadResultFacePhoto() {
@@ -134,7 +188,37 @@ function loadResultFacePhoto() {
   }
 }
 
+function setupButtons() {
+  const openCameraButton = document.getElementById("open-camera-button");
+  const takeCameraPhotoButton = document.getElementById("take-camera-photo-button");
+  const closeCameraButton = document.getElementById("close-camera-button");
+  const cancelPhotoButton = document.getElementById("cancel-photo-button");
+  const analyzeButton = document.getElementById("analyze-photo-button");
+
+  if (openCameraButton) {
+    openCameraButton.addEventListener("click", openCameraModal);
+  }
+
+  if (takeCameraPhotoButton) {
+    takeCameraPhotoButton.addEventListener("click", takeCameraPhoto);
+  }
+
+  if (closeCameraButton) {
+    closeCameraButton.addEventListener("click", closeCameraModal);
+  }
+
+  if (cancelPhotoButton) {
+    cancelPhotoButton.addEventListener("click", clearSelectedPhoto);
+  }
+
+  if (analyzeButton) {
+    analyzeButton.addEventListener("click", analyzeFacePhoto);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-  setupPhotoPreview();
+  setupUploadFile();
+  setupButtons();
+  loadSavedPhotoOnScanPage();
   loadResultFacePhoto();
 });
