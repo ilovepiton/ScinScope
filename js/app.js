@@ -1,4 +1,3 @@
-let selectedFacePhoto = null;
 let cameraStream = null;
 
 function setupPhotoPreview() {
@@ -6,16 +5,18 @@ function setupPhotoPreview() {
 
   if (!input) return;
 
-  input.addEventListener("change", function() {
+  input.addEventListener("change", function () {
     const file = input.files[0];
 
     if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = function(event) {
-      selectedFacePhoto = event.target.result;
-      showSelectedPhoto(selectedFacePhoto);
+    reader.onload = function (event) {
+      const photoData = event.target.result;
+
+      localStorage.setItem("skinscopeFacePhoto", photoData);
+      showSelectedPhoto(photoData);
     };
 
     reader.readAsDataURL(file);
@@ -35,29 +36,28 @@ function showSelectedPhoto(photoData) {
 }
 
 function clearSelectedPhoto() {
-  selectedFacePhoto = null;
-
   const input = document.getElementById("face-photo");
   const previewBox = document.getElementById("photo-preview");
   const previewImage = document.getElementById("preview-image");
   const actions = document.getElementById("selected-photo-actions");
 
+  localStorage.removeItem("skinscopeFacePhoto");
+
   if (input) input.value = "";
   if (previewImage) previewImage.src = "";
   if (previewBox) previewBox.classList.add("hidden");
   if (actions) actions.classList.add("hidden");
-
-  localStorage.removeItem("skinscopeFacePhoto");
 }
 
 function analyzeFacePhoto() {
-  if (!selectedFacePhoto) {
+  const savedPhoto = localStorage.getItem("skinscopeFacePhoto");
+
+  if (!savedPhoto) {
     alert("Please take or upload a face photo first.");
     return;
   }
 
-  localStorage.setItem("skinscopeFacePhoto", selectedFacePhoto);
-  window.location.href = "result.html";
+  window.location.href = "result.html?v=21";
 }
 
 async function openCameraModal() {
@@ -68,9 +68,7 @@ async function openCameraModal() {
 
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "user"
-      },
+      video: { facingMode: "user" },
       audio: false
     });
 
@@ -106,9 +104,10 @@ function takeCameraPhoto() {
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  selectedFacePhoto = canvas.toDataURL("image/png");
+  const photoData = canvas.toDataURL("image/png");
 
-  showSelectedPhoto(selectedFacePhoto);
+  localStorage.setItem("skinscopeFacePhoto", photoData);
+  showSelectedPhoto(photoData);
   closeCameraModal();
 }
 
@@ -130,7 +129,7 @@ function loadResultFacePhoto() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   setupPhotoPreview();
   loadResultFacePhoto();
 });
