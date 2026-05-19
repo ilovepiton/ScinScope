@@ -543,3 +543,21 @@ ul {
     padding: 22px;
   }
 }
+.logo-link {
+  text-decoration: none;
+}
+
+.camera-tip {
+  max-width: 420px;
+  margin: -6px auto 18px;
+  color: #5b6472;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.face-outline {
+  width: 58% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+}
