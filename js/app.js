@@ -1,8 +1,8 @@
 let cameraStream = null;
 let takingPhoto = false;
 
-const PHOTO_SIZE = 900;
-const PHOTO_QUALITY = 0.82;
+const PHOTO_SIZE = 650;
+const PHOTO_QUALITY = 0.7;
 
 function compressImageFromSource(source, sourceWidth, sourceHeight) {
   const canvas = document.createElement("canvas");
@@ -32,11 +32,12 @@ function compressImageFromSource(source, sourceWidth, sourceHeight) {
 
 function saveFacePhoto(photoData) {
   try {
+    localStorage.removeItem("skinscopeProductPhoto");
     localStorage.setItem("skinscopeFacePhoto", photoData);
     showFacePreview(photoData);
     enableAnalyzeButton();
   } catch (error) {
-    alert("Photo is too large. Please try a smaller JPG or PNG photo.");
+    alert("Photo is still too large. Please try another JPG, PNG, or WebP photo.");
   }
 }
 
