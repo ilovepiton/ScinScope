@@ -6,7 +6,7 @@
 
   <title>SkinScope — Face Scan</title>
 
-  <link rel="stylesheet" href="/ScinScope/css/main.css?v=60" />
+  <link rel="stylesheet" href="/ScinScope/css/main.css?v=70" />
 </head>
 <body>
 
@@ -14,9 +14,9 @@
     <div class="logo">SkinScope</div>
 
     <nav>
-      <a href="/ScinScope/index.html?v=60">Home</a>
-      <a href="/ScinScope/pages/scan.html?v=60">Face Scan</a>
-      <a href="/ScinScope/pages/account.html?v=60">Account</a>
+      <a href="/ScinScope/index.html?v=70">Home</a>
+      <a href="/ScinScope/pages/scan.html?v=70">Face Scan</a>
+      <a href="/ScinScope/pages/account.html?v=70">Account</a>
     </nav>
   </header>
 
@@ -51,11 +51,11 @@
         accept="image/*"
       />
 
-      <div id="photo-preview-box" class="photo-preview-large hidden">
+      <div id="photo-preview-box" class="photo-preview-large" hidden>
         <img id="photo-preview-image" src="" alt="Face preview" />
       </div>
 
-      <div id="photo-control-buttons" class="selected-photo-actions hidden">
+      <div id="photo-control-buttons" class="selected-photo-actions" hidden>
         <button type="button" id="cancel-photo-button" class="secondary-button button-reset">
           Cancel Photo
         </button>
@@ -67,7 +67,7 @@
     </section>
   </main>
 
-  <div id="camera-modal" class="camera-modal hidden">
+  <div id="camera-modal" class="camera-modal" hidden>
     <div class="camera-window">
       <h2>Put your face inside the guide</h2>
 
@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <canvas id="camera-canvas" class="hidden"></canvas>
+      <canvas id="camera-canvas" hidden></canvas>
 
       <div class="camera-actions">
         <button type="button" id="take-camera-photo-button" class="primary-button button-reset">
@@ -93,6 +93,6 @@
     </div>
   </div>
 
-  <script src="/ScinScope/js/app.js?v=60"></script>
+  <script src="/ScinScope/js/app.js?v=70"></script>
 </body>
 </html>
