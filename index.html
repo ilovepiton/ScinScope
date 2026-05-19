@@ -6,37 +6,78 @@
 
   <title>SkinScope</title>
 
-  <link rel="stylesheet" href="/ScinScope/css/main.css?v=300" />
+  <link rel="stylesheet" href="/ScinScope/css/main.css" />
 </head>
 <body>
 
   <header class="site-header">
-    <a class="logo logo-link" href="/ScinScope/index.html?v=300">SkinScope</a>
+    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
 
     <nav>
-      <nav>
-  <a href="/ScinScope/index.html">Home</a>
-  <a href="/ScinScope/pages/scan.html">Face Scan</a>
-  <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
-  <a href="/ScinScope/pages/account.html">Account</a>
-</nav>
+      <a href="/ScinScope/index.html">Home</a>
+      <a href="/ScinScope/pages/scan.html">Face Scan</a>
+      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
+      <a href="/ScinScope/pages/account.html">Account</a>
     </nav>
   </header>
 
-  <main class="page">
-    <section class="card home-card">
+  <main class="home-hero">
+    <section class="home-left">
       <p class="beta-label">Free beta</p>
 
       <h1>Your daily AI skin coach</h1>
 
       <p class="hero-text">
         Scan your face every day and get simple skincare, food, hydration,
-        sleep, and product advice based on your skin condition.
+        sleep, product advice, and progress tracking based on your skin condition.
       </p>
 
       <div class="hero-buttons">
-        <a class="primary-button" href="/ScinScope/pages/scan.html?v=300">Start Skin Scan</a>
-        <a class="secondary-button" href="/ScinScope/pages/account.html?v=300">Create Account</a>
+        <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
+        <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
+      </div>
+
+      <div class="auth-box">
+        <p>Save your progress and daily results.</p>
+
+        <div class="auth-buttons">
+          <a class="secondary-button small-button" href="/ScinScope/pages/account.html">Login</a>
+          <a class="primary-button small-button" href="/ScinScope/pages/account.html">Register</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-right">
+      <div class="result-showcase-card">
+        <div class="showcase-header">
+          <span>AI skin result preview</span>
+          <strong>74/100</strong>
+        </div>
+
+        <div class="before-after-image">
+          <img src="/ScinScope/assets/skin-result-1.png" alt="Skin result before and after" />
+        </div>
+
+        <div class="showcase-stats">
+          <div>
+            <span>Hydration</span>
+            <strong>70</strong>
+          </div>
+
+          <div>
+            <span>Texture</span>
+            <strong>82</strong>
+          </div>
+
+          <div>
+            <span>Redness</span>
+            <strong>Low</strong>
+          </div>
+        </div>
+
+        <p class="showcase-note">
+          Track visible skin changes and get daily advice for better results.
+        </p>
       </div>
     </section>
   </main>
