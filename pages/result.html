@@ -17,36 +17,136 @@
     </nav>
   </header>
 
-  <main class="page">
-    <section class="card">
-      <p class="beta-label">Demo AI result</p>
+  <main class="dashboard-page">
 
-      <h1>Your Skin Report</h1>
-
-      <div class="result-score">
-        <span id="skin-score">Loading...</span>
+    <section class="face-preview">
+      <div class="face-circle">
+        <span>Face Scan</span>
       </div>
-
-      <p id="skin-status" class="hero-text"></p>
-
-      <h2>What SkinScope noticed</h2>
-      <ul id="skin-observations"></ul>
-
-      <h2>Advice for today</h2>
-      <ul id="skin-advice"></ul>
-
-      <h2>Product direction</h2>
-      <ul id="skin-products"></ul>
-
-      <div class="hero-buttons">
-        <a class="primary-button" href="scan.html">Scan Again</a>
-        <a class="secondary-button" href="account.html">Save Progress</a>
-      </div>
+      <p class="beta-label">Demo AI skincare report</p>
+      <h1>Your Skin Dashboard</h1>
+      <p class="hero-text">
+        This is a beta preview of your daily skin metrics.
+      </p>
     </section>
+
+    <section class="metrics-grid">
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>☆ Skin Score</span>
+          <span>›</span>
+        </div>
+        <strong>68</strong>
+        <div class="bar yellow"><span style="width: 68%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>▦ Skin Age</span>
+          <span>›</span>
+        </div>
+        <strong>23</strong>
+        <div class="bar green"><span style="width: 80%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>💧 Hydration</span>
+          <span>›</span>
+        </div>
+        <strong>70</strong>
+        <div class="bar yellow"><span style="width: 70%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>♡ Elasticity</span>
+          <span>›</span>
+        </div>
+        <strong>75</strong>
+        <div class="bar yellow"><span style="width: 75%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>▦ Texture</span>
+          <span>›</span>
+        </div>
+        <strong>65</strong>
+        <div class="bar yellow"><span style="width: 65%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>🩹 Acne</span>
+          <span>›</span>
+        </div>
+        <strong>60</strong>
+        <div class="bar red"><span style="width: 60%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>🍃 Wrinkles</span>
+          <span>›</span>
+        </div>
+        <strong>80</strong>
+        <div class="bar green"><span style="width: 80%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>ⓘ Dark Spots</span>
+          <span>›</span>
+        </div>
+        <strong>60</strong>
+        <div class="bar red"><span style="width: 60%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>▥ Pores</span>
+          <span>›</span>
+        </div>
+        <strong>65</strong>
+        <div class="bar yellow"><span style="width: 65%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>🔥 Redness</span>
+          <span>›</span>
+        </div>
+        <strong>70</strong>
+        <div class="bar yellow"><span style="width: 70%;"></span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-top">
+          <span>ⓘ Under Eye Circles</span>
+          <span>›</span>
+        </div>
+        <strong>65</strong>
+        <div class="bar yellow"><span style="width: 65%;"></span></div>
+      </div>
+
+      <div class="metric-card advice-card">
+        <h2>Today’s advice</h2>
+        <p>
+          Drink more water, use a gentle cleanser, avoid strong exfoliating products,
+          and add cucumber, berries, or avocado today.
+        </p>
+      </div>
+
+    </section>
+
+    <div class="dashboard-actions">
+      <a class="primary-button" href="scan.html">Scan Again</a>
+      <a class="secondary-button" href="account.html">Save Progress</a>
+    </div>
+
   </main>
 
-  <script src="../js/config.js"></script>
-  <script src="../js/mock-ai.js"></script>
-  <script src="../js/app.js"></script>
 </body>
 </html>
