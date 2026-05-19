@@ -1,4 +1,5 @@
 let productCameraStream = null;
+let takingProductPhoto = false;
 
 const PRODUCT_PHOTO_WIDTH = 700;
 const PRODUCT_PHOTO_HEIGHT = 1000;
@@ -94,7 +95,6 @@ function clearProductPhoto() {
 
 function resetProductScanPage() {
   const input = document.getElementById("product-photo-input");
-
   if (!input) return;
 
   localStorage.removeItem("skinscopeProductPhoto");
@@ -152,8 +152,17 @@ function setupProductUpload() {
 async function openProductCameraModal() {
   const modal = document.getElementById("product-camera-modal");
   const video = document.getElementById("product-camera-video");
+  const button = document.getElementById("take-product-photo-button");
 
   if (!modal || !video) return;
+
+  takingProductPhoto = false;
+
+  if (button) {
+    button.textContent = "Take Photo";
+    button.disabled = false;
+    button.classList.remove("disabled-button");
+  }
 
   try {
     productCameraStream = await navigator.mediaDevices.getUserMedia({
@@ -171,7 +180,7 @@ async function openProductCameraModal() {
     try {
       await video.play();
     } catch (error) {
-      // Browser can delay video start. The button will retry.
+      // Browser can delay video start. Capture button retries.
     }
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
@@ -182,6 +191,7 @@ async function openProductCameraModal() {
 function closeProductCameraModal() {
   const modal = document.getElementById("product-camera-modal");
   const video = document.getElementById("product-camera-video");
+  const button = document.getElementById("take-product-photo-button");
 
   if (productCameraStream) {
     productCameraStream.getTracks().forEach(function (track) {
@@ -191,9 +201,17 @@ function closeProductCameraModal() {
     productCameraStream = null;
   }
 
+  takingProductPhoto = false;
+
   if (video) {
     video.pause();
     video.srcObject = null;
+  }
+
+  if (button) {
+    button.textContent = "Take Photo";
+    button.disabled = false;
+    button.classList.remove("disabled-button");
   }
 
   if (modal) modal.hidden = true;
@@ -203,31 +221,50 @@ function takeProductCameraPhoto() {
   const video = document.getElementById("product-camera-video");
   const button = document.getElementById("take-product-photo-button");
 
-  if (!video) return;
+  if (!video || takingProductPhoto) return;
+
+  takingProductPhoto = true;
 
   if (button) {
     button.textContent = "Taking...";
+    button.disabled = true;
+    button.classList.add("disabled-button");
   }
 
-  if (!video.videoWidth || !video.videoHeight) {
-    setTimeout(function () {
-      takeProductCameraPhoto();
-    }, 250);
-    return;
+  let attempts = 0;
+
+  function tryCapture() {
+    attempts++;
+
+    if (video.videoWidth && video.videoHeight) {
+      const compressedPhoto = compressProductImage(
+        video,
+        video.videoWidth,
+        video.videoHeight
+      );
+
+      saveProductPhoto(compressedPhoto);
+      closeProductCameraModal();
+      return;
+    }
+
+    if (attempts >= 8) {
+      takingProductPhoto = false;
+
+      if (button) {
+        button.textContent = "Take Photo";
+        button.disabled = false;
+        button.classList.remove("disabled-button");
+      }
+
+      alert("Camera is still loading. Try again in one second.");
+      return;
+    }
+
+    setTimeout(tryCapture, 250);
   }
 
-  const compressedPhoto = compressProductImage(
-    video,
-    video.videoWidth,
-    video.videoHeight
-  );
-
-  saveProductPhoto(compressedPhoto);
-  closeProductCameraModal();
-
-  if (button) {
-    button.textContent = "Take Photo";
-  }
+  tryCapture();
 }
 
 function analyzeProductPhoto() {
