@@ -19,19 +19,17 @@ function showFacePreview(photoData) {
 }
 
 function enableAnalyzeButton() {
-  const analyzeButton = document.getElementById("analyze-photo-button");
+  const button = document.getElementById("analyze-photo-button");
+  if (!button) return;
 
-  if (!analyzeButton) return;
-
-  analyzeButton.classList.remove("disabled-button");
+  button.classList.remove("disabled-button");
 }
 
 function disableAnalyzeButton() {
-  const analyzeButton = document.getElementById("analyze-photo-button");
+  const button = document.getElementById("analyze-photo-button");
+  if (!button) return;
 
-  if (!analyzeButton) return;
-
-  analyzeButton.classList.add("disabled-button");
+  button.classList.add("disabled-button");
 }
 
 function clearSelectedPhoto() {
@@ -79,9 +77,7 @@ async function openCameraModal() {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
       video: {
-        facingMode: "user",
-        width: { ideal: 900 },
-        height: { ideal: 900 }
+        facingMode: "user"
       },
       audio: false
     });
@@ -134,6 +130,7 @@ function takeCameraPhoto() {
     startX,
     startY,
     size,
+    size,
     0,
     0,
     canvas.width,
@@ -154,7 +151,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=50";
+  window.location.href = "/ScinScope/pages/result.html?v=60";
 }
 
 function loadSavedPhotoOnScanPage() {
