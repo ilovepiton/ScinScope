@@ -86,13 +86,19 @@ async function openCameraModal() {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
       video: {
-        facingMode: "user"
+        facingMode: "user",
+        width: { ideal: 900 },
+        height: { ideal: 900 }
       },
       audio: false
     });
 
     video.srcObject = cameraStream;
     modal.hidden = false;
+
+    video.onloadedmetadata = function () {
+      video.play();
+    };
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
   }
@@ -160,7 +166,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=110";
+  window.location.href = "/ScinScope/pages/result.html?v=300";
 }
 
 function loadResultFacePhoto() {
