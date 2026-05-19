@@ -293,11 +293,12 @@ h1 {
   justify-content: center;
 }
 
+/* Camera guide circle */
 .face-outline {
-  width: 52%;
-  height: 68%;
-  border: 4px solid rgba(255, 255, 255, 0.9);
-  border-radius: 48% 48% 44% 44% / 56% 56% 44% 44%;
+  width: 58%;
+  aspect-ratio: 1 / 1;
+  border: 4px solid rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
   box-shadow:
     0 0 0 999px rgba(17, 24, 39, 0.24),
     0 0 28px rgba(255, 255, 255, 0.5);
@@ -338,7 +339,7 @@ h1 {
   justify-content: center;
   color: #5b6472;
   font-weight: 800;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
@@ -347,6 +348,19 @@ h1 {
   height: 100%;
   object-fit: cover;
   display: none;
+  border-radius: 50%;
+}
+
+/* Bow only on result/dashboard photo */
+.face-preview .face-circle::after {
+  content: "🎀";
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  font-size: 34px;
+  transform: rotate(18deg);
+  filter: drop-shadow(0 6px 10px rgba(31, 41, 51, 0.18));
+  z-index: 5;
 }
 
 .face-circle span {
@@ -499,6 +513,12 @@ ul {
   .face-circle {
     width: 120px;
     height: 120px;
+  }
+
+  .face-preview .face-circle::after {
+    font-size: 28px;
+    top: -7px;
+    right: -9px;
   }
 
   .metrics-grid {
