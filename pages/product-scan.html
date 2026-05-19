@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SkinScope — Product Scan</title>
+
+  <link rel="stylesheet" href="/ScinScope/css/main.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+
+    <nav>
+      <a href="/ScinScope/index.html">Home</a>
+      <a href="/ScinScope/pages/scan.html">Face Scan</a>
+      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
+      <a href="/ScinScope/pages/account.html">Account</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="card scan-card">
+      <p class="beta-label">Beta product scan</p>
+
+      <h1>Check if a product fits your skin</h1>
+
+      <p class="hero-text">
+        Upload a photo of a skincare product. SkinScope will show a demo compatibility report.
+      </p>
+
+      <label class="scan-choice-button product-upload-box" for="product-photo-input">
+        <span>🧴</span>
+        <strong>Upload Product Photo</strong>
+        <small>Take or choose a photo of the product</small>
+      </label>
+
+      <input
+        id="product-photo-input"
+        class="hidden-file-input"
+        type="file"
+        accept="image/*"
+      />
+
+      <div id="product-preview-box" class="product-preview-box" hidden>
+        <img id="product-preview-image" src="" alt="Product preview" />
+      </div>
+
+      <div id="product-control-buttons" class="selected-photo-actions" hidden>
+        <button type="button" id="cancel-product-button" class="secondary-button button-reset">
+          Cancel Product
+        </button>
+      </div>
+
+      <button type="button" id="analyze-product-button" class="primary-button button-reset analyze-button disabled-button">
+        Analyze Product
+      </button>
+    </section>
+  </main>
+
+  <script src="/ScinScope/js/product.js"></script>
+</body>
+</html>
