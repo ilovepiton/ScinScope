@@ -48,6 +48,15 @@ function clearSelectedPhoto() {
   disableAnalyzeButton();
 }
 
+function resetScanPage() {
+  const input = document.getElementById("face-photo-input");
+
+  if (!input) return;
+
+  localStorage.removeItem("skinscopeFacePhoto");
+  clearSelectedPhoto();
+}
+
 function setupUploadFile() {
   const input = document.getElementById("face-photo-input");
 
@@ -151,19 +160,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=70";
-}
-
-function loadSavedPhotoOnScanPage() {
-  const savedPhoto = localStorage.getItem("skinscopeFacePhoto");
-
-  if (!savedPhoto) {
-    disableAnalyzeButton();
-    return;
-  }
-
-  showFacePreview(savedPhoto);
-  enableAnalyzeButton();
+  window.location.href = "/ScinScope/pages/result.html?v=110";
 }
 
 function loadResultFacePhoto() {
@@ -213,8 +210,8 @@ function setupButtons() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  resetScanPage();
   setupUploadFile();
   setupButtons();
-  loadSavedPhotoOnScanPage();
   loadResultFacePhoto();
 });
