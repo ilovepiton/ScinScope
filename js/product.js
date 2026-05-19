@@ -44,9 +44,13 @@ function compressProductImage(source, sourceWidth, sourceHeight) {
 }
 
 function saveProductPhoto(photoData) {
-  localStorage.setItem("skinscopeProductPhoto", photoData);
-  showProductPreview(photoData);
-  enableProductAnalyzeButton();
+  try {
+    localStorage.setItem("skinscopeProductPhoto", photoData);
+    showProductPreview(photoData);
+    enableProductAnalyzeButton();
+  } catch (error) {
+    alert("Product photo is too large. Please try a smaller JPG or PNG photo.");
+  }
 }
 
 function showProductPreview(photoData) {
@@ -111,41 +115,35 @@ function setupProductUpload() {
 
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file.");
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("This product photo format is not supported yet. Please use JPG, PNG, or WebP.");
       input.value = "";
       return;
     }
 
-    const reader = new FileReader();
+    const image = new Image();
+    const imageUrl = URL.createObjectURL(file);
 
-    reader.onload = function (event) {
-      const image = new Image();
+    image.onload = function () {
+      const compressedPhoto = compressProductImage(
+        image,
+        image.naturalWidth,
+        image.naturalHeight
+      );
 
-      image.onload = function () {
-        const compressedPhoto = compressProductImage(
-          image,
-          image.naturalWidth,
-          image.naturalHeight
-        );
-
-        saveProductPhoto(compressedPhoto);
-      };
-
-      image.onerror = function () {
-        alert("This image format is not supported. Please try another photo.");
-        input.value = "";
-      };
-
-      image.src = event.target.result;
+      URL.revokeObjectURL(imageUrl);
+      saveProductPhoto(compressedPhoto);
     };
 
-    reader.onerror = function () {
-      alert("Could not read this file. Please try another photo.");
+    image.onerror = function () {
+      URL.revokeObjectURL(imageUrl);
+      alert("This image could not be loaded. Please try JPG, PNG, or WebP.");
       input.value = "";
     };
 
-    reader.readAsDataURL(file);
+    image.src = imageUrl;
   });
 }
 
