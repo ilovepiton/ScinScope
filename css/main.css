@@ -528,3 +528,19 @@ h2 {
     padding: 22px;
   }
 }
+button,
+.scan-choice-button,
+.primary-button,
+.secondary-button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.camera-actions {
+  position: relative;
+  z-index: 20;
+}
+
+#take-camera-photo-button {
+  min-width: 140px;
+}
