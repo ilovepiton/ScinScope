@@ -14,8 +14,8 @@ function showFacePreview(photoData) {
   if (!previewBox || !previewImage || !controlButtons) return;
 
   previewImage.src = photoData;
-  previewBox.classList.remove("hidden");
-  controlButtons.classList.remove("hidden");
+  previewBox.hidden = false;
+  controlButtons.hidden = false;
 }
 
 function enableAnalyzeButton() {
@@ -42,8 +42,8 @@ function clearSelectedPhoto() {
 
   if (input) input.value = "";
   if (previewImage) previewImage.src = "";
-  if (previewBox) previewBox.classList.add("hidden");
-  if (controlButtons) controlButtons.classList.add("hidden");
+  if (previewBox) previewBox.hidden = true;
+  if (controlButtons) controlButtons.hidden = true;
 
   disableAnalyzeButton();
 }
@@ -83,7 +83,7 @@ async function openCameraModal() {
     });
 
     video.srcObject = cameraStream;
-    modal.classList.remove("hidden");
+    modal.hidden = false;
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
   }
@@ -102,7 +102,7 @@ function closeCameraModal() {
   }
 
   if (video) video.srcObject = null;
-  if (modal) modal.classList.add("hidden");
+  if (modal) modal.hidden = true;
 }
 
 function takeCameraPhoto() {
@@ -151,7 +151,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=60";
+  window.location.href = "/ScinScope/pages/result.html?v=70";
 }
 
 function loadSavedPhotoOnScanPage() {
