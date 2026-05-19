@@ -1,6 +1,35 @@
 let cameraStream = null;
 let cameraReady = false;
 
+const PHOTO_SIZE = 900;
+const PHOTO_QUALITY = 0.82;
+
+function compressImageFromSource(source, sourceWidth, sourceHeight) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  const size = Math.min(sourceWidth, sourceHeight);
+  const startX = (sourceWidth - size) / 2;
+  const startY = (sourceHeight - size) / 2;
+
+  canvas.width = PHOTO_SIZE;
+  canvas.height = PHOTO_SIZE;
+
+  context.drawImage(
+    source,
+    startX,
+    startY,
+    size,
+    size,
+    0,
+    0,
+    PHOTO_SIZE,
+    PHOTO_SIZE
+  );
+
+  return canvas.toDataURL("image/jpeg", PHOTO_QUALITY);
+}
+
 function saveFacePhoto(photoData) {
   localStorage.setItem("skinscopeFacePhoto", photoData);
   showFacePreview(photoData);
@@ -24,6 +53,7 @@ function enableAnalyzeButton() {
   if (!button) return;
 
   button.classList.remove("disabled-button");
+  button.disabled = false;
 }
 
 function disableAnalyzeButton() {
@@ -31,6 +61,7 @@ function disableAnalyzeButton() {
   if (!button) return;
 
   button.classList.add("disabled-button");
+  button.disabled = true;
 }
 
 function clearSelectedPhoto() {
@@ -68,10 +99,38 @@ function setupUploadFile() {
 
     if (!file) return;
 
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file.");
+      input.value = "";
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = function (event) {
-      saveFacePhoto(event.target.result);
+      const image = new Image();
+
+      image.onload = function () {
+        const compressedPhoto = compressImageFromSource(
+          image,
+          image.naturalWidth,
+          image.naturalHeight
+        );
+
+        saveFacePhoto(compressedPhoto);
+      };
+
+      image.onerror = function () {
+        alert("This image format is not supported. Please try another photo.");
+        input.value = "";
+      };
+
+      image.src = event.target.result;
+    };
+
+    reader.onerror = function () {
+      alert("Could not read this file. Please try another photo.");
+      input.value = "";
     };
 
     reader.readAsDataURL(file);
@@ -121,18 +180,13 @@ async function openCameraModal() {
     video.srcObject = cameraStream;
     modal.hidden = false;
 
-    video.onloadedmetadata = async function () {
-      try {
-        await video.play();
-        setTakePhotoButtonReady();
-      } catch (error) {
+    await video.play();
+
+    setTimeout(function () {
+      if (video.videoWidth && video.videoHeight) {
         setTakePhotoButtonReady();
       }
-    };
-
-    video.oncanplay = function () {
-      setTakePhotoButtonReady();
-    };
+    }, 500);
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
     closeCameraModal();
@@ -163,38 +217,21 @@ function closeCameraModal() {
 
 function takeCameraPhoto() {
   const video = document.getElementById("camera-video");
-  const canvas = document.getElementById("camera-canvas");
 
-  if (!video || !canvas) return;
+  if (!video) return;
 
   if (!cameraReady || !video.videoWidth || !video.videoHeight) {
+    setTimeout(takeCameraPhoto, 300);
     return;
   }
 
-  const size = Math.min(video.videoWidth, video.videoHeight);
-  const startX = (video.videoWidth - size) / 2;
-  const startY = (video.videoHeight - size) / 2;
-
-  canvas.width = 900;
-  canvas.height = 900;
-
-  const context = canvas.getContext("2d");
-
-  context.drawImage(
+  const compressedPhoto = compressImageFromSource(
     video,
-    startX,
-    startY,
-    size,
-    size,
-    0,
-    0,
-    canvas.width,
-    canvas.height
+    video.videoWidth,
+    video.videoHeight
   );
 
-  const photoData = canvas.toDataURL("image/jpeg", 0.92);
-
-  saveFacePhoto(photoData);
+  saveFacePhoto(compressedPhoto);
   closeCameraModal();
 }
 
@@ -206,7 +243,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=310";
+  window.location.href = "/ScinScope/pages/result.html?v=320";
 }
 
 function loadResultFacePhoto() {
@@ -240,6 +277,10 @@ function setupButtons() {
 
   if (takeCameraPhotoButton) {
     takeCameraPhotoButton.addEventListener("click", takeCameraPhoto);
+    takeCameraPhotoButton.addEventListener("touchend", function (event) {
+      event.preventDefault();
+      takeCameraPhoto();
+    });
   }
 
   if (closeCameraButton) {
