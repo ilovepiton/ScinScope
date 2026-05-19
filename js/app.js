@@ -57,7 +57,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "result.html?v=21";
+  window.location.href = "result.html?v=30";
 }
 
 async function openCameraModal() {
@@ -68,7 +68,9 @@ async function openCameraModal() {
 
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
+      video: {
+        facingMode: "user"
+      },
       audio: false
     });
 
@@ -84,7 +86,10 @@ function closeCameraModal() {
   const video = document.getElementById("camera-video");
 
   if (cameraStream) {
-    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream.getTracks().forEach(function (track) {
+      track.stop();
+    });
+
     cameraStream = null;
   }
 
