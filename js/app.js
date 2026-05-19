@@ -1,4 +1,5 @@
 let cameraStream = null;
+let cameraReady = false;
 
 function saveFacePhoto(photoData) {
   localStorage.setItem("skinscopeFacePhoto", photoData);
@@ -77,11 +78,35 @@ function setupUploadFile() {
   });
 }
 
+function setTakePhotoButtonLoading() {
+  const button = document.getElementById("take-camera-photo-button");
+
+  if (!button) return;
+
+  cameraReady = false;
+  button.textContent = "Loading camera...";
+  button.disabled = true;
+  button.classList.add("disabled-button");
+}
+
+function setTakePhotoButtonReady() {
+  const button = document.getElementById("take-camera-photo-button");
+
+  if (!button) return;
+
+  cameraReady = true;
+  button.textContent = "Take Photo";
+  button.disabled = false;
+  button.classList.remove("disabled-button");
+}
+
 async function openCameraModal() {
   const modal = document.getElementById("camera-modal");
   const video = document.getElementById("camera-video");
 
   if (!modal || !video) return;
+
+  setTakePhotoButtonLoading();
 
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
@@ -96,11 +121,21 @@ async function openCameraModal() {
     video.srcObject = cameraStream;
     modal.hidden = false;
 
-    video.onloadedmetadata = function () {
-      video.play();
+    video.onloadedmetadata = async function () {
+      try {
+        await video.play();
+        setTakePhotoButtonReady();
+      } catch (error) {
+        setTakePhotoButtonReady();
+      }
+    };
+
+    video.oncanplay = function () {
+      setTakePhotoButtonReady();
     };
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
+    closeCameraModal();
   }
 }
 
@@ -116,7 +151,13 @@ function closeCameraModal() {
     cameraStream = null;
   }
 
-  if (video) video.srcObject = null;
+  cameraReady = false;
+
+  if (video) {
+    video.pause();
+    video.srcObject = null;
+  }
+
   if (modal) modal.hidden = true;
 }
 
@@ -126,8 +167,7 @@ function takeCameraPhoto() {
 
   if (!video || !canvas) return;
 
-  if (!video.videoWidth || !video.videoHeight) {
-    alert("Camera is still loading. Wait one second and try again.");
+  if (!cameraReady || !video.videoWidth || !video.videoHeight) {
     return;
   }
 
@@ -166,7 +206,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=300";
+  window.location.href = "/ScinScope/pages/result.html?v=310";
 }
 
 function loadResultFacePhoto() {
