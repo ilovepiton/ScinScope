@@ -165,7 +165,9 @@ async function openCameraModal() {
 
     try {
       await video.play();
-    } catch (error) {}
+    } catch (error) {
+      // Browser can delay video start. Capture button retries.
+    }
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
     closeCameraModal();
@@ -287,7 +289,9 @@ function setupButtons() {
   const cancelPhotoButton = document.getElementById("cancel-photo-button");
   const analyzeButton = document.getElementById("analyze-photo-button");
 
-  if (openCameraButton) openCameraButton.onclick = openCameraModal;
+  if (openCameraButton) {
+    openCameraButton.onclick = openCameraModal;
+  }
 
   if (takeCameraPhotoButton) {
     takeCameraPhotoButton.onclick = takeCameraPhoto;
@@ -298,9 +302,17 @@ function setupButtons() {
     };
   }
 
-  if (closeCameraButton) closeCameraButton.onclick = closeCameraModal;
-  if (cancelPhotoButton) cancelPhotoButton.onclick = clearSelectedPhoto;
-  if (analyzeButton) analyzeButton.onclick = analyzeFacePhoto;
+  if (closeCameraButton) {
+    closeCameraButton.onclick = closeCameraModal;
+  }
+
+  if (cancelPhotoButton) {
+    cancelPhotoButton.onclick = clearSelectedPhoto;
+  }
+
+  if (analyzeButton) {
+    analyzeButton.onclick = analyzeFacePhoto;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
