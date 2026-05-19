@@ -134,7 +134,6 @@ function takeCameraPhoto() {
     startX,
     startY,
     size,
-    size,
     0,
     0,
     canvas.width,
@@ -155,7 +154,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "result.html?v=40";
+  window.location.href = "/ScinScope/pages/result.html?v=50";
 }
 
 function loadSavedPhotoOnScanPage() {
