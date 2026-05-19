@@ -1,336 +1,79 @@
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f6f3ef;
-  color: #1f2933;
-}
-
-.site-header {
+.photo-upload-box {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 24px 8%;
+  justify-content: center;
+  gap: 10px;
+  margin: 28px 0;
+  padding: 36px;
+  border: 2px dashed #d8d2c8;
+  border-radius: 24px;
+  background: #faf8f5;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.photo-upload-box:hover {
   background: #ffffff;
-  border-bottom: 1px solid #e5e0d8;
+  border-color: #111827;
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: 800;
-  color: #1f2933;
+.upload-icon {
+  font-size: 42px;
 }
 
-nav {
-  display: flex;
-  gap: 20px;
+.photo-upload-box strong {
+  font-size: 22px;
 }
 
-nav a {
-  color: #4b5563;
-  text-decoration: none;
+.photo-upload-box span {
+  color: #5b6472;
   font-size: 15px;
 }
 
-nav a:hover {
-  color: #111827;
+.hidden-file-input {
+  display: none;
 }
 
-.hero {
-  min-height: calc(100vh - 82px);
-  display: flex;
-  align-items: center;
-  padding: 60px 8%;
+.photo-preview {
+  width: 190px;
+  height: 190px;
+  margin: 20px auto 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #ffffff;
+  box-shadow: 0 18px 50px rgba(31, 41, 51, 0.14);
 }
 
-.hero-single {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.hero-content {
-  max-width: 760px;
-}
-
-.beta-label {
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: #e7f8ef;
-  color: #16834a;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-h1 {
-  font-size: 58px;
-  line-height: 1.05;
-  margin: 20px 0;
-  max-width: 760px;
-}
-
-.hero-text {
-  font-size: 19px;
-  line-height: 1.6;
-  color: #5b6472;
-  max-width: 620px;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 14px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.primary-button,
-.secondary-button {
-  display: inline-block;
-  padding: 15px 22px;
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.primary-button {
-  background: #111827;
-  color: #ffffff;
-}
-
-.secondary-button {
-  background: #ffffff;
-  color: #111827;
-  border: 1px solid #d8d2c8;
-}
-
-.page {
-  min-height: calc(100vh - 82px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 8%;
-}
-
-.card {
+.photo-preview img {
   width: 100%;
-  max-width: 760px;
-  background: #ffffff;
-  border: 1px solid #e5e0d8;
-  border-radius: 28px;
-  padding: 42px;
-  box-shadow: 0 24px 70px rgba(31, 41, 51, 0.08);
+  height: 100%;
+  object-fit: cover;
 }
 
-.card h1 {
-  font-size: 48px;
-  margin: 20px 0;
+.hidden {
+  display: none;
 }
 
-.upload-box {
-  margin: 28px 0;
-  padding: 28px;
-  border: 2px dashed #d8d2c8;
-  border-radius: 20px;
-  background: #faf8f5;
-}
-
-.account-list {
-  display: grid;
-  gap: 14px;
-  margin: 28px 0;
-}
-
-.account-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: #faf8f5;
-  border: 1px solid #e5e0d8;
-}
-
-/* RESULT DASHBOARD */
-
-.dashboard-page {
-  min-height: calc(100vh - 82px);
-  padding: 46px 8% 60px;
-  background: #f3f1ee;
-}
-
-.face-preview {
-  text-align: center;
-  max-width: 760px;
-  margin: 0 auto 34px;
+.button-reset {
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .face-circle {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #d9d4cc, #ffffff);
-  border: 4px solid #ffffff;
-  box-shadow: 0 18px 50px rgba(31, 41, 51, 0.14);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5b6472;
-  font-weight: 800;
-}
-
-.face-preview h1 {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.face-preview .hero-text {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.metrics-grid {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(260px, 1fr));
-  gap: 22px;
-}
-
-.metric-card {
-  background: #ffffff;
-  border-radius: 28px;
-  padding: 24px;
-  min-height: 170px;
-  box-shadow: 0 18px 50px rgba(31, 41, 51, 0.07);
-  border: 1px solid #ebe6de;
-}
-
-.metric-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #5b6472;
-  font-size: 24px;
-  margin-bottom: 16px;
-}
-
-.metric-card strong {
-  display: block;
-  font-size: 58px;
-  line-height: 1;
-  margin-bottom: 22px;
-  color: #111827;
-}
-
-.bar {
-  height: 10px;
-  border-radius: 999px;
-  background: #d5d5d5;
   overflow: hidden;
+  position: relative;
 }
 
-.bar span {
-  display: block;
+.face-circle img {
+  width: 100%;
   height: 100%;
-  border-radius: 999px;
+  object-fit: cover;
+  display: none;
 }
 
-.bar.yellow span {
-  background: #f4ea63;
-}
-
-.bar.green span {
-  background: #54d987;
-}
-
-.bar.red span {
-  background: #f27588;
-}
-
-.advice-card h2 {
-  margin: 0 0 12px;
-  font-size: 28px;
-}
-
-.advice-card p {
-  color: #5b6472;
-  line-height: 1.6;
-  font-size: 18px;
-}
-
-.dashboard-actions {
-  max-width: 1180px;
-  margin: 30px auto 0;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-ul {
-  padding-left: 22px;
-  line-height: 1.7;
-}
-
-@media (max-width: 800px) {
-  .site-header {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .hero {
-    padding: 40px 6%;
-    align-items: flex-start;
-  }
-
-  h1 {
-    font-size: 42px;
-  }
-
-  .page {
-    align-items: flex-start;
-    padding: 32px 6%;
-  }
-
-  .card {
-    padding: 28px;
-  }
-
-  .card h1 {
-    font-size: 36px;
-  }
-
-  .account-item {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .dashboard-page {
-    padding: 30px 5% 46px;
-  }
-
-  .face-circle {
-    width: 120px;
-    height: 120px;
-  }
-
-  .metrics-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .metric-card {
-    min-height: 150px;
-    padding: 22px;
-  }
-
-  .metric-top {
-    font-size: 20px;
-  }
-
-  .metric-card strong {
-    font-size: 48px;
-  }
+.face-circle span {
+  position: absolute;
 }
