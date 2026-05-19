@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkinScope — Scan</title>
+  <title>SkinScope — Face Scan</title>
   <link rel="stylesheet" href="../css/main.css" />
 </head>
 <body>
@@ -12,29 +12,45 @@
     <div class="logo">SkinScope</div>
     <nav>
       <a href="../index.html">Home</a>
-      <a href="scan.html">Scan</a>
+      <a href="scan.html">Face Scan</a>
       <a href="account.html">Account</a>
     </nav>
   </header>
 
   <main class="page">
     <section class="card">
-      <p class="beta-label">Beta scan</p>
+      <p class="beta-label">Beta face scan</p>
 
-      <h1>Upload your face photo</h1>
+      <h1>Take or upload your face photo</h1>
 
       <p class="hero-text">
-        SkinScope will analyze your photo and create a simple demo skin report.
-        In the beta version, this is a test result.
+        Upload a clear face photo. SkinScope will create a demo skincare dashboard.
       </p>
 
-      <div class="upload-box">
-        <input type="file" accept="image/*" />
+      <label class="photo-upload-box" for="face-photo">
+        <div class="upload-icon">📸</div>
+        <strong>Take / Upload Photo</strong>
+        <span>Use camera or choose from your device</span>
+      </label>
+
+      <input
+        id="face-photo"
+        class="hidden-file-input"
+        type="file"
+        accept="image/*"
+        capture="user"
+      />
+
+      <div id="photo-preview" class="photo-preview hidden">
+        <img id="preview-image" src="" alt="Face preview" />
       </div>
 
-      <a class="primary-button" href="result.html">Analyze Photo</a>
+      <button class="primary-button button-reset" onclick="analyzeFacePhoto()">
+        Analyze Photo
+      </button>
     </section>
   </main>
 
+  <script src="../js/app.js"></script>
 </body>
 </html>
