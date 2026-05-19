@@ -1,5 +1,4 @@
 let cameraStream = null;
-let cameraReady = false;
 
 const PHOTO_SIZE = 900;
 const PHOTO_QUALITY = 0.82;
@@ -82,7 +81,6 @@ function clearSelectedPhoto() {
 
 function resetScanPage() {
   const input = document.getElementById("face-photo-input");
-
   if (!input) return;
 
   localStorage.removeItem("skinscopeFacePhoto");
@@ -137,35 +135,18 @@ function setupUploadFile() {
   });
 }
 
-function setTakePhotoButtonLoading() {
-  const button = document.getElementById("take-camera-photo-button");
-
-  if (!button) return;
-
-  cameraReady = false;
-  button.textContent = "Loading camera...";
-  button.disabled = true;
-  button.classList.add("disabled-button");
-}
-
-function setTakePhotoButtonReady() {
-  const button = document.getElementById("take-camera-photo-button");
-
-  if (!button) return;
-
-  cameraReady = true;
-  button.textContent = "Take Photo";
-  button.disabled = false;
-  button.classList.remove("disabled-button");
-}
-
 async function openCameraModal() {
   const modal = document.getElementById("camera-modal");
   const video = document.getElementById("camera-video");
+  const takeButton = document.getElementById("take-camera-photo-button");
 
   if (!modal || !video) return;
 
-  setTakePhotoButtonLoading();
+  if (takeButton) {
+    takeButton.textContent = "Take Photo";
+    takeButton.disabled = false;
+    takeButton.classList.remove("disabled-button");
+  }
 
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
@@ -180,13 +161,11 @@ async function openCameraModal() {
     video.srcObject = cameraStream;
     modal.hidden = false;
 
-    await video.play();
-
-    setTimeout(function () {
-      if (video.videoWidth && video.videoHeight) {
-        setTakePhotoButtonReady();
-      }
-    }, 500);
+    try {
+      await video.play();
+    } catch (error) {
+      // Safari can ignore this sometimes. The button retry logic will handle it.
+    }
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
     closeCameraModal();
@@ -205,8 +184,6 @@ function closeCameraModal() {
     cameraStream = null;
   }
 
-  cameraReady = false;
-
   if (video) {
     video.pause();
     video.srcObject = null;
@@ -217,11 +194,18 @@ function closeCameraModal() {
 
 function takeCameraPhoto() {
   const video = document.getElementById("camera-video");
+  const takeButton = document.getElementById("take-camera-photo-button");
 
   if (!video) return;
 
-  if (!cameraReady || !video.videoWidth || !video.videoHeight) {
-    setTimeout(takeCameraPhoto, 300);
+  if (takeButton) {
+    takeButton.textContent = "Taking...";
+  }
+
+  if (!video.videoWidth || !video.videoHeight) {
+    setTimeout(function () {
+      takeCameraPhoto();
+    }, 250);
     return;
   }
 
@@ -233,6 +217,10 @@ function takeCameraPhoto() {
 
   saveFacePhoto(compressedPhoto);
   closeCameraModal();
+
+  if (takeButton) {
+    takeButton.textContent = "Take Photo";
+  }
 }
 
 function analyzeFacePhoto() {
@@ -243,7 +231,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html?v=320";
+  window.location.href = "/ScinScope/pages/result.html";
 }
 
 function loadResultFacePhoto() {
@@ -272,27 +260,28 @@ function setupButtons() {
   const analyzeButton = document.getElementById("analyze-photo-button");
 
   if (openCameraButton) {
-    openCameraButton.addEventListener("click", openCameraModal);
+    openCameraButton.onclick = openCameraModal;
   }
 
   if (takeCameraPhotoButton) {
-    takeCameraPhotoButton.addEventListener("click", takeCameraPhoto);
-    takeCameraPhotoButton.addEventListener("touchend", function (event) {
+    takeCameraPhotoButton.onclick = takeCameraPhoto;
+
+    takeCameraPhotoButton.ontouchstart = function (event) {
       event.preventDefault();
       takeCameraPhoto();
-    });
+    };
   }
 
   if (closeCameraButton) {
-    closeCameraButton.addEventListener("click", closeCameraModal);
+    closeCameraButton.onclick = closeCameraModal;
   }
 
   if (cancelPhotoButton) {
-    cancelPhotoButton.addEventListener("click", clearSelectedPhoto);
+    cancelPhotoButton.onclick = clearSelectedPhoto;
   }
 
   if (analyzeButton) {
-    analyzeButton.addEventListener("click", analyzeFacePhoto);
+    analyzeButton.onclick = analyzeFacePhoto;
   }
 }
 
