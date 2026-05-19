@@ -1,0 +1,140 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f3ef;
+  color: #1f2933;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 8%;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e0d8;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1f2933;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+nav a:hover {
+  color: #111827;
+}
+
+.hero {
+  min-height: calc(100vh - 82px);
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  align-items: center;
+  padding: 60px 8%;
+}
+
+.beta-label {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e7f8ef;
+  color: #16834a;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+h1 {
+  font-size: 58px;
+  line-height: 1.05;
+  margin: 20px 0;
+  max-width: 680px;
+}
+
+.hero-text {
+  font-size: 19px;
+  line-height: 1.6;
+  color: #5b6472;
+  max-width: 620px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 14px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-block;
+  padding: 15px 22px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: #111827;
+  color: #ffffff;
+}
+
+.secondary-button {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d8d2c8;
+}
+
+.hero-card {
+  background: #ffffff;
+  border: 1px solid #e5e0d8;
+  border-radius: 28px;
+  padding: 34px;
+  box-shadow: 0 24px 70px rgba(31, 41, 51, 0.08);
+}
+
+.hero-card h2 {
+  margin-top: 0;
+  font-size: 24px;
+}
+
+.score {
+  font-size: 54px;
+  font-weight: 800;
+  margin: 20px 0;
+}
+
+.hero-card p {
+  color: #5b6472;
+  line-height: 1.6;
+}
+
+@media (max-width: 800px) {
+  .site-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 40px 6%;
+  }
+
+  h1 {
+    font-size: 42px;
+  }
+}
