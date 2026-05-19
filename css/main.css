@@ -41,11 +41,18 @@ nav a:hover {
 
 .hero {
   min-height: calc(100vh - 82px);
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 40px;
+  display: flex;
   align-items: center;
   padding: 60px 8%;
+}
+
+.hero-single {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero-content {
+  max-width: 760px;
 }
 
 .beta-label {
@@ -62,7 +69,7 @@ h1 {
   font-size: 58px;
   line-height: 1.05;
   margin: 20px 0;
-  max-width: 680px;
+  max-width: 760px;
 }
 
 .hero-text {
@@ -99,28 +106,62 @@ h1 {
   border: 1px solid #d8d2c8;
 }
 
-.hero-card {
+.page {
+  min-height: calc(100vh - 82px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 8%;
+}
+
+.card {
+  width: 100%;
+  max-width: 760px;
   background: #ffffff;
   border: 1px solid #e5e0d8;
   border-radius: 28px;
-  padding: 34px;
+  padding: 42px;
   box-shadow: 0 24px 70px rgba(31, 41, 51, 0.08);
 }
 
-.hero-card h2 {
-  margin-top: 0;
-  font-size: 24px;
-}
-
-.score {
-  font-size: 54px;
-  font-weight: 800;
+.card h1 {
+  font-size: 48px;
   margin: 20px 0;
 }
 
-.hero-card p {
-  color: #5b6472;
-  line-height: 1.6;
+.upload-box {
+  margin: 28px 0;
+  padding: 28px;
+  border: 2px dashed #d8d2c8;
+  border-radius: 20px;
+  background: #faf8f5;
+}
+
+.result-score {
+  font-size: 54px;
+  font-weight: 800;
+  margin: 24px 0;
+}
+
+.account-list {
+  display: grid;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.account-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #faf8f5;
+  border: 1px solid #e5e0d8;
+}
+
+ul {
+  padding-left: 22px;
+  line-height: 1.7;
 }
 
 @media (max-width: 800px) {
@@ -130,11 +171,29 @@ h1 {
   }
 
   .hero {
-    grid-template-columns: 1fr;
     padding: 40px 6%;
+    align-items: flex-start;
   }
 
   h1 {
     font-size: 42px;
+  }
+
+  .page {
+    align-items: flex-start;
+    padding: 32px 6%;
+  }
+
+  .card {
+    padding: 28px;
+  }
+
+  .card h1 {
+    font-size: 36px;
+  }
+
+  .account-item {
+    flex-direction: column;
+    gap: 6px;
   }
 }
