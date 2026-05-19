@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkinScope — Result</title>
+  <link rel="stylesheet" href="../css/main.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="logo">SkinScope</div>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="scan.html">Scan</a>
+      <a href="account.html">Account</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <p class="beta-label">Demo AI result</p>
+
+      <h1>Your Skin Report</h1>
+
+      <div class="result-score">
+        <span id="skin-score">Loading...</span>
+      </div>
+
+      <p id="skin-status" class="hero-text"></p>
+
+      <h2>What SkinScope noticed</h2>
+      <ul id="skin-observations"></ul>
+
+      <h2>Advice for today</h2>
+      <ul id="skin-advice"></ul>
+
+      <h2>Product direction</h2>
+      <ul id="skin-products"></ul>
+
+      <div class="hero-buttons">
+        <a class="primary-button" href="scan.html">Scan Again</a>
+        <a class="secondary-button" href="account.html">Save Progress</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/mock-ai.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
