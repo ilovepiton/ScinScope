@@ -1,9 +1,9 @@
 let productCameraStream = null;
 let takingProductPhoto = false;
 
-const PRODUCT_PHOTO_WIDTH = 700;
-const PRODUCT_PHOTO_HEIGHT = 1000;
-const PRODUCT_PHOTO_QUALITY = 0.82;
+const PRODUCT_PHOTO_WIDTH = 420;
+const PRODUCT_PHOTO_HEIGHT = 600;
+const PRODUCT_PHOTO_QUALITY = 0.65;
 
 function compressProductImage(source, sourceWidth, sourceHeight) {
   const canvas = document.createElement("canvas");
@@ -45,11 +45,12 @@ function compressProductImage(source, sourceWidth, sourceHeight) {
 
 function saveProductPhoto(photoData) {
   try {
+    localStorage.removeItem("skinscopeFacePhoto");
     localStorage.setItem("skinscopeProductPhoto", photoData);
     showProductPreview(photoData);
     enableProductAnalyzeButton();
   } catch (error) {
-    alert("Product photo is too large. Please try a smaller JPG or PNG photo.");
+    alert("Photo is still too large. Please try another JPG, PNG, or WebP photo.");
   }
 }
 
