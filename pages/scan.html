@@ -18,38 +18,70 @@
   </header>
 
   <main class="page">
-    <section class="card">
+    <section class="card scan-card">
       <p class="beta-label">Beta face scan</p>
 
       <h1>Take or upload your face photo</h1>
 
       <p class="hero-text">
-        Upload a clear face photo. SkinScope will create a demo skincare dashboard.
+        Use your camera or upload a clear face photo. SkinScope will create your demo skincare dashboard.
       </p>
 
-      <label class="photo-upload-box" for="face-photo">
-        <div class="upload-icon">📸</div>
-        <strong>Take / Upload Photo</strong>
-        <span>Use camera or choose from your device</span>
-      </label>
+      <div class="scan-actions">
+        <button class="scan-choice-button" onclick="openCameraModal()">
+          <span>📸</span>
+          <strong>Take Photo</strong>
+          <small>Use camera inside the app</small>
+        </button>
+
+        <label class="scan-choice-button" for="face-photo">
+          <span>🖼️</span>
+          <strong>Upload File</strong>
+          <small>Choose from your device</small>
+        </label>
+      </div>
 
       <input
         id="face-photo"
         class="hidden-file-input"
         type="file"
         accept="image/*"
-        capture="user"
       />
 
-      <div id="photo-preview" class="photo-preview hidden">
+      <div id="photo-preview" class="photo-preview-large hidden">
         <img id="preview-image" src="" alt="Face preview" />
       </div>
 
-      <button class="primary-button button-reset" onclick="analyzeFacePhoto()">
+      <div id="selected-photo-actions" class="selected-photo-actions hidden">
+        <button class="secondary-button button-reset" onclick="clearSelectedPhoto()">
+          Cancel Photo
+        </button>
+      </div>
+
+      <button class="primary-button button-reset analyze-button" onclick="analyzeFacePhoto()">
         Analyze Photo
       </button>
     </section>
   </main>
+
+  <div id="camera-modal" class="camera-modal hidden">
+    <div class="camera-window">
+      <h2>Take your face photo</h2>
+
+      <video id="camera-video" autoplay playsinline></video>
+      <canvas id="camera-canvas" class="hidden"></canvas>
+
+      <div class="camera-actions">
+        <button class="primary-button button-reset" onclick="takeCameraPhoto()">
+          Take Photo
+        </button>
+
+        <button class="secondary-button button-reset" onclick="closeCameraModal()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="../js/app.js"></script>
 </body>
