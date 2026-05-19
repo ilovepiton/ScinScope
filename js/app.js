@@ -1,4 +1,5 @@
 let cameraStream = null;
+let takingPhoto = false;
 
 const PHOTO_SIZE = 900;
 const PHOTO_QUALITY = 0.82;
@@ -89,7 +90,6 @@ function resetScanPage() {
 
 function setupUploadFile() {
   const input = document.getElementById("face-photo-input");
-
   if (!input) return;
 
   input.addEventListener("change", function () {
@@ -142,6 +142,8 @@ async function openCameraModal() {
 
   if (!modal || !video) return;
 
+  takingPhoto = false;
+
   if (takeButton) {
     takeButton.textContent = "Take Photo";
     takeButton.disabled = false;
@@ -163,9 +165,7 @@ async function openCameraModal() {
 
     try {
       await video.play();
-    } catch (error) {
-      // Safari can ignore this sometimes. The button retry logic will handle it.
-    }
+    } catch (error) {}
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
     closeCameraModal();
@@ -175,6 +175,7 @@ async function openCameraModal() {
 function closeCameraModal() {
   const modal = document.getElementById("camera-modal");
   const video = document.getElementById("camera-video");
+  const takeButton = document.getElementById("take-camera-photo-button");
 
   if (cameraStream) {
     cameraStream.getTracks().forEach(function (track) {
@@ -184,9 +185,17 @@ function closeCameraModal() {
     cameraStream = null;
   }
 
+  takingPhoto = false;
+
   if (video) {
     video.pause();
     video.srcObject = null;
+  }
+
+  if (takeButton) {
+    takeButton.textContent = "Take Photo";
+    takeButton.disabled = false;
+    takeButton.classList.remove("disabled-button");
   }
 
   if (modal) modal.hidden = true;
@@ -196,31 +205,50 @@ function takeCameraPhoto() {
   const video = document.getElementById("camera-video");
   const takeButton = document.getElementById("take-camera-photo-button");
 
-  if (!video) return;
+  if (!video || takingPhoto) return;
+
+  takingPhoto = true;
 
   if (takeButton) {
     takeButton.textContent = "Taking...";
+    takeButton.disabled = true;
+    takeButton.classList.add("disabled-button");
   }
 
-  if (!video.videoWidth || !video.videoHeight) {
-    setTimeout(function () {
-      takeCameraPhoto();
-    }, 250);
-    return;
+  let attempts = 0;
+
+  function tryCapture() {
+    attempts++;
+
+    if (video.videoWidth && video.videoHeight) {
+      const compressedPhoto = compressImageFromSource(
+        video,
+        video.videoWidth,
+        video.videoHeight
+      );
+
+      saveFacePhoto(compressedPhoto);
+      closeCameraModal();
+      return;
+    }
+
+    if (attempts >= 8) {
+      takingPhoto = false;
+
+      if (takeButton) {
+        takeButton.textContent = "Take Photo";
+        takeButton.disabled = false;
+        takeButton.classList.remove("disabled-button");
+      }
+
+      alert("Camera is still loading. Try again in one second.");
+      return;
+    }
+
+    setTimeout(tryCapture, 250);
   }
 
-  const compressedPhoto = compressImageFromSource(
-    video,
-    video.videoWidth,
-    video.videoHeight
-  );
-
-  saveFacePhoto(compressedPhoto);
-  closeCameraModal();
-
-  if (takeButton) {
-    takeButton.textContent = "Take Photo";
-  }
+  tryCapture();
 }
 
 function analyzeFacePhoto() {
@@ -259,9 +287,7 @@ function setupButtons() {
   const cancelPhotoButton = document.getElementById("cancel-photo-button");
   const analyzeButton = document.getElementById("analyze-photo-button");
 
-  if (openCameraButton) {
-    openCameraButton.onclick = openCameraModal;
-  }
+  if (openCameraButton) openCameraButton.onclick = openCameraModal;
 
   if (takeCameraPhotoButton) {
     takeCameraPhotoButton.onclick = takeCameraPhoto;
@@ -272,17 +298,9 @@ function setupButtons() {
     };
   }
 
-  if (closeCameraButton) {
-    closeCameraButton.onclick = closeCameraModal;
-  }
-
-  if (cancelPhotoButton) {
-    cancelPhotoButton.onclick = clearSelectedPhoto;
-  }
-
-  if (analyzeButton) {
-    analyzeButton.onclick = analyzeFacePhoto;
-  }
+  if (closeCameraButton) closeCameraButton.onclick = closeCameraModal;
+  if (cancelPhotoButton) cancelPhotoButton.onclick = clearSelectedPhoto;
+  if (analyzeButton) analyzeButton.onclick = analyzeFacePhoto;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
