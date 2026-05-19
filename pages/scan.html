@@ -6,7 +6,7 @@
 
   <title>SkinScope — Face Scan</title>
 
-  <link rel="stylesheet" href="../css/main.css?v=30" />
+  <link rel="stylesheet" href="../css/main.css?v=40" />
 </head>
 <body>
 
@@ -14,9 +14,9 @@
     <div class="logo">SkinScope</div>
 
     <nav>
-      <a href="../index.html?v=30">Home</a>
-      <a href="scan.html?v=30">Face Scan</a>
-      <a href="account.html?v=30">Account</a>
+      <a href="../index.html?v=40">Home</a>
+      <a href="scan.html?v=40">Face Scan</a>
+      <a href="account.html?v=40">Account</a>
     </nav>
   </header>
 
@@ -31,13 +31,13 @@
       </p>
 
       <div class="scan-actions">
-        <button type="button" class="scan-choice-button" onclick="openCameraModal()">
+        <button type="button" id="open-camera-button" class="scan-choice-button">
           <span>📸</span>
           <strong>Take Photo</strong>
           <small>Use camera inside the app</small>
         </button>
 
-        <label class="scan-choice-button" for="face-photo">
+        <label class="scan-choice-button" for="face-photo-input">
           <span>🖼️</span>
           <strong>Upload File</strong>
           <small>Choose from your device</small>
@@ -45,23 +45,23 @@
       </div>
 
       <input
-        id="face-photo"
+        id="face-photo-input"
         class="hidden-file-input"
         type="file"
         accept="image/*"
       />
 
-      <div id="photo-preview" class="photo-preview-large hidden">
-        <img id="preview-image" src="" alt="Face preview" />
+      <div id="photo-preview-box" class="photo-preview-large hidden">
+        <img id="photo-preview-image" src="" alt="Face preview" />
       </div>
 
-      <div id="selected-photo-actions" class="selected-photo-actions hidden">
-        <button type="button" class="secondary-button button-reset" onclick="clearSelectedPhoto()">
+      <div id="photo-control-buttons" class="selected-photo-actions hidden">
+        <button type="button" id="cancel-photo-button" class="secondary-button button-reset">
           Cancel Photo
         </button>
       </div>
 
-      <button type="button" class="primary-button button-reset analyze-button" onclick="analyzeFacePhoto()">
+      <button type="button" id="analyze-photo-button" class="primary-button button-reset analyze-button disabled-button">
         Analyze Photo
       </button>
     </section>
@@ -69,23 +69,30 @@
 
   <div id="camera-modal" class="camera-modal hidden">
     <div class="camera-window">
-      <h2>Take your face photo</h2>
+      <h2>Put your face inside the guide</h2>
 
-      <video id="camera-video" autoplay playsinline></video>
+      <div class="camera-frame">
+        <video id="camera-video" autoplay playsinline></video>
+
+        <div class="face-guide">
+          <div class="face-outline"></div>
+        </div>
+      </div>
+
       <canvas id="camera-canvas" class="hidden"></canvas>
 
       <div class="camera-actions">
-        <button type="button" class="primary-button button-reset" onclick="takeCameraPhoto()">
+        <button type="button" id="take-camera-photo-button" class="primary-button button-reset">
           Take Photo
         </button>
 
-        <button type="button" class="secondary-button button-reset" onclick="closeCameraModal()">
+        <button type="button" id="close-camera-button" class="secondary-button button-reset">
           Cancel
         </button>
       </div>
     </div>
   </div>
 
-  <script src="../js/app.js?v=30"></script>
+  <script src="../js/app.js?v=40"></script>
 </body>
 </html>
