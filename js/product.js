@@ -1,27 +1,42 @@
-const PRODUCT_PHOTO_SIZE = 900;
+let productCameraStream = null;
+
+const PRODUCT_PHOTO_WIDTH = 700;
+const PRODUCT_PHOTO_HEIGHT = 1000;
 const PRODUCT_PHOTO_QUALITY = 0.82;
 
 function compressProductImage(source, sourceWidth, sourceHeight) {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
 
-  const size = Math.min(sourceWidth, sourceHeight);
-  const startX = (sourceWidth - size) / 2;
-  const startY = (sourceHeight - size) / 2;
+  const targetRatio = PRODUCT_PHOTO_WIDTH / PRODUCT_PHOTO_HEIGHT;
+  const sourceRatio = sourceWidth / sourceHeight;
 
-  canvas.width = PRODUCT_PHOTO_SIZE;
-  canvas.height = PRODUCT_PHOTO_SIZE;
+  let cropWidth = sourceWidth;
+  let cropHeight = sourceHeight;
+  let startX = 0;
+  let startY = 0;
+
+  if (sourceRatio > targetRatio) {
+    cropWidth = sourceHeight * targetRatio;
+    startX = (sourceWidth - cropWidth) / 2;
+  } else {
+    cropHeight = sourceWidth / targetRatio;
+    startY = (sourceHeight - cropHeight) / 2;
+  }
+
+  canvas.width = PRODUCT_PHOTO_WIDTH;
+  canvas.height = PRODUCT_PHOTO_HEIGHT;
 
   context.drawImage(
     source,
     startX,
     startY,
-    size,
-    size,
+    cropWidth,
+    cropHeight,
     0,
     0,
-    PRODUCT_PHOTO_SIZE,
-    PRODUCT_PHOTO_SIZE
+    PRODUCT_PHOTO_WIDTH,
+    PRODUCT_PHOTO_HEIGHT
   );
 
   return canvas.toDataURL("image/jpeg", PRODUCT_PHOTO_QUALITY);
@@ -77,6 +92,15 @@ function clearProductPhoto() {
   disableProductAnalyzeButton();
 }
 
+function resetProductScanPage() {
+  const input = document.getElementById("product-photo-input");
+
+  if (!input) return;
+
+  localStorage.removeItem("skinscopeProductPhoto");
+  clearProductPhoto();
+}
+
 function setupProductUpload() {
   const input = document.getElementById("product-photo-input");
 
@@ -125,11 +149,92 @@ function setupProductUpload() {
   });
 }
 
+async function openProductCameraModal() {
+  const modal = document.getElementById("product-camera-modal");
+  const video = document.getElementById("product-camera-video");
+
+  if (!modal || !video) return;
+
+  try {
+    productCameraStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "environment",
+        width: { ideal: 900 },
+        height: { ideal: 1200 }
+      },
+      audio: false
+    });
+
+    video.srcObject = productCameraStream;
+    modal.hidden = false;
+
+    try {
+      await video.play();
+    } catch (error) {
+      // Browser can delay video start. The button will retry.
+    }
+  } catch (error) {
+    alert("Camera is not available. Please use Upload File.");
+    closeProductCameraModal();
+  }
+}
+
+function closeProductCameraModal() {
+  const modal = document.getElementById("product-camera-modal");
+  const video = document.getElementById("product-camera-video");
+
+  if (productCameraStream) {
+    productCameraStream.getTracks().forEach(function (track) {
+      track.stop();
+    });
+
+    productCameraStream = null;
+  }
+
+  if (video) {
+    video.pause();
+    video.srcObject = null;
+  }
+
+  if (modal) modal.hidden = true;
+}
+
+function takeProductCameraPhoto() {
+  const video = document.getElementById("product-camera-video");
+  const button = document.getElementById("take-product-photo-button");
+
+  if (!video) return;
+
+  if (button) {
+    button.textContent = "Taking...";
+  }
+
+  if (!video.videoWidth || !video.videoHeight) {
+    setTimeout(function () {
+      takeProductCameraPhoto();
+    }, 250);
+    return;
+  }
+
+  const compressedPhoto = compressProductImage(
+    video,
+    video.videoWidth,
+    video.videoHeight
+  );
+
+  saveProductPhoto(compressedPhoto);
+  closeProductCameraModal();
+
+  if (button) {
+    button.textContent = "Take Photo";
+  }
+}
+
 function analyzeProductPhoto() {
   const savedPhoto = localStorage.getItem("skinscopeProductPhoto");
 
   if (!savedPhoto) {
-    alert("Upload a product photo first.");
+    alert("Take or upload a product photo first.");
     return;
   }
 
@@ -155,8 +260,28 @@ function loadProductResultPhoto() {
 }
 
 function setupProductButtons() {
+  const openCameraButton = document.getElementById("open-product-camera-button");
+  const takePhotoButton = document.getElementById("take-product-photo-button");
+  const closeCameraButton = document.getElementById("close-product-camera-button");
   const cancelButton = document.getElementById("cancel-product-button");
   const analyzeButton = document.getElementById("analyze-product-button");
+
+  if (openCameraButton) {
+    openCameraButton.onclick = openProductCameraModal;
+  }
+
+  if (takePhotoButton) {
+    takePhotoButton.onclick = takeProductCameraPhoto;
+
+    takePhotoButton.ontouchstart = function (event) {
+      event.preventDefault();
+      takeProductCameraPhoto();
+    };
+  }
+
+  if (closeCameraButton) {
+    closeCameraButton.onclick = closeProductCameraModal;
+  }
 
   if (cancelButton) {
     cancelButton.onclick = clearProductPhoto;
@@ -168,7 +293,7 @@ function setupProductButtons() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  clearProductPhoto();
+  resetProductScanPage();
   setupProductUpload();
   setupProductButtons();
   loadProductResultPhoto();
