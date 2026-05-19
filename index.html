@@ -11,13 +11,9 @@
 <body class="home-video-page">
 
   <div class="video-wallpaper">
-    <iframe
-      id="home-video"
-      src="https://www.youtube.com/embed/KVb7cMVOPnM?autoplay=1&mute=1&controls=0&loop=1&playlist=KVb7cMVOPnM&modestbranding=1&playsinline=1&rel=0"
-      title="SkinScope wallpaper video"
-      allow="autoplay; encrypted-media"
-      allowfullscreen>
-    </iframe>
+    <video id="home-bg-video" autoplay muted loop playsinline>
+      <source src="/ScinScope/assets/spa-wallpaper.mp4" type="video/mp4" />
+    </video>
   </div>
 
   <div class="home-video-overlay"></div>
@@ -64,50 +60,28 @@
 
     <section class="home-results-strip">
       <div class="result-image-card">
-        <img src="https://i.pinimg.com/736x/27/cd/a5/27cda5917ee7ccff4a2a3427750a3c98.jpg" alt="Skin result 1">
-        <div class="result-image-label">
-          <span>Texture</span>
-          <strong>82</strong>
-        </div>
+        <img src="https://i.pinimg.com/736x/27/cd/a5/27cda5917ee7ccff4a2a3427750a3c98.jpg" alt="Skin result example">
       </div>
 
       <div class="result-image-card result-image-card-main">
-        <img src="https://i.pinimg.com/736x/0e/11/ed/0e11edbb092ce83ca658177fb66d8cfd.jpg" alt="Skin result 2">
-        <div class="result-image-label">
-          <span>Skin Score</span>
-          <strong>74/100</strong>
-        </div>
+        <img src="https://i.pinimg.com/736x/0e/11/ed/0e11edbb092ce83ca658177fb66d8cfd.jpg" alt="Skin result example">
       </div>
 
       <div class="result-image-card">
-        <img src="https://i.pinimg.com/736x/a0/ed/8f/a0ed8f6c762b494d4a51738655d50f7f.jpg" alt="Skin result 3">
-        <div class="result-image-label">
-          <span>Hydration</span>
-          <strong>70</strong>
-        </div>
+        <img src="https://i.pinimg.com/736x/a0/ed/8f/a0ed8f6c762b494d4a51738655d50f7f.jpg" alt="Skin result example">
       </div>
     </section>
   </main>
 
-  <section class="home-extra-results">
-    <div class="result-wide-card">
-      <img src="https://i.pinimg.com/736x/ae/e8/db/aee8dbec372cda0120c4a073627707e2.jpg" alt="Skin result 4">
-      <div>
-        <p class="beta-label">AI result preview</p>
-        <h2>Track visible progress over time</h2>
-        <p>
-          Compare daily scans, understand what your skin needs, and build better routines with clear product and lifestyle advice.
-        </p>
-      </div>
-    </div>
-  </section>
-
   <script>
     function enableHomeSound() {
-      const iframe = document.getElementById("home-video");
+      const video = document.getElementById("home-bg-video");
 
-      iframe.src =
-        "https://www.youtube.com/embed/KVb7cMVOPnM?autoplay=1&mute=0&controls=0&loop=1&playlist=KVb7cMVOPnM&modestbranding=1&playsinline=1&rel=0";
+      if (!video) return;
+
+      video.muted = false;
+      video.volume = 0.45;
+      video.play();
     }
   </script>
 
