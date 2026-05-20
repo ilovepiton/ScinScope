@@ -592,8 +592,8 @@ h2 {
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: blur(8px);
-  transform: scale(1.06);
+filter: blur(4px);
+transform: scale(1.03);
 }
 
 .home-video-overlay {
