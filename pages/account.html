@@ -6,19 +6,19 @@
 
   <title>SkinScope — Account</title>
 
-  <link rel="stylesheet" href="/ScinScope/css/main.css?v=300" />
+  <link rel="stylesheet" href="/ScinScope/css/main.css" />
 </head>
 <body>
 
   <header class="site-header">
-    <a class="logo logo-link" href="/ScinScope/index.html?v=300">SkinScope</a>
+    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
 
     <nav>
-  <a href="/ScinScope/index.html">Home</a>
-  <a href="/ScinScope/pages/scan.html">Face Scan</a>
-  <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
-  <a href="/ScinScope/pages/account.html">Account</a>
-</nav>
+      <a href="/ScinScope/index.html">Home</a>
+      <a href="/ScinScope/pages/scan.html">Face Scan</a>
+      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
+      <a href="/ScinScope/pages/account.html">Account</a>
+    </nav>
   </header>
 
   <main class="page">
@@ -28,33 +28,96 @@
       <h1>Your SkinScope Account</h1>
 
       <p class="hero-text">
-        Accounts are coming soon. In the beta version, SkinScope will later save
-        your daily scans, skin score, progress history, and personal skin plan.
+        Create a demo account to save your future scans, skin score, product checks, and progress history.
       </p>
 
-      <div class="account-list">
-        <div class="account-item">
-          <strong>Status:</strong>
-          <span>Free beta</span>
+      <div id="auth-panel">
+        <div class="auth-tabs">
+          <button type="button" id="login-tab" class="auth-tab active-auth-tab">
+            Login
+          </button>
+
+          <button type="button" id="register-tab" class="auth-tab">
+            Register
+          </button>
         </div>
 
-        <div class="account-item">
-          <strong>Trial:</strong>
-          <span>7 days planned</span>
-        </div>
+        <form id="login-form" class="auth-form">
+          <label>
+            Email
+            <input id="login-email" type="email" placeholder="you@example.com" required />
+          </label>
 
-        <div class="account-item">
-          <strong>Premium:</strong>
-          <span>€3.99/month planned</span>
-        </div>
+          <label>
+            Password
+            <input id="login-password" type="password" placeholder="Your password" required />
+          </label>
+
+          <button type="submit" class="primary-button button-reset">
+            Login
+          </button>
+        </form>
+
+        <form id="register-form" class="auth-form" hidden>
+          <label>
+            Name
+            <input id="register-name" type="text" placeholder="Your name" required />
+          </label>
+
+          <label>
+            Email
+            <input id="register-email" type="email" placeholder="you@example.com" required />
+          </label>
+
+          <label>
+            Password
+            <input id="register-password" type="password" placeholder="Create password" required />
+          </label>
+
+          <button type="submit" class="primary-button button-reset">
+            Create Account
+          </button>
+        </form>
       </div>
 
-      <div class="hero-buttons">
-        <a class="primary-button" href="/ScinScope/pages/scan.html?v=300">Start Skin Scan</a>
-        <a class="secondary-button" href="/ScinScope/index.html?v=300">Back Home</a>
+      <div id="logged-panel" class="logged-panel" hidden>
+        <div class="account-avatar">🧴</div>
+
+        <h2 id="account-welcome">Welcome back</h2>
+
+        <p>
+          Your demo account is active. Later this page will show saved skin scans,
+          product checks, daily progress, and personalized recommendations.
+        </p>
+
+        <div class="account-list">
+          <div class="account-item">
+            <strong>Status:</strong>
+            <span>Free beta</span>
+          </div>
+
+          <div class="account-item">
+            <strong>Saved scans:</strong>
+            <span>Coming soon</span>
+          </div>
+
+          <div class="account-item">
+            <strong>Premium:</strong>
+            <span>€3.99/month planned</span>
+          </div>
+        </div>
+
+        <div class="hero-buttons">
+          <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
+          <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
+          <button type="button" id="logout-button" class="secondary-button button-reset">
+            Logout
+          </button>
+        </div>
       </div>
     </section>
   </main>
 
+  <script src="/ScinScope/js/account.js"></script>
 </body>
 </html>
