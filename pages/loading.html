@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SkinScope — Analyzing Skin</title>
+
+  <link rel="stylesheet" href="/ScinScope/css/main.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+
+    <nav>
+      <a href="/ScinScope/index.html">Home</a>
+      <a href="/ScinScope/pages/scan.html">Face Scan</a>
+      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
+      <a href="/ScinScope/pages/account.html">Account</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="card loading-card">
+      <div class="loading-ring"></div>
+
+      <p class="beta-label">AI analysis</p>
+
+      <h1>Analyzing your skin...</h1>
+
+      <p class="hero-text loading-step" id="loading-step">
+        Checking hydration and texture...
+      </p>
+
+      <div class="loading-progress">
+        <span></span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const steps = [
+      "Checking hydration and texture...",
+      "Reading redness and pores...",
+      "Building your daily skin plan..."
+    ];
+
+    let index = 0;
+    const stepText = document.getElementById("loading-step");
+
+    const interval = setInterval(function () {
+      index += 1;
+
+      if (index < steps.length) {
+        stepText.textContent = steps[index];
+      }
+    }, 650);
+
+    setTimeout(function () {
+      clearInterval(interval);
+      window.location.href = "/ScinScope/pages/result.html";
+    }, 2000);
+  </script>
+
+</body>
+</html>
