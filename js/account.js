@@ -1,198 +1,191 @@
-function getDemoUser() {
-  const savedUser = localStorage.getItem("skinscopeDemoUser");
-
-  if (!savedUser) return null;
-
-  try {
-    return JSON.parse(savedUser);
-  } catch (error) {
-    return null;
-  }
-}
-
-function saveDemoUser(user) {
-  localStorage.setItem("skinscopeDemoUser", JSON.stringify(user));
-}
-
-function showLoggedIn(user) {
-  const authPanel = document.getElementById("auth-panel");
-  const loggedPanel = document.getElementById("logged-panel");
-  const welcome = document.getElementById("account-welcome");
-
-  if (authPanel) authPanel.hidden = true;
-  if (loggedPanel) loggedPanel.hidden = false;
-
-  if (welcome) {
-    welcome.textContent = "Welcome, " + user.name;
-  }
-}
-
-function showLoggedOut() {
-  const authPanel = document.getElementById("auth-panel");
-  const loggedPanel = document.getElementById("logged-panel");
-
-  if (authPanel) authPanel.hidden = false;
-  if (loggedPanel) loggedPanel.hidden = true;
-}
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function switchToLogin() {
-  const loginTab = document.getElementById("login-tab");
-  const registerTab = document.getElementById("register-tab");
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
+  document.getElementById("login-tab").classList.add("active-auth-tab");
+  document.getElementById("register-tab").classList.remove("active-auth-tab");
 
-  if (loginTab) loginTab.classList.add("active-auth-tab");
-  if (registerTab) registerTab.classList.remove("active-auth-tab");
-
-  if (loginForm) loginForm.hidden = false;
-  if (registerForm) registerForm.hidden = true;
+  document.getElementById("login-form").hidden = false;
+  document.getElementById("register-form").hidden = true;
 }
 
 function switchToRegister() {
-  const loginTab = document.getElementById("login-tab");
-  const registerTab = document.getElementById("register-tab");
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
+  document.getElementById("register-tab").classList.add("active-auth-tab");
+  document.getElementById("login-tab").classList.remove("active-auth-tab");
 
-  if (registerTab) registerTab.classList.add("active-auth-tab");
-  if (loginTab) loginTab.classList.remove("active-auth-tab");
-
-  if (registerForm) registerForm.hidden = false;
-  if (loginForm) loginForm.hidden = true;
+  document.getElementById("register-form").hidden = false;
+  document.getElementById("login-form").hidden = true;
 }
 
 function toggleLoginPassword() {
-  const passwordInput = document.getElementById("login-password");
+  const input = document.getElementById("login-password");
   const button = document.getElementById("toggle-login-password");
 
-  if (!passwordInput || !button) return;
-
-  if (passwordInput.type === "password") {
-    passwordInput.type = "text";
+  if (input.type === "password") {
+    input.type = "text";
     button.textContent = "Hide Password";
   } else {
-    passwordInput.type = "password";
+    input.type = "password";
     button.textContent = "Show Password";
   }
 }
 
 function toggleRegisterPassword() {
-  const passwordInput = document.getElementById("register-password");
-  const repeatInput = document.getElementById("register-repeat-password");
+  const password = document.getElementById("register-password");
+  const repeat = document.getElementById("register-repeat-password");
   const button = document.getElementById("toggle-register-password");
 
-  if (!passwordInput || !repeatInput || !button) return;
-
-  if (passwordInput.type === "password") {
-    passwordInput.type = "text";
-    repeatInput.type = "text";
+  if (password.type === "password") {
+    password.type = "text";
+    repeat.type = "text";
     button.textContent = "Hide Password";
   } else {
-    passwordInput.type = "password";
-    repeatInput.type = "password";
+    password.type = "password";
+    repeat.type = "password";
     button.textContent = "Show Password";
   }
 }
 
-function setupAuthTabs() {
-  const loginTab = document.getElementById("login-tab");
-  const registerTab = document.getElementById("register-tab");
-
-  if (loginTab) loginTab.onclick = switchToLogin;
-  if (registerTab) registerTab.onclick = switchToRegister;
+function showLoggedOut() {
+  document.getElementById("auth-panel").hidden = false;
+  document.getElementById("logged-panel").hidden = true;
 }
 
-function setupRegisterForm() {
-  const form = document.getElementById("register-form");
+async function showLoggedIn(user) {
+  document.getElementById("auth-panel").hidden = true;
+  document.getElementById("logged-panel").hidden = false;
 
-  if (!form) return;
+  const name = user.user_metadata?.name || user.email.split("@")[0];
 
-  form.onsubmit = function (event) {
-    event.preventDefault();
+  document.getElementById("account-welcome").textContent = "Welcome, " + name;
+  document.getElementById("account-email-text").textContent = user.email;
 
-    const name = document.getElementById("register-name").value.trim();
-    const email = document.getElementById("register-email").value.trim();
-    const password = document.getElementById("register-password").value.trim();
-    const repeatPassword = document.getElementById("register-repeat-password").value.trim();
-
-    if (!name || !email || !password || !repeatPassword) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    if (password !== repeatPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    const user = {
-      name: name,
-      email: email,
-      createdAt: new Date().toISOString()
-    };
-
-    saveDemoUser(user);
-    showLoggedIn(user);
-  };
+  await loadSubscription(user.id);
 }
 
-function setupLoginForm() {
-  const form = document.getElementById("login-form");
+async function loadSubscription(userId) {
+  const statusEl = document.getElementById("account-status");
+  const planEl = document.getElementById("account-plan");
+  const trialEl = document.getElementById("account-trial");
 
-  if (!form) return;
+  const { data, error } = await supabaseClient
+    .from("subscriptions")
+    .select("plan, status, trial_ends_at")
+    .eq("user_id", userId)
+    .single();
 
-  form.onsubmit = function (event) {
-    event.preventDefault();
+  if (error || !data) {
+    statusEl.textContent = "Trial";
+    planEl.textContent = "Trial";
+    trialEl.textContent = "7 days after registration";
+    return;
+  }
 
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value.trim();
+  statusEl.textContent = data.status;
+  planEl.textContent = data.plan;
 
-    if (!email || !password) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    const savedUser = getDemoUser();
-
-    if (savedUser) {
-      showLoggedIn(savedUser);
-      return;
-    }
-
-    const demoUser = {
-      name: email.split("@")[0],
-      email: email,
-      createdAt: new Date().toISOString()
-    };
-
-    saveDemoUser(demoUser);
-    showLoggedIn(demoUser);
-  };
+  if (data.trial_ends_at) {
+    const date = new Date(data.trial_ends_at);
+    trialEl.textContent = date.toLocaleDateString();
+  } else {
+    trialEl.textContent = "No trial date";
+  }
 }
 
-function setupLogout() {
-  const logoutButton = document.getElementById("logout-button");
+async function registerUser(event) {
+  event.preventDefault();
 
-  if (!logoutButton) return;
+  const name = document.getElementById("register-name").value.trim();
+  const email = document.getElementById("register-email").value.trim();
+  const password = document.getElementById("register-password").value.trim();
+  const repeatPassword = document.getElementById("register-repeat-password").value.trim();
 
-  logoutButton.onclick = function () {
-    localStorage.removeItem("skinscopeDemoUser");
-    showLoggedOut();
-    switchToLogin();
-  };
+  if (!name || !email || !password || !repeatPassword) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  if (password !== repeatPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        name: name
+      }
+    }
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  if (data.user) {
+    alert("Account created. If email confirmation is enabled, check your email.");
+    await checkSession();
+  }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  setupAuthTabs();
-  setupRegisterForm();
-  setupLoginForm();
-  setupLogout();
+async function loginUser(event) {
+  event.preventDefault();
 
-  const savedUser = getDemoUser();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value.trim();
 
-  if (savedUser) {
-    showLoggedIn(savedUser);
+  if (!email || !password) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  if (data.user) {
+    await showLoggedIn(data.user);
+  }
+}
+
+async function logoutUser() {
+  await supabaseClient.auth.signOut();
+  showLoggedOut();
+  switchToLogin();
+}
+
+async function checkSession() {
+  const { data } = await supabaseClient.auth.getSession();
+
+  if (data.session && data.session.user) {
+    await showLoggedIn(data.session.user);
   } else {
     showLoggedOut();
   }
+}
+
+function setupAccountPage() {
+  document.getElementById("login-tab").onclick = switchToLogin;
+  document.getElementById("register-tab").onclick = switchToRegister;
+
+  document.getElementById("toggle-login-password").onclick = toggleLoginPassword;
+  document.getElementById("toggle-register-password").onclick = toggleRegisterPassword;
+
+  document.getElementById("login-form").onsubmit = loginUser;
+  document.getElementById("register-form").onsubmit = registerUser;
+
+  document.getElementById("logout-button").onclick = logoutUser;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  setupAccountPage();
+  checkSession();
 });
