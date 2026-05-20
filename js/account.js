@@ -36,50 +36,60 @@ function showLoggedOut() {
 }
 
 function switchToLogin() {
-  document.getElementById("login-tab").classList.add("active-auth-tab");
-  document.getElementById("register-tab").classList.remove("active-auth-tab");
+  const loginTab = document.getElementById("login-tab");
+  const registerTab = document.getElementById("register-tab");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
 
-  document.getElementById("login-form").hidden = false;
-  document.getElementById("register-form").hidden = true;
+  if (loginTab) loginTab.classList.add("active-auth-tab");
+  if (registerTab) registerTab.classList.remove("active-auth-tab");
+
+  if (loginForm) loginForm.hidden = false;
+  if (registerForm) registerForm.hidden = true;
 }
 
 function switchToRegister() {
-  document.getElementById("register-tab").classList.add("active-auth-tab");
-  document.getElementById("login-tab").classList.remove("active-auth-tab");
+  const loginTab = document.getElementById("login-tab");
+  const registerTab = document.getElementById("register-tab");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
 
-  document.getElementById("register-form").hidden = false;
-  document.getElementById("login-form").hidden = true;
+  if (registerTab) registerTab.classList.add("active-auth-tab");
+  if (loginTab) loginTab.classList.remove("active-auth-tab");
+
+  if (registerForm) registerForm.hidden = false;
+  if (loginForm) loginForm.hidden = true;
 }
 
-function toggleSinglePassword(inputId, buttonId) {
-  const input = document.getElementById(inputId);
-  const button = document.getElementById(buttonId);
+function toggleLoginPassword() {
+  const passwordInput = document.getElementById("login-password");
+  const button = document.getElementById("toggle-login-password");
 
-  if (!input || !button) return;
+  if (!passwordInput || !button) return;
 
-  if (input.type === "password") {
-    input.type = "text";
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
     button.textContent = "Hide Password";
   } else {
-    input.type = "password";
+    passwordInput.type = "password";
     button.textContent = "Show Password";
   }
 }
 
-function toggleRegisterPasswords() {
-  const password = document.getElementById("register-password");
-  const repeat = document.getElementById("register-repeat-password");
+function toggleRegisterPassword() {
+  const passwordInput = document.getElementById("register-password");
+  const repeatInput = document.getElementById("register-repeat-password");
   const button = document.getElementById("toggle-register-password");
 
-  if (!password || !repeat || !button) return;
+  if (!passwordInput || !repeatInput || !button) return;
 
-  if (password.type === "password") {
-    password.type = "text";
-    repeat.type = "text";
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    repeatInput.type = "text";
     button.textContent = "Hide Password";
   } else {
-    password.type = "password";
-    repeat.type = "password";
+    passwordInput.type = "password";
+    repeatInput.type = "password";
     button.textContent = "Show Password";
   }
 }
@@ -90,21 +100,6 @@ function setupAuthTabs() {
 
   if (loginTab) loginTab.onclick = switchToLogin;
   if (registerTab) registerTab.onclick = switchToRegister;
-}
-
-function setupPasswordToggles() {
-  const loginButton = document.getElementById("toggle-login-password");
-  const registerButton = document.getElementById("toggle-register-password");
-
-  if (loginButton) {
-    loginButton.onclick = function () {
-      toggleSinglePassword("login-password", "toggle-login-password");
-    };
-  }
-
-  if (registerButton) {
-    registerButton.onclick = toggleRegisterPasswords;
-  }
 }
 
 function setupRegisterForm() {
@@ -189,7 +184,6 @@ function setupLogout() {
 
 document.addEventListener("DOMContentLoaded", function () {
   setupAuthTabs();
-  setupPasswordToggles();
   setupRegisterForm();
   setupLoginForm();
   setupLogout();
