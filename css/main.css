@@ -634,10 +634,10 @@ transform: scale(1.03);
   max-width: 700px;
   padding: 42px;
   border-radius: 34px;
-  background: rgba(255, 255, 255, 0.34);
-  border: 1px solid rgba(255, 255, 255, 0.52);
-  box-shadow: 0 30px 90px rgba(17, 24, 39, 0.16);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.20);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 30px 90px rgba(17, 24, 39, 0.12);
+  backdrop-filter: blur(14px);
 }
 
 .home-glass-card h1 {
