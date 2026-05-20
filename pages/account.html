@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>SkinScope — Account</title>
-
   <link rel="stylesheet" href="/ScinScope/css/main.css" />
 </head>
 <body class="account-video-page">
@@ -25,8 +24,8 @@
       <a href="/ScinScope/index.html">Home</a>
       <a href="/ScinScope/pages/scan.html">Face Scan</a>
       <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
-      <a href="/ScinScope/pages/account.html">Account</a>
       <a href="/ScinScope/pages/plan.html">Plan</a>
+      <a href="/ScinScope/pages/account.html">Account</a>
     </nav>
   </header>
 
@@ -37,18 +36,13 @@
       <h1>Your SkinScope Account</h1>
 
       <p class="hero-text">
-        Create a demo account to save your future scans, skin score, product checks, and progress history.
+        Create an account to save your scans, trial status, skin score, product checks, and progress history.
       </p>
 
       <div id="auth-panel">
         <div class="auth-tabs">
-          <button type="button" id="login-tab" class="auth-tab active-auth-tab">
-            Login
-          </button>
-
-          <button type="button" id="register-tab" class="auth-tab">
-            Register
-          </button>
+          <button type="button" id="login-tab" class="auth-tab active-auth-tab">Login</button>
+          <button type="button" id="register-tab" class="auth-tab">Register</button>
         </div>
 
         <form id="login-form" class="auth-form">
@@ -62,12 +56,7 @@
             <input id="login-password" type="password" placeholder="Your password" required />
           </label>
 
-          <button
-            type="button"
-            id="toggle-login-password"
-            class="secondary-button button-reset password-toggle-button"
-            onclick="toggleLoginPassword()"
-          >
+          <button type="button" id="toggle-login-password" class="secondary-button button-reset password-toggle-button">
             Show Password
           </button>
 
@@ -97,12 +86,7 @@
             <input id="register-repeat-password" type="password" placeholder="Repeat password" required />
           </label>
 
-          <button
-            type="button"
-            id="toggle-register-password"
-            class="secondary-button button-reset password-toggle-button"
-            onclick="toggleRegisterPassword()"
-          >
+          <button type="button" id="toggle-register-password" class="secondary-button button-reset password-toggle-button">
             Show Password
           </button>
 
@@ -117,31 +101,29 @@
 
         <h2 id="account-welcome">Welcome back</h2>
 
-        <p>
-          Your demo account is active. Later this page will show saved skin scans,
-          product checks, daily progress, and personalized recommendations.
-        </p>
+        <p id="account-email-text"></p>
 
         <div class="account-list">
           <div class="account-item">
             <strong>Status:</strong>
-            <span>Free beta</span>
+            <span id="account-status">Loading...</span>
           </div>
 
           <div class="account-item">
-            <strong>Saved scans:</strong>
-            <span>Coming soon</span>
+            <strong>Current plan:</strong>
+            <span id="account-plan">Loading...</span>
           </div>
 
           <div class="account-item">
-            <strong>Premium:</strong>
-            <span>€3.99/month planned</span>
+            <strong>Trial ends:</strong>
+            <span id="account-trial">Loading...</span>
           </div>
         </div>
 
         <div class="hero-buttons">
           <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
           <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
+          <a class="secondary-button" href="/ScinScope/pages/plan.html">Plan</a>
           <button type="button" id="logout-button" class="secondary-button button-reset">
             Logout
           </button>
@@ -150,6 +132,8 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/ScinScope/js/supabase-config.js"></script>
   <script src="/ScinScope/js/account.js"></script>
 </body>
 </html>
