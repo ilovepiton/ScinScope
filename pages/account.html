@@ -94,6 +94,31 @@
             Create Account
           </button>
         </form>
+
+        <form id="confirm-code-form" class="auth-form" hidden>
+          <h2>Confirm your account</h2>
+
+          <p class="hero-text">
+            Enter the 6-digit code we sent to your email.
+          </p>
+
+          <label>
+            6-digit code
+            <input id="confirm-code-input" type="text" inputmode="numeric" maxlength="6" placeholder="123456" required />
+          </label>
+
+          <button type="submit" class="primary-button button-reset">
+            Confirm Account
+          </button>
+
+          <button type="button" id="resend-code-button" class="secondary-button button-reset">
+            Resend Code
+          </button>
+
+          <button type="button" id="back-to-register-button" class="secondary-button button-reset">
+            Back to Register
+          </button>
+        </form>
       </div>
 
       <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
