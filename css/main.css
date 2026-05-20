@@ -1104,3 +1104,127 @@ transform: scale(1.03);
   background: rgba(255, 255, 255, 0.54);
   backdrop-filter: blur(10px);
 }
+/* Home reviews carousel */
+
+.reviews-section {
+  position: relative;
+  z-index: 2;
+  padding: 10px 0 46px;
+  margin-top: -20px;
+}
+
+.reviews-section h2 {
+  width: 84%;
+  max-width: 1280px;
+  margin: 0 auto 18px;
+  font-size: 28px;
+  color: #111827;
+  text-shadow: 0 8px 28px rgba(255, 255, 255, 0.55);
+}
+
+.reviews-marquee {
+  width: 100%;
+  overflow: hidden;
+  padding: 14px 0;
+  background: rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.reviews-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  animation: reviewsMove 55s linear infinite;
+}
+
+.reviews-marquee:hover .reviews-track {
+  animation-play-state: paused;
+}
+
+.review-card {
+  width: 360px;
+  min-height: 150px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow: 0 20px 50px rgba(17, 24, 39, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.review-avatar {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.14);
+}
+
+.review-content {
+  min-width: 0;
+}
+
+.review-stars {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  font-weight: 900;
+}
+
+.five-stars {
+  color: #f6b51e;
+}
+
+.four-stars {
+  color: #f6b51e;
+}
+
+.two-stars {
+  color: #f97316;
+}
+
+.review-card p {
+  margin: 0;
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+@keyframes reviewsMove {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 800px) {
+  .reviews-section {
+    padding-bottom: 34px;
+    margin-top: 0;
+  }
+
+  .reviews-section h2 {
+    width: 88%;
+    font-size: 24px;
+  }
+
+  .review-card {
+    width: 300px;
+  }
+
+  .reviews-track {
+    animation-duration: 70s;
+  }
+}
