@@ -41,11 +41,11 @@ function switchToLogin() {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
-  loginTab.classList.add("active-auth-tab");
-  registerTab.classList.remove("active-auth-tab");
+  if (loginTab) loginTab.classList.add("active-auth-tab");
+  if (registerTab) registerTab.classList.remove("active-auth-tab");
 
-  loginForm.hidden = false;
-  registerForm.hidden = true;
+  if (loginForm) loginForm.hidden = false;
+  if (registerForm) registerForm.hidden = true;
 }
 
 function switchToRegister() {
@@ -54,11 +54,11 @@ function switchToRegister() {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
-  registerTab.classList.add("active-auth-tab");
-  loginTab.classList.remove("active-auth-tab");
+  if (registerTab) registerTab.classList.add("active-auth-tab");
+  if (loginTab) loginTab.classList.remove("active-auth-tab");
 
-  registerForm.hidden = false;
-  loginForm.hidden = true;
+  if (registerForm) registerForm.hidden = false;
+  if (loginForm) loginForm.hidden = true;
 }
 
 function setupAuthTabs() {
@@ -67,6 +67,48 @@ function setupAuthTabs() {
 
   if (loginTab) loginTab.onclick = switchToLogin;
   if (registerTab) registerTab.onclick = switchToRegister;
+}
+
+function togglePasswordFields(inputIds, buttonId) {
+  const button = document.getElementById(buttonId);
+
+  if (!button) return;
+
+  const inputs = inputIds
+    .map(function (id) {
+      return document.getElementById(id);
+    })
+    .filter(Boolean);
+
+  if (!inputs.length) return;
+
+  const isHidden = inputs[0].type === "password";
+
+  inputs.forEach(function (input) {
+    input.type = isHidden ? "text" : "password";
+  });
+
+  button.textContent = isHidden ? "Hide Password" : "Show Password";
+}
+
+function setupPasswordToggles() {
+  const loginToggle = document.getElementById("toggle-login-password");
+  const registerToggle = document.getElementById("toggle-register-password");
+
+  if (loginToggle) {
+    loginToggle.onclick = function () {
+      togglePasswordFields(["login-password"], "toggle-login-password");
+    };
+  }
+
+  if (registerToggle) {
+    registerToggle.onclick = function () {
+      togglePasswordFields(
+        ["register-password", "register-repeat-password"],
+        "toggle-register-password"
+      );
+    };
+  }
 }
 
 function setupRegisterForm() {
@@ -80,9 +122,15 @@ function setupRegisterForm() {
     const name = document.getElementById("register-name").value.trim();
     const email = document.getElementById("register-email").value.trim();
     const password = document.getElementById("register-password").value.trim();
+    const repeatPassword = document.getElementById("register-repeat-password").value.trim();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !repeatPassword) {
       alert("Please fill in all fields.");
+      return;
+    }
+
+    if (password !== repeatPassword) {
+      alert("Passwords do not match.");
       return;
     }
 
@@ -145,6 +193,7 @@ function setupLogout() {
 
 document.addEventListener("DOMContentLoaded", function () {
   setupAuthTabs();
+  setupPasswordToggles();
   setupRegisterForm();
   setupLoginForm();
   setupLogout();
