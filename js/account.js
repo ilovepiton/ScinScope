@@ -36,29 +36,52 @@ function showLoggedOut() {
 }
 
 function switchToLogin() {
-  const loginTab = document.getElementById("login-tab");
-  const registerTab = document.getElementById("register-tab");
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
+  document.getElementById("login-tab").classList.add("active-auth-tab");
+  document.getElementById("register-tab").classList.remove("active-auth-tab");
 
-  if (loginTab) loginTab.classList.add("active-auth-tab");
-  if (registerTab) registerTab.classList.remove("active-auth-tab");
-
-  if (loginForm) loginForm.hidden = false;
-  if (registerForm) registerForm.hidden = true;
+  document.getElementById("login-form").hidden = false;
+  document.getElementById("register-form").hidden = true;
 }
 
 function switchToRegister() {
-  const loginTab = document.getElementById("login-tab");
-  const registerTab = document.getElementById("register-tab");
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
+  document.getElementById("register-tab").classList.add("active-auth-tab");
+  document.getElementById("login-tab").classList.remove("active-auth-tab");
 
-  if (registerTab) registerTab.classList.add("active-auth-tab");
-  if (loginTab) loginTab.classList.remove("active-auth-tab");
+  document.getElementById("register-form").hidden = false;
+  document.getElementById("login-form").hidden = true;
+}
 
-  if (registerForm) registerForm.hidden = false;
-  if (loginForm) loginForm.hidden = true;
+function toggleSinglePassword(inputId, buttonId) {
+  const input = document.getElementById(inputId);
+  const button = document.getElementById(buttonId);
+
+  if (!input || !button) return;
+
+  if (input.type === "password") {
+    input.type = "text";
+    button.textContent = "Hide Password";
+  } else {
+    input.type = "password";
+    button.textContent = "Show Password";
+  }
+}
+
+function toggleRegisterPasswords() {
+  const password = document.getElementById("register-password");
+  const repeat = document.getElementById("register-repeat-password");
+  const button = document.getElementById("toggle-register-password");
+
+  if (!password || !repeat || !button) return;
+
+  if (password.type === "password") {
+    password.type = "text";
+    repeat.type = "text";
+    button.textContent = "Hide Password";
+  } else {
+    password.type = "password";
+    repeat.type = "password";
+    button.textContent = "Show Password";
+  }
 }
 
 function setupAuthTabs() {
@@ -69,45 +92,18 @@ function setupAuthTabs() {
   if (registerTab) registerTab.onclick = switchToRegister;
 }
 
-function togglePasswordFields(inputIds, buttonId) {
-  const button = document.getElementById(buttonId);
-
-  if (!button) return;
-
-  const inputs = inputIds
-    .map(function (id) {
-      return document.getElementById(id);
-    })
-    .filter(Boolean);
-
-  if (!inputs.length) return;
-
-  const isHidden = inputs[0].type === "password";
-
-  inputs.forEach(function (input) {
-    input.type = isHidden ? "text" : "password";
-  });
-
-  button.textContent = isHidden ? "Hide Password" : "Show Password";
-}
-
 function setupPasswordToggles() {
-  const loginToggle = document.getElementById("toggle-login-password");
-  const registerToggle = document.getElementById("toggle-register-password");
+  const loginButton = document.getElementById("toggle-login-password");
+  const registerButton = document.getElementById("toggle-register-password");
 
-  if (loginToggle) {
-    loginToggle.onclick = function () {
-      togglePasswordFields(["login-password"], "toggle-login-password");
+  if (loginButton) {
+    loginButton.onclick = function () {
+      toggleSinglePassword("login-password", "toggle-login-password");
     };
   }
 
-  if (registerToggle) {
-    registerToggle.onclick = function () {
-      togglePasswordFields(
-        ["register-password", "register-repeat-password"],
-        "toggle-register-password"
-      );
-    };
+  if (registerButton) {
+    registerButton.onclick = toggleRegisterPasswords;
   }
 }
 
@@ -116,7 +112,7 @@ function setupRegisterForm() {
 
   if (!form) return;
 
-  form.addEventListener("submit", function (event) {
+  form.onsubmit = function (event) {
     event.preventDefault();
 
     const name = document.getElementById("register-name").value.trim();
@@ -142,7 +138,7 @@ function setupRegisterForm() {
 
     saveDemoUser(user);
     showLoggedIn(user);
-  });
+  };
 }
 
 function setupLoginForm() {
@@ -150,7 +146,7 @@ function setupLoginForm() {
 
   if (!form) return;
 
-  form.addEventListener("submit", function (event) {
+  form.onsubmit = function (event) {
     event.preventDefault();
 
     const email = document.getElementById("login-email").value.trim();
@@ -176,7 +172,7 @@ function setupLoginForm() {
 
     saveDemoUser(demoUser);
     showLoggedIn(demoUser);
-  });
+  };
 }
 
 function setupLogout() {
