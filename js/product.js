@@ -178,9 +178,7 @@ async function openProductCameraModal() {
 
     try {
       await video.play();
-    } catch (error) {
-      // Browser can delay video start. Capture button retries.
-    }
+    } catch (error) {}
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
     closeProductCameraModal();
@@ -274,7 +272,7 @@ function analyzeProductPhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/product-result.html";
+  window.location.href = "/ScinScope/pages/product-loading.html";
 }
 
 function loadProductResultPhoto() {
