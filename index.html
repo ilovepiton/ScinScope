@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <button type="button" class="sound-button" onclick="enableHomeSound()">
+      <button type="button" id="sound-toggle-button" class="sound-button" onclick="toggleHomeSound()">
         Sound On
       </button>
     </section>
@@ -74,14 +74,21 @@
   </main>
 
   <script>
-    function enableHomeSound() {
+    function toggleHomeSound() {
       const video = document.getElementById("home-bg-video");
+      const button = document.getElementById("sound-toggle-button");
 
-      if (!video) return;
+      if (!video || !button) return;
 
-      video.muted = false;
-      video.volume = 0.45;
-      video.play();
+      if (video.muted) {
+        video.muted = false;
+        video.volume = 0.45;
+        video.play();
+        button.textContent = "Sound Off";
+      } else {
+        video.muted = true;
+        button.textContent = "Sound On";
+      }
     }
   </script>
 
