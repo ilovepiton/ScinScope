@@ -164,9 +164,7 @@ async function openCameraModal() {
 
     try {
       await video.play();
-    } catch (error) {
-      // Browser can delay video start. Capture button retries.
-    }
+    } catch (error) {}
   } catch (error) {
     alert("Camera is not available. Please use Upload File.");
     closeCameraModal();
@@ -260,7 +258,7 @@ function analyzeFacePhoto() {
     return;
   }
 
-  window.location.href = "/ScinScope/pages/result.html";
+  window.location.href = "/ScinScope/pages/loading.html";
 }
 
 function loadResultFacePhoto() {
