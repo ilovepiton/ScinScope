@@ -585,12 +585,11 @@ h2 {
 }
 
 /* Reviews */
-
 .reviews-section {
   position: relative;
   z-index: 2;
   padding: 0 0 42px;
-  margin-top: -70px;
+  margin-top: -38px;
 }
 
 .reviews-section h2 {
