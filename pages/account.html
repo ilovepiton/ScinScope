@@ -8,9 +8,17 @@
 
   <link rel="stylesheet" href="/ScinScope/css/main.css" />
 </head>
-<body>
+<body class="account-video-page">
 
-  <header class="site-header">
+  <div class="account-video-wallpaper">
+    <video autoplay muted loop playsinline>
+      <source src="/ScinScope/assets/account-wallpaper.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <div class="account-video-overlay"></div>
+
+  <header class="site-header transparent-header">
     <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
 
     <nav>
@@ -21,8 +29,8 @@
     </nav>
   </header>
 
-  <main class="page">
-    <section class="card account-card">
+  <main class="page account-video-page-content">
+    <section class="card account-card account-glass-card">
       <p class="beta-label">Account beta</p>
 
       <h1>Your SkinScope Account</h1>
@@ -103,7 +111,7 @@
         </form>
       </div>
 
-      <div id="logged-panel" class="logged-panel" hidden>
+      <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
         <div class="account-avatar">🧴</div>
 
         <h2 id="account-welcome">Welcome back</h2>
