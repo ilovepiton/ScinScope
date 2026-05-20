@@ -432,9 +432,17 @@ h2 {
   height: 100%;
 }
 
-.bar.yellow span { background: #f4ea63; }
-.bar.green span { background: #54d987; }
-.bar.red span { background: #f27588; }
+.bar.yellow span {
+  background: #f4ea63;
+}
+
+.bar.green span {
+  background: #54d987;
+}
+
+.bar.red span {
+  background: #f27588;
+}
 
 .product-result-layout {
   display: grid;
@@ -475,7 +483,12 @@ h2 {
 
 .home-video-overlay {
   z-index: -2;
-  background: linear-gradient(90deg, rgba(246, 243, 239, 0.28), rgba(246, 243, 239, 0.16), rgba(17, 24, 39, 0.10));
+  background: linear-gradient(
+    90deg,
+    rgba(246, 243, 239, 0.28),
+    rgba(246, 243, 239, 0.16),
+    rgba(17, 24, 39, 0.10)
+  );
 }
 
 .transparent-header {
@@ -585,11 +598,12 @@ h2 {
 }
 
 /* Reviews */
+
 .reviews-section {
   position: relative;
   z-index: 2;
   padding: 0 0 42px;
-  margin-top: -30px;
+  margin-top: -38px;
 }
 
 .reviews-section h2 {
@@ -601,6 +615,7 @@ h2 {
 }
 
 .reviews-marquee {
+  width: 100%;
   overflow: hidden;
   padding: 14px 0;
   background: rgba(255, 255, 255, 0.18);
@@ -613,7 +628,13 @@ h2 {
   display: flex;
   gap: 18px;
   width: max-content;
-  animation: reviewsMove 55s linear infinite;
+  min-width: 200%;
+  animation: reviewsMove 38s linear infinite;
+  will-change: transform;
+}
+
+.reviews-marquee:hover .reviews-track {
+  animation-play-state: paused;
 }
 
 .review-card {
@@ -628,6 +649,7 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.56);
   box-shadow: 0 20px 50px rgba(17, 24, 39, 0.12);
   backdrop-filter: blur(16px);
+  flex: 0 0 350px;
 }
 
 .review-avatar {
@@ -665,8 +687,13 @@ h2 {
 }
 
 @keyframes reviewsMove {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 /* Account */
@@ -774,7 +801,12 @@ h2 {
 
 .account-video-overlay {
   z-index: -2;
-  background: linear-gradient(90deg, rgba(246, 243, 239, 0.22), rgba(246, 243, 239, 0.14), rgba(17, 24, 39, 0.12));
+  background: linear-gradient(
+    90deg,
+    rgba(246, 243, 239, 0.22),
+    rgba(246, 243, 239, 0.14),
+    rgba(17, 24, 39, 0.12)
+  );
 }
 
 .account-video-page-content {
@@ -887,12 +919,19 @@ h2 {
 }
 
 @keyframes loadingSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes loadingBar {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /* Mobile */
@@ -963,6 +1002,7 @@ h2 {
 
   .review-card {
     width: 300px;
+    flex: 0 0 300px;
   }
 
   .reviews-track {
