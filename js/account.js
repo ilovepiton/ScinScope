@@ -1,19 +1,34 @@
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let pendingRegisterEmail = "";
+let pendingRegisterPassword = "";
+
+function showOnlyForm(formName) {
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const confirmForm = document.getElementById("confirm-code-form");
+
+  loginForm.hidden = formName !== "login";
+  registerForm.hidden = formName !== "register";
+  confirmForm.hidden = formName !== "confirm";
+}
+
 function switchToLogin() {
   document.getElementById("login-tab").classList.add("active-auth-tab");
   document.getElementById("register-tab").classList.remove("active-auth-tab");
-
-  document.getElementById("login-form").hidden = false;
-  document.getElementById("register-form").hidden = true;
+  showOnlyForm("login");
 }
 
 function switchToRegister() {
   document.getElementById("register-tab").classList.add("active-auth-tab");
   document.getElementById("login-tab").classList.remove("active-auth-tab");
+  showOnlyForm("register");
+}
 
-  document.getElementById("register-form").hidden = false;
-  document.getElementById("login-form").hidden = true;
+function switchToConfirmCode() {
+  document.getElementById("register-tab").classList.add("active-auth-tab");
+  document.getElementById("login-tab").classList.remove("active-auth-tab");
+  showOnlyForm("confirm");
 }
 
 function toggleLoginPassword() {
@@ -109,7 +124,10 @@ async function registerUser(event) {
     return;
   }
 
-  const { data, error } = await supabaseClient.auth.signUp({
+  pendingRegisterEmail = email;
+  pendingRegisterPassword = password;
+
+  const { error } = await supabaseClient.auth.signUp({
     email: email,
     password: password,
     options: {
@@ -124,10 +142,77 @@ async function registerUser(event) {
     return;
   }
 
-  if (data.user) {
-    alert("Account created. If email confirmation is enabled, check your email.");
-    await checkSession();
+  switchToConfirmCode();
+}
+
+async function confirmAccount(event) {
+  event.preventDefault();
+
+  const code = document.getElementById("confirm-code-input").value.trim();
+
+  if (!pendingRegisterEmail) {
+    alert("Email is missing. Please register again.");
+    switchToRegister();
+    return;
   }
+
+  if (!code || code.length !== 6) {
+    alert("Please enter the 6-digit code.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    email: pendingRegisterEmail,
+    token: code,
+    type: "signup"
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  if (data.user) {
+    await showLoggedIn(data.user);
+    return;
+  }
+
+  if (pendingRegisterEmail && pendingRegisterPassword) {
+    const loginResult = await supabaseClient.auth.signInWithPassword({
+      email: pendingRegisterEmail,
+      password: pendingRegisterPassword
+    });
+
+    if (loginResult.error) {
+      alert("Account confirmed. Please login.");
+      switchToLogin();
+      return;
+    }
+
+    if (loginResult.data.user) {
+      await showLoggedIn(loginResult.data.user);
+    }
+  }
+}
+
+async function resendCode() {
+  if (!pendingRegisterEmail) {
+    alert("Email is missing. Please register again.");
+    switchToRegister();
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resend({
+    type: "signup",
+    email: pendingRegisterEmail
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("A new confirmation code has been sent.");
 }
 
 async function loginUser(event) {
@@ -169,6 +254,7 @@ async function checkSession() {
     await showLoggedIn(data.session.user);
   } else {
     showLoggedOut();
+    switchToLogin();
   }
 }
 
@@ -181,6 +267,13 @@ function setupAccountPage() {
 
   document.getElementById("login-form").onsubmit = loginUser;
   document.getElementById("register-form").onsubmit = registerUser;
+  document.getElementById("confirm-code-form").onsubmit = confirmAccount;
+
+  document.getElementById("resend-code-button").onclick = resendCode;
+
+  document.getElementById("back-to-register-button").onclick = function () {
+    switchToRegister();
+  };
 
   document.getElementById("logout-button").onclick = logoutUser;
 }
