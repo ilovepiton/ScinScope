@@ -1,34 +1,22 @@
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let pendingRegisterEmail = "";
-let pendingRegisterPassword = "";
-
-function showOnlyForm(formName) {
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
-  const confirmForm = document.getElementById("confirm-code-form");
-
-  loginForm.hidden = formName !== "login";
-  registerForm.hidden = formName !== "register";
-  confirmForm.hidden = formName !== "confirm";
-}
+let pendingEmail = "";
+let pendingPassword = "";
 
 function switchToLogin() {
   document.getElementById("login-tab").classList.add("active-auth-tab");
   document.getElementById("register-tab").classList.remove("active-auth-tab");
-  showOnlyForm("login");
+
+  document.getElementById("login-form").hidden = false;
+  document.getElementById("register-form").hidden = true;
 }
 
 function switchToRegister() {
   document.getElementById("register-tab").classList.add("active-auth-tab");
   document.getElementById("login-tab").classList.remove("active-auth-tab");
-  showOnlyForm("register");
-}
 
-function switchToConfirmCode() {
-  document.getElementById("register-tab").classList.add("active-auth-tab");
-  document.getElementById("login-tab").classList.remove("active-auth-tab");
-  showOnlyForm("confirm");
+  document.getElementById("register-form").hidden = false;
+  document.getElementById("login-form").hidden = true;
 }
 
 function toggleLoginPassword() {
@@ -60,9 +48,105 @@ function toggleRegisterPassword() {
   }
 }
 
+function toggleCodeVisibility() {
+  const inputs = document.querySelectorAll(".code-input");
+  const button = document.getElementById("toggle-code-button");
+
+  if (!inputs.length) return;
+
+  const hidden = inputs[0].type === "password";
+
+  inputs.forEach(function (input) {
+    input.type = hidden ? "text" : "password";
+  });
+
+  button.textContent = hidden ? "Hide Code" : "Show Code";
+}
+
+function clearCodeInputs() {
+  document.querySelectorAll(".code-input").forEach(function (input) {
+    input.value = "";
+    input.type = "password";
+  });
+
+  const button = document.getElementById("toggle-code-button");
+  if (button) button.textContent = "Show Code";
+}
+
+function getCodeValue() {
+  return Array.from(document.querySelectorAll(".code-input"))
+    .map(function (input) {
+      return input.value.trim();
+    })
+    .join("");
+}
+
+function openVerificationModal(email) {
+  pendingEmail = email;
+
+  const modal = document.getElementById("verification-modal");
+  const emailText = document.getElementById("verification-email-text");
+
+  clearCodeInputs();
+
+  if (emailText) {
+    emailText.textContent = email;
+  }
+
+  modal.hidden = false;
+
+  setTimeout(function () {
+    const firstInput = document.querySelector(".code-input");
+    if (firstInput) firstInput.focus();
+  }, 50);
+}
+
+function closeVerificationModal() {
+  document.getElementById("verification-modal").hidden = true;
+}
+
+function setupCodeInputs() {
+  const inputs = Array.from(document.querySelectorAll(".code-input"));
+
+  inputs.forEach(function (input, index) {
+    input.addEventListener("input", function () {
+      input.value = input.value.replace(/\D/g, "").slice(0, 1);
+
+      if (input.value && inputs[index + 1]) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Backspace" && !input.value && inputs[index - 1]) {
+        inputs[index - 1].focus();
+      }
+    });
+
+    input.addEventListener("paste", function (event) {
+      event.preventDefault();
+
+      const pasted = event.clipboardData
+        .getData("text")
+        .replace(/\D/g, "")
+        .slice(0, 6);
+
+      pasted.split("").forEach(function (number, pastedIndex) {
+        if (inputs[pastedIndex]) {
+          inputs[pastedIndex].value = number;
+        }
+      });
+
+      const next = inputs[Math.min(pasted.length, inputs.length - 1)];
+      if (next) next.focus();
+    });
+  });
+}
+
 function showLoggedOut() {
   document.getElementById("auth-panel").hidden = false;
   document.getElementById("logged-panel").hidden = true;
+  document.getElementById("header-account-menu").hidden = true;
 }
 
 async function showLoggedIn(user) {
@@ -71,8 +155,13 @@ async function showLoggedIn(user) {
 
   const name = user.user_metadata?.name || user.email.split("@")[0];
 
-  document.getElementById("account-welcome").textContent = "Welcome, " + name;
-  document.getElementById("account-email-text").textContent = user.email;
+  document.getElementById("account-welcome").textContent = "Perfect, you’re signed in!";
+  document.getElementById("account-email-text").textContent = "Signed in as " + user.email;
+
+  document.getElementById("header-account-menu").hidden = false;
+  document.getElementById("header-account-button").textContent = name + " ▼";
+  document.getElementById("dropdown-name").textContent = name;
+  document.getElementById("dropdown-email").textContent = user.email;
 
   await loadSubscription(user.id);
 }
@@ -82,6 +171,9 @@ async function loadSubscription(userId) {
   const planEl = document.getElementById("account-plan");
   const trialEl = document.getElementById("account-trial");
 
+  const dropdownPlan = document.getElementById("dropdown-plan");
+  const dropdownStatus = document.getElementById("dropdown-status");
+
   const { data, error } = await supabaseClient
     .from("subscriptions")
     .select("plan, status, trial_ends_at")
@@ -89,14 +181,20 @@ async function loadSubscription(userId) {
     .single();
 
   if (error || !data) {
-    statusEl.textContent = "Trial";
-    planEl.textContent = "Trial";
+    statusEl.textContent = "active";
+    planEl.textContent = "trial";
     trialEl.textContent = "7 days after registration";
+
+    dropdownPlan.textContent = "trial";
+    dropdownStatus.textContent = "active";
     return;
   }
 
   statusEl.textContent = data.status;
   planEl.textContent = data.plan;
+
+  dropdownPlan.textContent = data.plan;
+  dropdownStatus.textContent = data.status;
 
   if (data.trial_ends_at) {
     const date = new Date(data.trial_ends_at);
@@ -124,10 +222,10 @@ async function registerUser(event) {
     return;
   }
 
-  pendingRegisterEmail = email;
-  pendingRegisterPassword = password;
+  pendingEmail = email;
+  pendingPassword = password;
 
-  const { error } = await supabaseClient.auth.signUp({
+  const { data, error } = await supabaseClient.auth.signUp({
     email: email,
     password: password,
     options: {
@@ -142,77 +240,7 @@ async function registerUser(event) {
     return;
   }
 
-  switchToConfirmCode();
-}
-
-async function confirmAccount(event) {
-  event.preventDefault();
-
-  const code = document.getElementById("confirm-code-input").value.trim();
-
-  if (!pendingRegisterEmail) {
-    alert("Email is missing. Please register again.");
-    switchToRegister();
-    return;
-  }
-
-  if (!code || code.length !== 6) {
-    alert("Please enter the 6-digit code.");
-    return;
-  }
-
-  const { data, error } = await supabaseClient.auth.verifyOtp({
-    email: pendingRegisterEmail,
-    token: code,
-    type: "signup"
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  if (data.user) {
-    await showLoggedIn(data.user);
-    return;
-  }
-
-  if (pendingRegisterEmail && pendingRegisterPassword) {
-    const loginResult = await supabaseClient.auth.signInWithPassword({
-      email: pendingRegisterEmail,
-      password: pendingRegisterPassword
-    });
-
-    if (loginResult.error) {
-      alert("Account confirmed. Please login.");
-      switchToLogin();
-      return;
-    }
-
-    if (loginResult.data.user) {
-      await showLoggedIn(loginResult.data.user);
-    }
-  }
-}
-
-async function resendCode() {
-  if (!pendingRegisterEmail) {
-    alert("Email is missing. Please register again.");
-    switchToRegister();
-    return;
-  }
-
-  const { error } = await supabaseClient.auth.resend({
-    type: "signup",
-    email: pendingRegisterEmail
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  alert("A new confirmation code has been sent.");
+  openVerificationModal(email);
 }
 
 async function loginUser(event) {
@@ -226,12 +254,26 @@ async function loginUser(event) {
     return;
   }
 
+  pendingEmail = email;
+  pendingPassword = password;
+
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email: email,
     password: password
   });
 
   if (error) {
+    const message = error.message.toLowerCase();
+
+    if (
+      message.includes("email not confirmed") ||
+      message.includes("not confirmed") ||
+      message.includes("confirm")
+    ) {
+      openVerificationModal(email);
+      return;
+    }
+
     alert(error.message);
     return;
   }
@@ -241,8 +283,80 @@ async function loginUser(event) {
   }
 }
 
+async function confirmAccount(event) {
+  event.preventDefault();
+
+  const code = getCodeValue();
+
+  if (!pendingEmail) {
+    alert("Email is missing. Please register or login again.");
+    closeVerificationModal();
+    return;
+  }
+
+  if (code.length !== 6) {
+    alert("Please enter the 6-digit code.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    email: pendingEmail,
+    token: code,
+    type: "signup"
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  closeVerificationModal();
+
+  if (data.user) {
+    await showLoggedIn(data.user);
+    return;
+  }
+
+  if (pendingEmail && pendingPassword) {
+    const loginResult = await supabaseClient.auth.signInWithPassword({
+      email: pendingEmail,
+      password: pendingPassword
+    });
+
+    if (loginResult.data && loginResult.data.user) {
+      await showLoggedIn(loginResult.data.user);
+      return;
+    }
+  }
+
+  alert("Account confirmed. Please login.");
+  switchToLogin();
+}
+
+async function resendCode() {
+  if (!pendingEmail) {
+    alert("Email is missing. Please register or login again.");
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resend({
+    type: "signup",
+    email: pendingEmail
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("A new confirmation code has been sent.");
+}
+
 async function logoutUser() {
   await supabaseClient.auth.signOut();
+
+  document.getElementById("header-account-dropdown").hidden = true;
+
   showLoggedOut();
   switchToLogin();
 }
@@ -258,24 +372,35 @@ async function checkSession() {
   }
 }
 
+function setupAccountDropdown() {
+  const button = document.getElementById("header-account-button");
+  const dropdown = document.getElementById("header-account-dropdown");
+
+  button.onclick = function () {
+    dropdown.hidden = !dropdown.hidden;
+  };
+}
+
 function setupAccountPage() {
   document.getElementById("login-tab").onclick = switchToLogin;
   document.getElementById("register-tab").onclick = switchToRegister;
 
   document.getElementById("toggle-login-password").onclick = toggleLoginPassword;
   document.getElementById("toggle-register-password").onclick = toggleRegisterPassword;
+  document.getElementById("toggle-code-button").onclick = toggleCodeVisibility;
 
   document.getElementById("login-form").onsubmit = loginUser;
   document.getElementById("register-form").onsubmit = registerUser;
-  document.getElementById("confirm-code-form").onsubmit = confirmAccount;
+  document.getElementById("verification-form").onsubmit = confirmAccount;
 
   document.getElementById("resend-code-button").onclick = resendCode;
-
-  document.getElementById("back-to-register-button").onclick = function () {
-    switchToRegister();
-  };
+  document.getElementById("close-verification-button").onclick = closeVerificationModal;
 
   document.getElementById("logout-button").onclick = logoutUser;
+  document.getElementById("dropdown-logout-button").onclick = logoutUser;
+
+  setupCodeInputs();
+  setupAccountDropdown();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
