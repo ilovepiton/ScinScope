@@ -37,6 +37,7 @@
           <p><strong>Email:</strong> <span id="dropdown-email">—</span></p>
           <p><strong>Plan:</strong> <span id="dropdown-plan">—</span></p>
           <p><strong>Status:</strong> <span id="dropdown-status">—</span></p>
+
           <button type="button" id="dropdown-logout-button" class="secondary-button button-reset small-button">
             Logout
           </button>
@@ -57,8 +58,13 @@
 
       <div id="auth-panel">
         <div class="auth-tabs">
-          <button type="button" id="login-tab" class="auth-tab active-auth-tab">Login</button>
-          <button type="button" id="register-tab" class="auth-tab">Register</button>
+          <button type="button" id="login-tab" class="auth-tab active-auth-tab">
+            Login
+          </button>
+
+          <button type="button" id="register-tab" class="auth-tab">
+            Register
+          </button>
         </div>
 
         <form id="login-form" class="auth-form">
@@ -140,6 +146,7 @@
           <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
           <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
           <a class="secondary-button" href="/ScinScope/pages/plan.html">Plan</a>
+
           <button type="button" id="logout-button" class="secondary-button button-reset">
             Logout
           </button>
@@ -152,10 +159,10 @@
     <div class="verification-window">
       <p class="beta-label">Email verification</p>
 
-      <h2>Enter verification code</h2>
+      <h2>Check your email</h2>
 
       <p class="verification-text">
-        Enter the 6-digit code we sent to your email.
+        We’ve sent a 6-digit verification code to your email. Enter it below to confirm this is you.
       </p>
 
       <p id="verification-email-text" class="verification-email"></p>
