@@ -288,63 +288,6 @@ function getFriendlyAuthError(errorMessage) {
   return errorMessage || "Something went wrong. Please try again.";
 }
 
-function generateAlphaCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-
-  for (let i = 0; i < 6; i += 1) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-  return code;
-}
-
-async function loadOrCreateAlphaCode(userId) {
-  const input = document.getElementById("alpha-code-input");
-
-  if (!input) return;
-
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("alpha_code")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
-    input.value = "ERROR";
-    return;
-  }
-
-  if (data && data.alpha_code) {
-    input.value = data.alpha_code;
-    return;
-  }
-
-  let finalCode = "";
-  let saved = false;
-
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const newCode = generateAlphaCode();
-
-    const updateResult = await supabaseClient
-      .from("profiles")
-      .update({
-        alpha_code: newCode
-      })
-      .eq("id", userId)
-      .select("alpha_code")
-      .single();
-
-    if (!updateResult.error && updateResult.data) {
-      finalCode = updateResult.data.alpha_code;
-      saved = true;
-      break;
-    }
-  }
-
-  input.value = saved ? finalCode : "REFRESH";
-}
-
 function showLoggedOut() {
   document.getElementById("auth-panel").hidden = false;
   document.getElementById("logged-panel").hidden = true;
@@ -366,7 +309,6 @@ async function showLoggedIn(user) {
   document.getElementById("dropdown-email").textContent = user.email;
 
   await loadSubscription(user.id);
-  await loadOrCreateAlphaCode(user.id);
 }
 
 async function loadSubscription(userId) {
