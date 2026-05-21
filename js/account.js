@@ -454,7 +454,7 @@ async function confirmAccount(event) {
   const { data, error } = await supabaseClient.auth.verifyOtp({
     email: pendingEmail,
     token: code,
-    type: "signup"
+    type: "email"
   });
 
   if (error) {
