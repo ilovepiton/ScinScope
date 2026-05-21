@@ -48,10 +48,7 @@
 
   <main class="page account-video-page-content">
     <section class="card account-card account-glass-card">
-      <div class="account-label-row">
-  <p class="beta-label">Account beta</p>
-  <p class="beta-label alpha-label">Account alpha</p>
-</div>
+      <p class="beta-label">Account beta</p>
 
       <h1>Your SkinScope Account</h1>
 
@@ -123,20 +120,7 @@
 
       <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
         <div class="account-avatar">🧴</div>
-        <div class="alpha-code-box">
-  <h3>Your Alpha Code</h3>
 
-  <p>
-    This is your personal SkinScope Alpha code. You get it automatically after creating an account.
-    Later you can use it for early access, invites, premium tests, or special beta features.
-  </p>
-
-  <input id="alpha-code-input" type="text" readonly value="Loading..." />
-
-  <small>
-    Keep this code. It is connected to your account.
-  </small>
-</div>
         <h2 id="account-welcome">Perfect, you’re signed in!</h2>
 
         <p id="account-email-text"></p>
@@ -182,6 +166,7 @@
       </p>
 
       <p id="verification-email-text" class="verification-email"></p>
+      <p id="verification-message" class="verification-message" hidden></p>
 
       <form id="verification-form">
         <div class="code-boxes" id="code-boxes">
