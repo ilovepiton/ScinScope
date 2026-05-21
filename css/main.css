@@ -1009,3 +1009,120 @@ h2 {
     animation-duration: 70s;
   }
 }
+/* Account dropdown + verification modal */
+
+.header-account-menu {
+  position: relative;
+}
+
+.header-account-button {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.42);
+  color: #111827;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.header-account-dropdown {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 280px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 20px 60px rgba(17, 24, 39, 0.18);
+  backdrop-filter: blur(18px);
+  z-index: 2000;
+}
+
+.header-account-dropdown p {
+  margin: 0 0 10px;
+  color: #1f2933;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.verification-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 24, 39, 0.58);
+  backdrop-filter: blur(16px);
+}
+
+.verification-window {
+  width: min(92vw, 520px);
+  padding: 34px;
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(22px);
+  text-align: center;
+}
+
+.verification-window h2 {
+  font-size: 34px;
+  margin: 18px 0 10px;
+}
+
+.verification-text {
+  margin: 0 auto 8px;
+  color: #4b5563;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.verification-email {
+  margin: 0 0 24px;
+  color: #111827;
+  font-weight: 800;
+}
+
+.code-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 24px 0 18px;
+}
+
+.code-input {
+  width: 54px;
+  height: 62px;
+  border-radius: 16px;
+  border: 1px solid rgba(17, 24, 39, 0.22);
+  background: rgba(255, 255, 255, 0.72);
+  color: #111827;
+  font-size: 28px;
+  font-weight: 900;
+  text-align: center;
+  outline: none;
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+}
+
+.code-input:focus {
+  border-color: #111827;
+  background: #ffffff;
+}
+
+.verification-submit {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.verification-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
