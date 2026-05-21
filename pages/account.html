@@ -75,7 +75,7 @@
 
           <label>
             Password
-            <input id="login-password" type="password" placeholder="Your password" required />
+            <input id="login-password" type="password" placeholder="Your password" minlength="8" required />
           </label>
 
           <button type="button" id="toggle-login-password" class="secondary-button button-reset password-toggle-button">
@@ -100,12 +100,12 @@
 
           <label>
             Password
-            <input id="register-password" type="password" placeholder="Create password" required />
+            <input id="register-password" type="password" placeholder="At least 8 letters or numbers" minlength="8" required />
           </label>
 
           <label>
             Repeat Password
-            <input id="register-repeat-password" type="password" placeholder="Repeat password" required />
+            <input id="register-repeat-password" type="password" placeholder="Repeat password" minlength="8" required />
           </label>
 
           <button type="button" id="toggle-register-password" class="secondary-button button-reset password-toggle-button">
@@ -162,13 +162,15 @@
       <h2>Check your email</h2>
 
       <p class="verification-text">
-        We’ve sent a 6-digit verification code to your email. Enter it below to confirm this is you.
+        We’ve sent a verification code to your email. Enter it below to confirm this is you.
       </p>
 
       <p id="verification-email-text" class="verification-email"></p>
 
       <form id="verification-form">
         <div class="code-boxes" id="code-boxes">
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
           <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
           <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
           <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
