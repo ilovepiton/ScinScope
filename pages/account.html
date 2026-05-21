@@ -26,6 +26,22 @@
       <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
       <a href="/ScinScope/pages/plan.html">Plan</a>
       <a href="/ScinScope/pages/account.html">Account</a>
+
+      <div id="header-account-menu" class="header-account-menu" hidden>
+        <button type="button" id="header-account-button" class="header-account-button">
+          Account ▼
+        </button>
+
+        <div id="header-account-dropdown" class="header-account-dropdown" hidden>
+          <p><strong>Name:</strong> <span id="dropdown-name">—</span></p>
+          <p><strong>Email:</strong> <span id="dropdown-email">—</span></p>
+          <p><strong>Plan:</strong> <span id="dropdown-plan">—</span></p>
+          <p><strong>Status:</strong> <span id="dropdown-status">—</span></p>
+          <button type="button" id="dropdown-logout-button" class="secondary-button button-reset small-button">
+            Logout
+          </button>
+        </div>
+      </div>
     </nav>
   </header>
 
@@ -94,37 +110,12 @@
             Create Account
           </button>
         </form>
-
-        <form id="confirm-code-form" class="auth-form" hidden>
-          <h2>Confirm your account</h2>
-
-          <p class="hero-text">
-            Enter the 6-digit code we sent to your email.
-          </p>
-
-          <label>
-            6-digit code
-            <input id="confirm-code-input" type="text" inputmode="numeric" maxlength="6" placeholder="123456" required />
-          </label>
-
-          <button type="submit" class="primary-button button-reset">
-            Confirm Account
-          </button>
-
-          <button type="button" id="resend-code-button" class="secondary-button button-reset">
-            Resend Code
-          </button>
-
-          <button type="button" id="back-to-register-button" class="secondary-button button-reset">
-            Back to Register
-          </button>
-        </form>
       </div>
 
       <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
         <div class="account-avatar">🧴</div>
 
-        <h2 id="account-welcome">Welcome back</h2>
+        <h2 id="account-welcome">Perfect, you’re signed in!</h2>
 
         <p id="account-email-text"></p>
 
@@ -156,6 +147,49 @@
       </div>
     </section>
   </main>
+
+  <div id="verification-modal" class="verification-modal" hidden>
+    <div class="verification-window">
+      <p class="beta-label">Email verification</p>
+
+      <h2>Enter verification code</h2>
+
+      <p class="verification-text">
+        Enter the 6-digit code we sent to your email.
+      </p>
+
+      <p id="verification-email-text" class="verification-email"></p>
+
+      <form id="verification-form">
+        <div class="code-boxes" id="code-boxes">
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
+        </div>
+
+        <button type="button" id="toggle-code-button" class="secondary-button button-reset password-toggle-button">
+          Show Code
+        </button>
+
+        <button type="submit" class="primary-button button-reset verification-submit">
+          Confirm Account
+        </button>
+
+        <div class="verification-actions">
+          <button type="button" id="resend-code-button" class="secondary-button button-reset">
+            Resend Code
+          </button>
+
+          <button type="button" id="close-verification-button" class="secondary-button button-reset">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/ScinScope/js/supabase-config.js"></script>
