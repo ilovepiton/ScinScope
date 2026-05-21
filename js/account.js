@@ -5,6 +5,31 @@ let pendingPassword = "";
 let resendTimer = null;
 let resendSeconds = 0;
 
+function showVerificationMessage(text, type = "error") {
+  const message = document.getElementById("verification-message");
+
+  if (!message) return;
+
+  message.hidden = false;
+  message.textContent = text;
+  message.classList.remove("error", "success");
+  message.classList.add(type);
+}
+
+function hideVerificationMessage() {
+  const message = document.getElementById("verification-message");
+
+  if (!message) return;
+
+  message.hidden = true;
+  message.textContent = "";
+  message.classList.remove("error", "success");
+}
+
+function showPageMessage(text) {
+  alert(text);
+}
+
 function switchToLogin() {
   document.getElementById("login-tab").classList.add("active-auth-tab");
   document.getElementById("register-tab").classList.remove("active-auth-tab");
@@ -121,6 +146,7 @@ function openVerificationModal(email) {
   const emailText = document.getElementById("verification-email-text");
 
   clearCodeInputs();
+  hideVerificationMessage();
 
   if (emailText) {
     emailText.textContent = email;
@@ -137,6 +163,7 @@ function openVerificationModal(email) {
 
 function closeVerificationModal() {
   document.getElementById("verification-modal").hidden = true;
+  hideVerificationMessage();
 }
 
 function setupCodeInputs() {
@@ -201,17 +228,17 @@ function validateName(name) {
   });
 
   if (hasBlockedWord) {
-    alert("Please choose another name. This name is not allowed.");
+    showPageMessage("Please choose another name. This name is not allowed.");
     return false;
   }
 
   if (name.length < 2) {
-    alert("Name is too short.");
+    showPageMessage("Name is too short.");
     return false;
   }
 
   if (name.length > 24) {
-    alert("Name is too long. Please use 24 characters or less.");
+    showPageMessage("Name is too long. Please use 24 characters or less.");
     return false;
   }
 
@@ -220,11 +247,102 @@ function validateName(name) {
 
 function validatePassword(password) {
   if (password.length < 8) {
-    alert("Password must be at least 8 letters or numbers.");
+    showPageMessage("Password must be at least 8 letters or numbers.");
     return false;
   }
 
   return true;
+}
+
+function getFriendlyAuthError(errorMessage) {
+  const message = String(errorMessage || "").toLowerCase();
+
+  if (message.includes("rate limit") || message.includes("email rate limit")) {
+    return "Too many email attempts. Please wait a few minutes before requesting a new code.";
+  }
+
+  if (message.includes("security") || message.includes("seconds")) {
+    return "Please wait a moment before requesting another code.";
+  }
+
+  if (message.includes("token has expired") || message.includes("expired") || message.includes("invalid")) {
+    return "This code is expired or invalid. Please request a new code and use the latest email.";
+  }
+
+  if (message.includes("already registered") || message.includes("already exists")) {
+    return "This email already has an account. Try logging in instead.";
+  }
+
+  if (message.includes("email not confirmed") || message.includes("not confirmed")) {
+    return "Please confirm your email first. Enter the code from your email.";
+  }
+
+  if (message.includes("invalid login credentials")) {
+    return "Email or password is incorrect.";
+  }
+
+  if (message.includes("password")) {
+    return "Please check your password. It must be at least 8 characters.";
+  }
+
+  return errorMessage || "Something went wrong. Please try again.";
+}
+
+function generateAlphaCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+
+  for (let i = 0; i < 6; i += 1) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  return code;
+}
+
+async function loadOrCreateAlphaCode(userId) {
+  const input = document.getElementById("alpha-code-input");
+
+  if (!input) return;
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("alpha_code")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    input.value = "ERROR";
+    return;
+  }
+
+  if (data && data.alpha_code) {
+    input.value = data.alpha_code;
+    return;
+  }
+
+  let finalCode = "";
+  let saved = false;
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const newCode = generateAlphaCode();
+
+    const updateResult = await supabaseClient
+      .from("profiles")
+      .update({
+        alpha_code: newCode
+      })
+      .eq("id", userId)
+      .select("alpha_code")
+      .single();
+
+    if (!updateResult.error && updateResult.data) {
+      finalCode = updateResult.data.alpha_code;
+      saved = true;
+      break;
+    }
+  }
+
+  input.value = saved ? finalCode : "REFRESH";
 }
 
 function showLoggedOut() {
@@ -248,6 +366,7 @@ async function showLoggedIn(user) {
   document.getElementById("dropdown-email").textContent = user.email;
 
   await loadSubscription(user.id);
+  await loadOrCreateAlphaCode(user.id);
 }
 
 async function loadSubscription(userId) {
@@ -297,7 +416,7 @@ async function registerUser(event) {
   const repeatPassword = document.getElementById("register-repeat-password").value.trim();
 
   if (!name || !email || !password || !repeatPassword) {
-    alert("Please fill in all fields.");
+    showPageMessage("Please fill in all fields.");
     return;
   }
 
@@ -305,7 +424,7 @@ async function registerUser(event) {
   if (!validatePassword(password)) return;
 
   if (password !== repeatPassword) {
-    alert("Passwords do not match.");
+    showPageMessage("Passwords do not match.");
     return;
   }
 
@@ -323,7 +442,7 @@ async function registerUser(event) {
   });
 
   if (error) {
-    alert(error.message);
+    showPageMessage(getFriendlyAuthError(error.message));
     return;
   }
 
@@ -337,7 +456,7 @@ async function loginUser(event) {
   const password = document.getElementById("login-password").value.trim();
 
   if (!email || !password) {
-    alert("Please fill in all fields.");
+    showPageMessage("Please fill in all fields.");
     return;
   }
 
@@ -360,10 +479,11 @@ async function loginUser(event) {
       message.includes("confirm")
     ) {
       openVerificationModal(email);
+      showVerificationMessage("Please enter the code from your email to confirm your account.", "error");
       return;
     }
 
-    alert(error.message);
+    showPageMessage(getFriendlyAuthError(error.message));
     return;
   }
 
@@ -375,16 +495,17 @@ async function loginUser(event) {
 async function confirmAccount(event) {
   event.preventDefault();
 
+  hideVerificationMessage();
+
   const code = getCodeValue();
 
   if (!pendingEmail) {
-    alert("Email is missing. Please register or login again.");
-    closeVerificationModal();
+    showVerificationMessage("Email is missing. Please register or login again.", "error");
     return;
   }
 
   if (code.length !== 8) {
-    alert("Please enter the verification code from your email.");
+    showVerificationMessage("Please enter the full verification code from your email.", "error");
     return;
   }
 
@@ -395,7 +516,7 @@ async function confirmAccount(event) {
   });
 
   if (error) {
-    alert(error.message);
+    showVerificationMessage(getFriendlyAuthError(error.message), "error");
     return;
   }
 
@@ -418,13 +539,15 @@ async function confirmAccount(event) {
     }
   }
 
-  alert("Account confirmed. Please login.");
+  showPageMessage("Account confirmed. Please login.");
   switchToLogin();
 }
 
 async function resendCode() {
+  hideVerificationMessage();
+
   if (!pendingEmail) {
-    alert("Email is missing. Please register or login again.");
+    showVerificationMessage("Email is missing. Please register or login again.", "error");
     return;
   }
 
@@ -440,18 +563,20 @@ async function resendCode() {
   });
 
   if (error) {
-    const message = error.message.toLowerCase();
+    showVerificationMessage(getFriendlyAuthError(error.message), "error");
 
-    if (message.includes("security") || message.includes("seconds")) {
+    if (
+      error.message.toLowerCase().includes("rate limit") ||
+      error.message.toLowerCase().includes("security") ||
+      error.message.toLowerCase().includes("seconds")
+    ) {
       startResendCooldown(60);
-      return;
     }
 
-    alert(error.message);
     return;
   }
 
-  alert("A new confirmation code has been sent.");
+  showVerificationMessage("A new verification code has been sent.", "success");
   startResendCooldown(60);
 }
 
