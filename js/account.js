@@ -2,6 +2,8 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let pendingEmail = "";
 let pendingPassword = "";
+let resendTimer = null;
+let resendSeconds = 0;
 
 function switchToLogin() {
   document.getElementById("login-tab").classList.add("active-auth-tab");
@@ -81,6 +83,37 @@ function getCodeValue() {
     .join("");
 }
 
+function startResendCooldown(seconds) {
+  const button = document.getElementById("resend-code-button");
+
+  if (!button) return;
+
+  resendSeconds = seconds;
+  button.disabled = true;
+  button.classList.add("disabled-button");
+  button.textContent = "Resend Code " + resendSeconds + "s";
+
+  if (resendTimer) {
+    clearInterval(resendTimer);
+  }
+
+  resendTimer = setInterval(function () {
+    resendSeconds -= 1;
+
+    if (resendSeconds <= 0) {
+      clearInterval(resendTimer);
+      resendTimer = null;
+
+      button.disabled = false;
+      button.classList.remove("disabled-button");
+      button.textContent = "Resend Code";
+      return;
+    }
+
+    button.textContent = "Resend Code " + resendSeconds + "s";
+  }, 1000);
+}
+
 function openVerificationModal(email) {
   pendingEmail = email;
 
@@ -94,6 +127,7 @@ function openVerificationModal(email) {
   }
 
   modal.hidden = false;
+  startResendCooldown(60);
 
   setTimeout(function () {
     const firstInput = document.querySelector(".code-input");
@@ -129,7 +163,7 @@ function setupCodeInputs() {
       const pasted = event.clipboardData
         .getData("text")
         .replace(/\D/g, "")
-        .slice(0, 6);
+        .slice(0, 8);
 
       pasted.split("").forEach(function (number, pastedIndex) {
         if (inputs[pastedIndex]) {
@@ -141,6 +175,56 @@ function setupCodeInputs() {
       if (next) next.focus();
     });
   });
+}
+
+function validateName(name) {
+  const blockedNames = [
+    "admin",
+    "administrator",
+    "support",
+    "skinscope",
+    "moderator",
+    "fuck",
+    "shit",
+    "bitch",
+    "asshole",
+    "nazi",
+    "hitler",
+    "porn",
+    "sex"
+  ];
+
+  const lowerName = name.toLowerCase();
+
+  const hasBlockedWord = blockedNames.some(function (word) {
+    return lowerName.includes(word);
+  });
+
+  if (hasBlockedWord) {
+    alert("Please choose another name. This name is not allowed.");
+    return false;
+  }
+
+  if (name.length < 2) {
+    alert("Name is too short.");
+    return false;
+  }
+
+  if (name.length > 24) {
+    alert("Name is too long. Please use 24 characters or less.");
+    return false;
+  }
+
+  return true;
+}
+
+function validatePassword(password) {
+  if (password.length < 8) {
+    alert("Password must be at least 8 letters or numbers.");
+    return false;
+  }
+
+  return true;
 }
 
 function showLoggedOut() {
@@ -217,6 +301,9 @@ async function registerUser(event) {
     return;
   }
 
+  if (!validateName(name)) return;
+  if (!validatePassword(password)) return;
+
   if (password !== repeatPassword) {
     alert("Passwords do not match.");
     return;
@@ -225,7 +312,7 @@ async function registerUser(event) {
   pendingEmail = email;
   pendingPassword = password;
 
-  const { data, error } = await supabaseClient.auth.signUp({
+  const { error } = await supabaseClient.auth.signUp({
     email: email,
     password: password,
     options: {
@@ -253,6 +340,8 @@ async function loginUser(event) {
     alert("Please fill in all fields.");
     return;
   }
+
+  if (!validatePassword(password)) return;
 
   pendingEmail = email;
   pendingPassword = password;
@@ -294,8 +383,8 @@ async function confirmAccount(event) {
     return;
   }
 
-  if (code.length !== 6) {
-    alert("Please enter the 6-digit code.");
+  if (code.length !== 8) {
+    alert("Please enter the verification code from your email.");
     return;
   }
 
@@ -339,17 +428,31 @@ async function resendCode() {
     return;
   }
 
+  const button = document.getElementById("resend-code-button");
+
+  if (button && button.disabled) {
+    return;
+  }
+
   const { error } = await supabaseClient.auth.resend({
     type: "signup",
     email: pendingEmail
   });
 
   if (error) {
+    const message = error.message.toLowerCase();
+
+    if (message.includes("security") || message.includes("seconds")) {
+      startResendCooldown(60);
+      return;
+    }
+
     alert(error.message);
     return;
   }
 
   alert("A new confirmation code has been sent.");
+  startResendCooldown(60);
 }
 
 async function logoutUser() {
