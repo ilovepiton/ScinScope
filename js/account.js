@@ -4,10 +4,11 @@ let pendingEmail = "";
 let pendingPassword = "";
 let resendTimer = null;
 let resendSeconds = 0;
+let currentUser = null;
+let currentProfile = null;
 
 function showVerificationMessage(text, type = "error") {
   const message = document.getElementById("verification-message");
-
   if (!message) return;
 
   message.hidden = false;
@@ -18,7 +19,6 @@ function showVerificationMessage(text, type = "error") {
 
 function hideVerificationMessage() {
   const message = document.getElementById("verification-message");
-
   if (!message) return;
 
   message.hidden = true;
@@ -28,6 +28,25 @@ function hideVerificationMessage() {
 
 function showPageMessage(text) {
   alert(text);
+}
+
+function showDrawerMessage(id, text, type = "error") {
+  const message = document.getElementById(id);
+  if (!message) return;
+
+  message.hidden = false;
+  message.textContent = text;
+  message.classList.remove("error", "success");
+  message.classList.add(type);
+}
+
+function hideDrawerMessage(id) {
+  const message = document.getElementById(id);
+  if (!message) return;
+
+  message.hidden = true;
+  message.textContent = "";
+  message.classList.remove("error", "success");
 }
 
 function switchToLogin() {
@@ -78,7 +97,6 @@ function toggleRegisterPassword() {
 function toggleCodeVisibility() {
   const inputs = document.querySelectorAll(".code-input");
   const button = document.getElementById("toggle-code-button");
-
   if (!inputs.length) return;
 
   const hidden = inputs[0].type === "password";
@@ -110,7 +128,6 @@ function getCodeValue() {
 
 function startResendCooldown(seconds) {
   const button = document.getElementById("resend-code-button");
-
   if (!button) return;
 
   resendSeconds = seconds;
@@ -270,7 +287,7 @@ function getFriendlyAuthError(errorMessage) {
   }
 
   if (message.includes("already registered") || message.includes("already exists")) {
-    return "This email already has an account. Try logging in instead.";
+    return "This email already has an account. Please log in with your password.";
   }
 
   if (message.includes("email not confirmed") || message.includes("not confirmed")) {
@@ -281,6 +298,10 @@ function getFriendlyAuthError(errorMessage) {
     return "Email or password is incorrect.";
   }
 
+  if (message.includes("duplicate") || message.includes("unique")) {
+    return "This name is already taken. Please choose another name.";
+  }
+
   if (message.includes("password")) {
     return "Please check your password. It must be at least 8 characters.";
   }
@@ -288,25 +309,117 @@ function getFriendlyAuthError(errorMessage) {
   return errorMessage || "Something went wrong. Please try again.";
 }
 
+function getProfileAvatarUrl(profile) {
+  if (profile && profile.avatar_url) {
+    return profile.avatar_url;
+  }
+
+  return "";
+}
+
+function setAvatarImages(url) {
+  const profileImage = document.getElementById("profile-avatar-image");
+  const profileFallback = document.getElementById("profile-avatar-fallback");
+  const drawerImage = document.getElementById("drawer-avatar-image");
+  const drawerFallback = document.getElementById("drawer-avatar-fallback");
+  const headerImage = document.getElementById("header-account-avatar");
+
+  if (url) {
+    if (profileImage) {
+      profileImage.src = url;
+      profileImage.hidden = false;
+    }
+
+    if (profileFallback) profileFallback.hidden = true;
+
+    if (drawerImage) {
+      drawerImage.src = url;
+      drawerImage.hidden = false;
+    }
+
+    if (drawerFallback) drawerFallback.hidden = true;
+
+    if (headerImage) {
+      headerImage.src = url;
+      headerImage.hidden = false;
+    }
+  } else {
+    if (profileImage) {
+      profileImage.src = "";
+      profileImage.hidden = true;
+    }
+
+    if (profileFallback) profileFallback.hidden = false;
+
+    if (drawerImage) {
+      drawerImage.src = "";
+      drawerImage.hidden = true;
+    }
+
+    if (drawerFallback) drawerFallback.hidden = false;
+
+    if (headerImage) {
+      headerImage.src = "";
+      headerImage.hidden = true;
+    }
+  }
+}
+
+async function loadProfile(user) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("id, email, name, avatar_url")
+    .eq("id", user.id)
+    .single();
+
+  if (error || !data) {
+    currentProfile = {
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.name || user.email.split("@")[0],
+      avatar_url: ""
+    };
+
+    return currentProfile;
+  }
+
+  currentProfile = data;
+  return data;
+}
+
 function showLoggedOut() {
   document.getElementById("auth-panel").hidden = false;
   document.getElementById("logged-panel").hidden = true;
   document.getElementById("header-account-menu").hidden = true;
+
+  const accountNavLink = document.getElementById("account-nav-link");
+  if (accountNavLink) accountNavLink.hidden = false;
 }
 
 async function showLoggedIn(user) {
+  currentUser = user;
+
   document.getElementById("auth-panel").hidden = true;
   document.getElementById("logged-panel").hidden = false;
 
-  const name = user.user_metadata?.name || user.email.split("@")[0];
+  const profile = await loadProfile(user);
+  const name = profile.name || user.user_metadata?.name || user.email.split("@")[0];
+  const avatarUrl = getProfileAvatarUrl(profile);
 
   document.getElementById("account-welcome").textContent = "Perfect, you’re signed in!";
   document.getElementById("account-email-text").textContent = "Signed in as " + user.email;
 
   document.getElementById("header-account-menu").hidden = false;
-  document.getElementById("header-account-button").textContent = name + " ▼";
-  document.getElementById("dropdown-name").textContent = name;
-  document.getElementById("dropdown-email").textContent = user.email;
+  document.getElementById("header-account-name").textContent = name;
+
+  const accountNavLink = document.getElementById("account-nav-link");
+  if (accountNavLink) accountNavLink.hidden = true;
+
+  document.getElementById("drawer-name").textContent = name;
+  document.getElementById("drawer-email").textContent = user.email;
+  document.getElementById("change-name-input").value = name;
+
+  setAvatarImages(avatarUrl);
 
   await loadSubscription(user.id);
 }
@@ -316,8 +429,9 @@ async function loadSubscription(userId) {
   const planEl = document.getElementById("account-plan");
   const trialEl = document.getElementById("account-trial");
 
-  const dropdownPlan = document.getElementById("dropdown-plan");
-  const dropdownStatus = document.getElementById("dropdown-status");
+  const drawerPlan = document.getElementById("drawer-plan");
+  const drawerStatus = document.getElementById("drawer-status");
+  const drawerTrial = document.getElementById("drawer-trial");
 
   const { data, error } = await supabaseClient
     .from("subscriptions")
@@ -330,22 +444,27 @@ async function loadSubscription(userId) {
     planEl.textContent = "trial";
     trialEl.textContent = "7 days after registration";
 
-    dropdownPlan.textContent = "trial";
-    dropdownStatus.textContent = "active";
+    drawerPlan.textContent = "trial";
+    drawerStatus.textContent = "active";
+    drawerTrial.textContent = "7 days after registration";
     return;
   }
 
   statusEl.textContent = data.status;
   planEl.textContent = data.plan;
 
-  dropdownPlan.textContent = data.plan;
-  dropdownStatus.textContent = data.status;
+  drawerPlan.textContent = data.plan;
+  drawerStatus.textContent = data.status;
 
   if (data.trial_ends_at) {
     const date = new Date(data.trial_ends_at);
-    trialEl.textContent = date.toLocaleDateString();
+    const formattedDate = date.toLocaleDateString();
+
+    trialEl.textContent = formattedDate;
+    drawerTrial.textContent = formattedDate;
   } else {
     trialEl.textContent = "No trial date";
+    drawerTrial.textContent = "No trial date";
   }
 }
 
@@ -522,13 +641,117 @@ async function resendCode() {
   startResendCooldown(60);
 }
 
+function openAccountDrawer() {
+  document.getElementById("account-drawer").hidden = false;
+  hideDrawerMessage("avatar-message");
+  hideDrawerMessage("name-message");
+}
+
+function closeAccountDrawer() {
+  document.getElementById("account-drawer").hidden = true;
+}
+
+function openLogoutConfirm() {
+  document.getElementById("logout-confirm-modal").hidden = false;
+}
+
+function closeLogoutConfirm() {
+  document.getElementById("logout-confirm-modal").hidden = true;
+}
+
 async function logoutUser() {
   await supabaseClient.auth.signOut();
 
-  document.getElementById("header-account-dropdown").hidden = true;
+  closeLogoutConfirm();
+  closeAccountDrawer();
+
+  currentUser = null;
+  currentProfile = null;
 
   showLoggedOut();
   switchToLogin();
+}
+
+async function changeProfilePicture(file) {
+  if (!currentUser || !file) return;
+
+  hideDrawerMessage("avatar-message");
+
+  if (!file.type.startsWith("image/")) {
+    showDrawerMessage("avatar-message", "Please upload an image file.", "error");
+    return;
+  }
+
+  const fileExt = file.name.split(".").pop();
+  const fileName = Date.now() + "." + fileExt;
+  const filePath = currentUser.id + "/" + fileName;
+
+  const uploadResult = await supabaseClient.storage
+    .from("avatars")
+    .upload(filePath, file, {
+      upsert: true
+    });
+
+  if (uploadResult.error) {
+    showDrawerMessage("avatar-message", "Could not upload profile picture.", "error");
+    return;
+  }
+
+  const publicUrlResult = supabaseClient.storage
+    .from("avatars")
+    .getPublicUrl(filePath);
+
+  const avatarUrl = publicUrlResult.data.publicUrl;
+
+  const updateResult = await supabaseClient
+    .from("profiles")
+    .update({
+      avatar_url: avatarUrl
+    })
+    .eq("id", currentUser.id)
+    .select("id, email, name, avatar_url")
+    .single();
+
+  if (updateResult.error) {
+    showDrawerMessage("avatar-message", "Could not save profile picture.", "error");
+    return;
+  }
+
+  currentProfile = updateResult.data;
+  setAvatarImages(avatarUrl);
+  showDrawerMessage("avatar-message", "Profile picture updated.", "success");
+}
+
+async function saveName() {
+  if (!currentUser) return;
+
+  hideDrawerMessage("name-message");
+
+  const input = document.getElementById("change-name-input");
+  const newName = input.value.trim();
+
+  if (!validateName(newName)) return;
+
+  const updateResult = await supabaseClient
+    .from("profiles")
+    .update({
+      name: newName
+    })
+    .eq("id", currentUser.id)
+    .select("id, email, name, avatar_url")
+    .single();
+
+  if (updateResult.error) {
+    showDrawerMessage("name-message", getFriendlyAuthError(updateResult.error.message), "error");
+    return;
+  }
+
+  currentProfile = updateResult.data;
+
+  document.getElementById("header-account-name").textContent = newName;
+  document.getElementById("drawer-name").textContent = newName;
+
+  showDrawerMessage("name-message", "Name updated.", "success");
 }
 
 async function checkSession() {
@@ -540,15 +763,6 @@ async function checkSession() {
     showLoggedOut();
     switchToLogin();
   }
-}
-
-function setupAccountDropdown() {
-  const button = document.getElementById("header-account-button");
-  const dropdown = document.getElementById("header-account-dropdown");
-
-  button.onclick = function () {
-    dropdown.hidden = !dropdown.hidden;
-  };
 }
 
 function setupAccountPage() {
@@ -566,11 +780,26 @@ function setupAccountPage() {
   document.getElementById("resend-code-button").onclick = resendCode;
   document.getElementById("close-verification-button").onclick = closeVerificationModal;
 
-  document.getElementById("logout-button").onclick = logoutUser;
-  document.getElementById("dropdown-logout-button").onclick = logoutUser;
+  document.getElementById("header-account-button").onclick = openAccountDrawer;
+  document.getElementById("open-account-drawer-button").onclick = openAccountDrawer;
+  document.getElementById("close-account-drawer-button").onclick = closeAccountDrawer;
+
+  document.getElementById("drawer-logout-button").onclick = openLogoutConfirm;
+  document.getElementById("confirm-logout-button").onclick = logoutUser;
+  document.getElementById("cancel-logout-button").onclick = closeLogoutConfirm;
+
+  document.getElementById("change-avatar-button").onclick = function () {
+    document.getElementById("avatar-file-input").click();
+  };
+
+  document.getElementById("avatar-file-input").onchange = function (event) {
+    const file = event.target.files[0];
+    changeProfilePicture(file);
+  };
+
+  document.getElementById("save-name-button").onclick = saveName;
 
   setupCodeInputs();
-  setupAccountDropdown();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
