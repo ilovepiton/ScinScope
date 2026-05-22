@@ -25,23 +25,14 @@
       <a href="/ScinScope/pages/scan.html">Face Scan</a>
       <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
       <a href="/ScinScope/pages/plan.html">Plan</a>
-      <a href="/ScinScope/pages/account.html">Account</a>
+      <a id="account-nav-link" href="/ScinScope/pages/account.html">Account</a>
 
       <div id="header-account-menu" class="header-account-menu" hidden>
         <button type="button" id="header-account-button" class="header-account-button">
-          Account ▼
+          <img id="header-account-avatar" class="header-account-avatar" src="" alt="" hidden />
+          <span id="header-account-name">Account</span>
+          <span>▼</span>
         </button>
-
-        <div id="header-account-dropdown" class="header-account-dropdown" hidden>
-          <p><strong>Name:</strong> <span id="dropdown-name">—</span></p>
-          <p><strong>Email:</strong> <span id="dropdown-email">—</span></p>
-          <p><strong>Plan:</strong> <span id="dropdown-plan">—</span></p>
-          <p><strong>Status:</strong> <span id="dropdown-status">—</span></p>
-
-          <button type="button" id="dropdown-logout-button" class="secondary-button button-reset small-button">
-            Logout
-          </button>
-        </div>
       </div>
     </nav>
   </header>
@@ -119,11 +110,17 @@
       </div>
 
       <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
-        <div class="account-avatar">🧴</div>
+        <div class="profile-preview-row">
+          <div class="profile-avatar-large" id="profile-avatar-large">
+            <span id="profile-avatar-fallback">👤</span>
+            <img id="profile-avatar-image" src="" alt="Profile picture" hidden />
+          </div>
 
-        <h2 id="account-welcome">Perfect, you’re signed in!</h2>
-
-        <p id="account-email-text"></p>
+          <div>
+            <h2 id="account-welcome">Perfect, you’re signed in!</h2>
+            <p id="account-email-text"></p>
+          </div>
+        </div>
 
         <div class="account-list">
           <div class="account-item">
@@ -146,9 +143,8 @@
           <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
           <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
           <a class="secondary-button" href="/ScinScope/pages/plan.html">Plan</a>
-
-          <button type="button" id="logout-button" class="secondary-button button-reset">
-            Logout
+          <button type="button" id="open-account-drawer-button" class="secondary-button button-reset">
+            Account settings
           </button>
         </div>
       </div>
@@ -198,6 +194,116 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="account-drawer" class="account-drawer" hidden>
+    <div class="account-drawer-panel">
+      <div class="account-drawer-header">
+        <div>
+          <p class="beta-label">Account settings</p>
+          <h2>My SkinScope Profile</h2>
+        </div>
+
+        <button type="button" id="close-account-drawer-button" class="drawer-close-button">
+          ✕
+        </button>
+      </div>
+
+      <div class="drawer-profile-top">
+        <div class="drawer-profile-avatar">
+          <span id="drawer-avatar-fallback">👤</span>
+          <img id="drawer-avatar-image" src="" alt="Profile picture" hidden />
+        </div>
+
+        <div>
+          <h3 id="drawer-name">Profile</h3>
+          <p id="drawer-email">email@example.com</p>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Change profile picture</h3>
+
+        <p>
+          Upload a profile picture for your SkinScope account.
+        </p>
+
+        <input id="avatar-file-input" type="file" accept="image/*" hidden />
+
+        <button type="button" id="change-avatar-button" class="primary-button button-reset">
+          Change profile picture
+        </button>
+
+        <p id="avatar-message" class="drawer-message" hidden></p>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Change name</h3>
+
+        <p>
+          Your name must be unique. Other users cannot use the same name.
+        </p>
+
+        <input id="change-name-input" class="drawer-input" type="text" placeholder="New name" />
+
+        <button type="button" id="save-name-button" class="primary-button button-reset">
+          Save name
+        </button>
+
+        <p id="name-message" class="drawer-message" hidden></p>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Subscription</h3>
+
+        <div class="drawer-info-row">
+          <strong>Plan:</strong>
+          <span id="drawer-plan">trial</span>
+        </div>
+
+        <div class="drawer-info-row">
+          <strong>Status:</strong>
+          <span id="drawer-status">active</span>
+        </div>
+
+        <div class="drawer-info-row">
+          <strong>Trial ends:</strong>
+          <span id="drawer-trial">—</span>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Logout</h3>
+
+        <p>
+          You can log out from this device. Your account data will stay saved.
+        </p>
+
+        <button type="button" id="drawer-logout-button" class="secondary-button button-reset logout-danger-button">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="logout-confirm-modal" class="logout-confirm-modal" hidden>
+    <div class="logout-confirm-box">
+      <h2>Are you sure you want to log out?</h2>
+
+      <p>
+        You can log back in anytime with your email and password.
+      </p>
+
+      <div class="verification-actions">
+        <button type="button" id="confirm-logout-button" class="primary-button button-reset">
+          Yes, log out
+        </button>
+
+        <button type="button" id="cancel-logout-button" class="secondary-button button-reset">
+          Cancel
+        </button>
+      </div>
     </div>
   </div>
 
