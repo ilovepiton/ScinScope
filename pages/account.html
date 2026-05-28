@@ -29,7 +29,10 @@
 
       <div id="header-account-menu" class="header-account-menu" hidden>
         <button type="button" id="header-account-button" class="header-account-button">
-          <img id="header-account-avatar" class="header-account-avatar" src="" alt="" hidden />
+          <span class="header-profile-circle">
+            <img id="header-account-avatar" class="header-account-avatar" src="" alt="Profile picture" hidden />
+            <span id="header-avatar-fallback">👤</span>
+          </span>
           <span id="header-account-name">Account</span>
           <span>▼</span>
         </button>
@@ -223,35 +226,19 @@
       </div>
 
       <div class="drawer-section">
-        <h3>Change profile picture</h3>
+        <h3>Profile picture</h3>
 
         <p>
-          Upload a profile picture for your SkinScope account.
+          Upload any clear image from your device. It will become your SkinScope profile picture.
         </p>
 
-        <input id="avatar-file-input" type="file" accept="image/*" hidden />
+        <input id="avatar-file-input" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif" hidden />
 
         <button type="button" id="change-avatar-button" class="primary-button button-reset">
-          Change profile picture
+          Add profile picture
         </button>
 
         <p id="avatar-message" class="drawer-message" hidden></p>
-      </div>
-
-      <div class="drawer-section">
-        <h3>Change name</h3>
-
-        <p>
-          Your name must be unique. Other users cannot use the same name.
-        </p>
-
-        <input id="change-name-input" class="drawer-input" type="text" placeholder="New name" />
-
-        <button type="button" id="save-name-button" class="primary-button button-reset">
-          Save name
-        </button>
-
-        <p id="name-message" class="drawer-message" hidden></p>
       </div>
 
       <div class="drawer-section">
