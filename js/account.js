@@ -309,6 +309,42 @@ function getFriendlyAuthError(errorMessage) {
   return errorMessage || "Something went wrong. Please try again.";
 }
 
+function getSafeFileExtension(file) {
+  const fileName = file.name || "";
+  const rawExt = fileName.split(".").pop().toLowerCase();
+
+  const allowedExts = ["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"];
+
+  if (allowedExts.includes(rawExt)) {
+    return rawExt;
+  }
+
+  if (file.type === "image/png") return "png";
+  if (file.type === "image/webp") return "webp";
+  if (file.type === "image/gif") return "gif";
+
+  return "jpg";
+}
+
+function isLikelyImage(file) {
+  const fileName = file.name || "";
+  const lowerName = fileName.toLowerCase();
+
+  if (file.type && file.type.startsWith("image/")) {
+    return true;
+  }
+
+  return (
+    lowerName.endsWith(".jpg") ||
+    lowerName.endsWith(".jpeg") ||
+    lowerName.endsWith(".png") ||
+    lowerName.endsWith(".webp") ||
+    lowerName.endsWith(".gif") ||
+    lowerName.endsWith(".heic") ||
+    lowerName.endsWith(".heif")
+  );
+}
+
 function getProfileAvatarUrl(profile) {
   if (profile && profile.avatar_url) {
     return profile.avatar_url;
@@ -323,6 +359,7 @@ function setAvatarImages(url) {
   const drawerImage = document.getElementById("drawer-avatar-image");
   const drawerFallback = document.getElementById("drawer-avatar-fallback");
   const headerImage = document.getElementById("header-account-avatar");
+  const headerFallback = document.getElementById("header-avatar-fallback");
 
   if (url) {
     if (profileImage) {
@@ -343,6 +380,8 @@ function setAvatarImages(url) {
       headerImage.src = url;
       headerImage.hidden = false;
     }
+
+    if (headerFallback) headerFallback.hidden = true;
   } else {
     if (profileImage) {
       profileImage.src = "";
@@ -362,6 +401,8 @@ function setAvatarImages(url) {
       headerImage.src = "";
       headerImage.hidden = true;
     }
+
+    if (headerFallback) headerFallback.hidden = false;
   }
 }
 
@@ -417,7 +458,6 @@ async function showLoggedIn(user) {
 
   document.getElementById("drawer-name").textContent = name;
   document.getElementById("drawer-email").textContent = user.email;
-  document.getElementById("change-name-input").value = name;
 
   setAvatarImages(avatarUrl);
 
@@ -644,7 +684,6 @@ async function resendCode() {
 function openAccountDrawer() {
   document.getElementById("account-drawer").hidden = false;
   hideDrawerMessage("avatar-message");
-  hideDrawerMessage("name-message");
 }
 
 function closeAccountDrawer() {
@@ -677,23 +716,24 @@ async function changeProfilePicture(file) {
 
   hideDrawerMessage("avatar-message");
 
-  if (!file.type.startsWith("image/")) {
+  if (!isLikelyImage(file)) {
     showDrawerMessage("avatar-message", "Please upload an image file.", "error");
     return;
   }
 
-  const fileExt = file.name.split(".").pop();
-  const fileName = Date.now() + "." + fileExt;
+  const fileExt = getSafeFileExtension(file);
+  const fileName = "avatar-" + Date.now() + "." + fileExt;
   const filePath = currentUser.id + "/" + fileName;
 
   const uploadResult = await supabaseClient.storage
     .from("avatars")
     .upload(filePath, file, {
-      upsert: true
+      upsert: true,
+      contentType: file.type || "image/jpeg"
     });
 
   if (uploadResult.error) {
-    showDrawerMessage("avatar-message", "Could not upload profile picture.", "error");
+    showDrawerMessage("avatar-message", uploadResult.error.message || "Could not upload profile picture.", "error");
     return;
   }
 
@@ -713,45 +753,13 @@ async function changeProfilePicture(file) {
     .single();
 
   if (updateResult.error) {
-    showDrawerMessage("avatar-message", "Could not save profile picture.", "error");
+    showDrawerMessage("avatar-message", updateResult.error.message || "Could not save profile picture.", "error");
     return;
   }
 
   currentProfile = updateResult.data;
   setAvatarImages(avatarUrl);
   showDrawerMessage("avatar-message", "Profile picture updated.", "success");
-}
-
-async function saveName() {
-  if (!currentUser) return;
-
-  hideDrawerMessage("name-message");
-
-  const input = document.getElementById("change-name-input");
-  const newName = input.value.trim();
-
-  if (!validateName(newName)) return;
-
-  const updateResult = await supabaseClient
-    .from("profiles")
-    .update({
-      name: newName
-    })
-    .eq("id", currentUser.id)
-    .select("id, email, name, avatar_url")
-    .single();
-
-  if (updateResult.error) {
-    showDrawerMessage("name-message", getFriendlyAuthError(updateResult.error.message), "error");
-    return;
-  }
-
-  currentProfile = updateResult.data;
-
-  document.getElementById("header-account-name").textContent = newName;
-  document.getElementById("drawer-name").textContent = newName;
-
-  showDrawerMessage("name-message", "Name updated.", "success");
 }
 
 async function checkSession() {
@@ -796,8 +804,6 @@ function setupAccountPage() {
     const file = event.target.files[0];
     changeProfilePicture(file);
   };
-
-  document.getElementById("save-name-button").onclick = saveName;
 
   setupCodeInputs();
 }
