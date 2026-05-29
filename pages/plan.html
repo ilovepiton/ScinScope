@@ -3,27 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>SkinScope — Plan</title>
-  <link rel="stylesheet" href="/ScinScope/css/main.css" />
+  <link rel="stylesheet" href="../css/main.css" />
 </head>
-<body>
 
-  <header class="site-header">
-    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+<body class="account-video-page plan-page">
+  <div class="account-video-wallpaper">
+    <video autoplay muted loop playsinline>
+      <source src="../assets/spa.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <div class="account-video-overlay"></div>
+
+  <header class="site-header transparent-header">
+    <a class="logo-link" href="../index.html">SkinScope</a>
 
     <nav>
-      <a href="/ScinScope/index.html">Home</a>
-      <a href="/ScinScope/pages/scan.html">Face Scan</a>
-      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
-      <a href="/ScinScope/pages/plan.html">Plan</a>
-      <a href="/ScinScope/pages/account.html">Account</a>
+      <a href="../index.html">Home</a>
+      <a href="scan.html">Face Scan</a>
+      <a href="product-scan.html">Product Scan</a>
+      <a class="active-nav" href="plan.html">Plan</a>
+
+      <a id="account-nav-link" href="account.html">Account</a>
+
+      <div id="header-account-menu" class="header-account-menu" hidden>
+        <button id="header-account-button" class="header-account-button" type="button">
+          <span class="header-profile-circle">
+            <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
+            <span id="header-avatar-fallback">👤</span>
+          </span>
+          <span id="header-account-name">Account</span>
+          <span>▼</span>
+        </button>
+      </div>
     </nav>
   </header>
 
-  <main class="page">
-    <section class="card plan-card">
-      <p class="beta-label">Current plan</p>
+  <main class="page spa-page-content">
+    <section class="card plan-card spa-glass-card">
+      <span class="beta-label">Current plan</span>
 
       <h1>Premium skin coaching</h1>
 
@@ -39,7 +58,7 @@
 
       <div class="plan-grid">
         <article class="price-card featured-plan">
-          <p class="plan-name">Premium Monthly</p>
+          <span class="plan-name">Premium Monthly</span>
           <h2>€3.99<span>/month</span></h2>
 
           <ul>
@@ -47,43 +66,39 @@
             <li>AI skin score</li>
             <li>Hydration, redness, and texture checks</li>
             <li>Product compatibility scan</li>
-            <li>Personal skincare advice</li>
-            <li>Progress history planned</li>
+            <li>Progress tracking</li>
           </ul>
 
-          <a class="primary-button" href="/ScinScope/pages/account.html">Choose Premium</a>
+          <a class="primary-button" href="account.html">Current Plan</a>
         </article>
 
-        <article class="price-card lifetime-plan">
-          <p class="plan-name">Lifetime</p>
-          <h2>€78.99<span> one-time</span></h2>
+        <article class="price-card">
+          <span class="plan-name">Lifetime</span>
+          <h2>€78.99 <span>one-time</span></h2>
 
           <ul>
             <li>Everything in Premium</li>
             <li>One-time payment</li>
             <li>Long-term skin progress tracking</li>
             <li>Future premium features included</li>
-            <li>Best value for daily users</li>
           </ul>
 
-          <a class="secondary-button" href="/ScinScope/pages/account.html">Get Lifetime</a>
+          <a class="secondary-button" href="account.html">Upgrade Later</a>
         </article>
       </div>
 
       <div class="premium-note">
-        <h2>Why Premium?</h2>
+        <h2>What Premium unlocks</h2>
         <p>
-          Premium is made for people who want a simple daily skin routine without guessing.
-          Scan your face, check your skincare products, follow your advice, and track visible progress over time.
+          Premium is designed for people who want to track their skin consistently, understand product compatibility,
+          and build a simple daily skincare routine without guessing.
         </p>
-      </div>
-
-      <div class="hero-buttons">
-        <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
-        <a class="secondary-button" href="/ScinScope/index.html">Back Home</a>
       </div>
     </section>
   </main>
 
+  <script src="../js/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/global-auth.js"></script>
 </body>
 </html>
