@@ -3,67 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>SkinScope — Product Scan</title>
-
-  <link rel="stylesheet" href="/ScinScope/css/main.css" />
+  <link rel="stylesheet" href="css/main.css" />
 </head>
-<body>
 
-  <header class="site-header">
-    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+<body class="account-video-page product-scan-page">
+  <div class="account-video-wallpaper">
+    <video autoplay muted loop playsinline>
+      <source src="assets/spa.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="account-video-overlay"></div>
+
+  <header class="site-header transparent-header">
+    <a class="logo-link" href="index.html">SkinScope</a>
 
     <nav>
-      <a href="/ScinScope/index.html">Home</a>
-      <a href="/ScinScope/pages/scan.html">Face Scan</a>
-      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
-      <a href="/ScinScope/pages/account.html">Account</a>
-      <a href="/ScinScope/pages/plan.html">Plan</a>
+      <a href="index.html">Home</a>
+      <a href="scan.html">Face Scan</a>
+      <a href="product-scan.html">Product Scan</a>
+      <a href="plan.html">Plan</a>
+
+      <a id="account-nav-link" href="account.html">Account</a>
+
+      <div id="header-account-menu" class="header-account-menu" hidden>
+        <button id="header-account-button" class="header-account-button" type="button">
+          <span class="header-profile-circle">
+            <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
+            <span id="header-avatar-fallback">👤</span>
+          </span>
+          <span id="header-account-name">Account</span>
+          <span>▼</span>
+        </button>
+      </div>
     </nav>
   </header>
 
-  <main class="page">
-    <section class="card scan-card">
-      <p class="beta-label">Beta product scan</p>
+  <main class="page spa-page-content">
+    <section class="card spa-glass-card">
+      <span class="beta-label">Beta product scan</span>
 
       <h1>Take or upload a product photo</h1>
 
       <p class="hero-text">
-        Take a clear photo of a skincare product or upload it from your device. SkinScope will create a demo compatibility report.
+        Take a clear photo of a skincare product or upload it from your device.
+        SkinScope will create a demo compatibility report.
       </p>
 
       <div class="scan-actions">
-        <button type="button" id="open-product-camera-button" class="scan-choice-button">
+        <button id="open-product-camera-button" class="scan-choice-button button-reset" type="button">
           <span>📸</span>
           <strong>Take Product Photo</strong>
           <small>Use camera inside the app</small>
         </button>
 
-        <label class="scan-choice-button" for="product-photo-input">
+        <label class="scan-choice-button">
           <span>🧴</span>
           <strong>Upload Product File</strong>
           <small>Choose product photo from your device</small>
+          <input id="product-file-input" class="hidden-file-input" type="file" accept="image/*" />
         </label>
       </div>
 
-      <input
-        id="product-photo-input"
-        class="hidden-file-input"
-        type="file"
-        accept="image/*"
-      />
+      <div id="selected-product-box" hidden>
+        <div class="product-bottle-preview">
+          <img id="selected-product-photo" alt="Selected product photo" />
+        </div>
 
-      <div id="product-preview-box" class="product-bottle-preview" hidden>
-        <img id="product-preview-image" src="" alt="Product preview" />
+        <div class="selected-photo-actions">
+          <button id="change-product-photo-button" class="secondary-button button-reset" type="button">
+            Change Product Photo
+          </button>
+        </div>
       </div>
 
-      <div id="product-control-buttons" class="selected-photo-actions" hidden>
-        <button type="button" id="cancel-product-button" class="secondary-button button-reset">
-          Cancel Product
-        </button>
-      </div>
-
-      <button type="button" id="analyze-product-button" class="primary-button button-reset analyze-button disabled-button">
+      <button id="analyze-product-button" class="primary-button button-reset analyze-button" type="button" disabled>
         Analyze Product
       </button>
     </section>
@@ -71,34 +85,32 @@
 
   <div id="product-camera-modal" class="camera-modal" hidden>
     <div class="camera-window">
-      <h2>Fit the product inside the guide</h2>
-
-      <p class="camera-tip">
-        For better results, use good lighting and make sure the product label is clearly visible.
-      </p>
+      <h2>Take product photo</h2>
+      <p class="camera-tip">Place the product inside the frame and take a clear photo.</p>
 
       <div class="camera-frame">
-        <video id="product-camera-video" autoplay playsinline muted></video>
-
+        <video id="product-camera-video" autoplay playsinline></video>
         <div class="face-guide">
           <div class="product-outline"></div>
         </div>
       </div>
 
-      <canvas id="product-camera-canvas" hidden></canvas>
-
       <div class="camera-actions">
-        <button type="button" id="take-product-photo-button" class="primary-button button-reset">
+        <button id="take-product-photo-button" class="primary-button button-reset" type="button">
           Take Photo
         </button>
-
-        <button type="button" id="close-product-camera-button" class="secondary-button button-reset">
+        <button id="close-product-camera-button" class="secondary-button button-reset" type="button">
           Cancel
         </button>
       </div>
     </div>
   </div>
 
-  <script src="/ScinScope/js/product.js"></script>
+  <canvas id="product-camera-canvas" hidden></canvas>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/global-auth.js"></script>
+  <script src="js/product-scan.js"></script>
 </body>
 </html>
