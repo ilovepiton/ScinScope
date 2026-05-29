@@ -3,28 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>SkinScope — Face Scan</title>
-
-  <link rel="stylesheet" href="/ScinScope/css/main.css" />
+  <link rel="stylesheet" href="css/main.css" />
 </head>
-<body>
 
-  <header class="site-header">
-    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+<body class="account-video-page scan-page">
+  <div class="account-video-wallpaper">
+    <video autoplay muted loop playsinline>
+      <source src="assets/spa.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="account-video-overlay"></div>
+
+  <header class="site-header transparent-header">
+    <a class="logo-link" href="index.html">SkinScope</a>
 
     <nav>
-      <a href="/ScinScope/index.html">Home</a>
-      <a href="/ScinScope/pages/scan.html">Face Scan</a>
-      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
-      <a href="/ScinScope/pages/account.html">Account</a>
-      <a href="/ScinScope/pages/plan.html">Plan</a>
+      <a href="index.html">Home</a>
+      <a href="scan.html">Face Scan</a>
+      <a href="product-scan.html">Product Scan</a>
+      <a href="plan.html">Plan</a>
+
+      <a id="account-nav-link" href="account.html">Account</a>
+
+      <div id="header-account-menu" class="header-account-menu" hidden>
+        <button id="header-account-button" class="header-account-button" type="button">
+          <span class="header-profile-circle">
+            <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
+            <span id="header-avatar-fallback">👤</span>
+          </span>
+          <span id="header-account-name">Account</span>
+          <span>▼</span>
+        </button>
+      </div>
     </nav>
   </header>
 
-  <main class="page">
-    <section class="card scan-card">
-      <p class="beta-label">Beta face scan</p>
+  <main class="page spa-page-content">
+    <section class="card spa-glass-card">
+      <span class="beta-label">Beta face scan</span>
 
       <h1>Take or upload your face photo</h1>
 
@@ -33,37 +50,33 @@
       </p>
 
       <div class="scan-actions">
-        <button type="button" id="open-camera-button" class="scan-choice-button">
+        <button id="open-camera-button" class="scan-choice-button button-reset" type="button">
           <span>📸</span>
           <strong>Take Photo</strong>
           <small>Use camera inside the app</small>
         </button>
 
-        <label class="scan-choice-button" for="face-photo-input">
+        <label class="scan-choice-button">
           <span>🖼️</span>
           <strong>Upload File</strong>
           <small>Choose from your device</small>
+          <input id="face-file-input" class="hidden-file-input" type="file" accept="image/*" />
         </label>
       </div>
 
-      <input
-        id="face-photo-input"
-        class="hidden-file-input"
-        type="file"
-        accept="image/*"
-      />
+      <div id="selected-photo-box" hidden>
+        <div class="photo-preview-large">
+          <img id="selected-face-photo" alt="Selected face photo" />
+        </div>
 
-      <div id="photo-preview-box" class="photo-preview-large" hidden>
-        <img id="photo-preview-image" src="" alt="Face preview" />
+        <div class="selected-photo-actions">
+          <button id="change-photo-button" class="secondary-button button-reset" type="button">
+            Change Photo
+          </button>
+        </div>
       </div>
 
-      <div id="photo-control-buttons" class="selected-photo-actions" hidden>
-        <button type="button" id="cancel-photo-button" class="secondary-button button-reset">
-          Cancel Photo
-        </button>
-      </div>
-
-      <button type="button" id="analyze-photo-button" class="primary-button button-reset analyze-button disabled-button">
+      <button id="analyze-face-button" class="primary-button button-reset analyze-button" type="button" disabled>
         Analyze Photo
       </button>
     </section>
@@ -71,34 +84,32 @@
 
   <div id="camera-modal" class="camera-modal" hidden>
     <div class="camera-window">
-      <h2>Put your face inside the guide</h2>
-
-      <p class="camera-tip">
-        For better results, use good lighting and keep your face clearly visible.
-      </p>
+      <h2>Take your face photo</h2>
+      <p class="camera-tip">Put your face inside the circle and take a clear photo.</p>
 
       <div class="camera-frame">
-        <video id="camera-video" autoplay playsinline muted></video>
-
+        <video id="camera-video" autoplay playsinline></video>
         <div class="face-guide">
           <div class="face-outline"></div>
         </div>
       </div>
 
-      <canvas id="camera-canvas" hidden></canvas>
-
       <div class="camera-actions">
-        <button type="button" id="take-camera-photo-button" class="primary-button button-reset">
+        <button id="take-camera-photo-button" class="primary-button button-reset" type="button">
           Take Photo
         </button>
-
-        <button type="button" id="close-camera-button" class="secondary-button button-reset">
+        <button id="close-camera-button" class="secondary-button button-reset" type="button">
           Cancel
         </button>
       </div>
     </div>
   </div>
 
-  <script src="/ScinScope/js/app.js"></script>
+  <canvas id="camera-canvas" hidden></canvas>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/global-auth.js"></script>
+  <script src="js/face-scan.js"></script>
 </body>
 </html>
