@@ -4,24 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkinScope — Product Scan</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="../css/main.css" />
 </head>
 
 <body class="account-video-page product-scan-page">
   <div class="account-video-wallpaper">
     <video autoplay muted loop playsinline>
-      <source src="assets/spa.mp4" type="video/mp4" />
+      <source src="../assets/spa.mp4" type="video/mp4" />
     </video>
   </div>
+
   <div class="account-video-overlay"></div>
 
   <header class="site-header transparent-header">
-    <a class="logo-link" href="index.html">SkinScope</a>
+    <a class="logo-link" href="../index.html">SkinScope</a>
 
     <nav>
-      <a href="index.html">Home</a>
+      <a href="../index.html">Home</a>
       <a href="scan.html">Face Scan</a>
-      <a href="product-scan.html">Product Scan</a>
+      <a class="active-nav" href="product-scan.html">Product Scan</a>
       <a href="plan.html">Plan</a>
 
       <a id="account-nav-link" href="account.html">Account</a>
@@ -90,6 +91,7 @@
 
       <div class="camera-frame">
         <video id="product-camera-video" autoplay playsinline></video>
+
         <div class="face-guide">
           <div class="product-outline"></div>
         </div>
@@ -99,6 +101,7 @@
         <button id="take-product-photo-button" class="primary-button button-reset" type="button">
           Take Photo
         </button>
+
         <button id="close-product-camera-button" class="secondary-button button-reset" type="button">
           Cancel
         </button>
@@ -108,9 +111,9 @@
 
   <canvas id="product-camera-canvas" hidden></canvas>
 
-  <script src="js/supabase-config.js"></script>
+  <script src="../js/supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/global-auth.js"></script>
-  <script src="js/product-scan.js"></script>
+  <script src="../js/global-auth.js"></script>
+  <script src="../js/product.js"></script>
 </body>
 </html>
