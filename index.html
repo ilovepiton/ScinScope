@@ -3,35 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>SkinScope</title>
+  <title>SkinScope — AI Skin Coach</title>
   <link rel="stylesheet" href="/ScinScope/css/main.css" />
 </head>
-<body class="home-video-page">
 
+<body class="home-video-page">
   <div class="video-wallpaper">
     <video id="home-bg-video" autoplay muted loop playsinline>
-      <source src="/ScinScope/assets/spa-wallpaper.mp4" type="video/mp4" />
+      <source src="/ScinScope/assets/spa.mp4" type="video/mp4" />
     </video>
   </div>
 
   <div class="home-video-overlay"></div>
 
   <header class="site-header transparent-header">
-    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+    <a class="logo-link" href="/ScinScope/index.html">SkinScope</a>
 
     <nav>
       <a href="/ScinScope/index.html">Home</a>
       <a href="/ScinScope/pages/scan.html">Face Scan</a>
       <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
       <a href="/ScinScope/pages/plan.html">Plan</a>
-      <a href="/ScinScope/pages/account.html">Account</a>
+
+      <a id="account-nav-link" href="/ScinScope/pages/account.html">Account</a>
+
+      <div id="header-account-menu" class="header-account-menu" hidden>
+        <button id="header-account-button" class="header-account-button" type="button">
+          <span class="header-profile-circle">
+            <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
+            <span id="header-avatar-fallback">👤</span>
+          </span>
+          <span id="header-account-name">Account</span>
+          <span>▼</span>
+        </button>
+      </div>
     </nav>
   </header>
 
   <main class="home-menu-layout">
     <section class="home-glass-card">
-      <p class="beta-label">Free beta</p>
+      <span class="beta-label">Free beta</span>
 
       <h1>Your daily AI skin coach</h1>
 
@@ -79,7 +90,6 @@
 
     <div class="reviews-marquee">
       <div class="reviews-track">
-
         <article class="review-card">
           <img class="review-avatar" src="https://i.pravatar.cc/120?img=47" alt="">
           <div>
@@ -144,8 +154,6 @@
           </div>
         </article>
 
-        <!-- duplicate for endless loop -->
-
         <article class="review-card">
           <img class="review-avatar" src="https://i.pravatar.cc/120?img=47" alt="">
           <div>
@@ -169,10 +177,13 @@
             <p>Very useful app. A few small bugs, but the idea and design are excellent.</p>
           </div>
         </article>
-
       </div>
     </div>
   </section>
+
+  <script src="/ScinScope/js/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/ScinScope/js/global-auth.js"></script>
 
   <script>
     const video = document.getElementById("home-bg-video");
@@ -204,6 +215,5 @@
       setSoundState(false);
     });
   </script>
-
 </body>
 </html>
