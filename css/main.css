@@ -1429,3 +1429,124 @@ h3 {
     font-size: 32px;
   }
 }
+/* ===== FINAL SPA / HEADER / ACCOUNT GLASS FIX ===== */
+
+.scan-page,
+.product-scan-page,
+.account-video-page {
+  min-height: 100vh;
+  background: #111827;
+}
+
+.scan-page .site-header,
+.product-scan-page .site-header,
+.account-video-page .site-header {
+  background: rgba(255, 255, 255, 0.26);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(18px);
+}
+
+.scan-page nav a,
+.product-scan-page nav a,
+.account-video-page nav a {
+  color: #111827;
+  font-weight: 800;
+}
+
+.account-video-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  background: #111827;
+}
+
+.account-video-wallpaper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+
+.account-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(
+    90deg,
+    rgba(246, 243, 239, 0.22),
+    rgba(246, 243, 239, 0.12),
+    rgba(17, 24, 39, 0.10)
+  );
+}
+
+.spa-page-content {
+  background: transparent;
+}
+
+.spa-glass-card {
+  background: rgba(255, 255, 255, 0.30) !important;
+  border: 1px solid rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 30px 90px rgba(17, 24, 39, 0.16);
+}
+
+.spa-glass-card h1,
+.spa-glass-card h2,
+.spa-glass-card h3,
+.spa-glass-card p,
+.spa-glass-card strong,
+.spa-glass-card small {
+  color: #111827;
+}
+
+.spa-glass-card .hero-text {
+  color: #1f2933;
+  font-weight: 800;
+}
+
+.scan-choice-button {
+  background: rgba(255, 255, 255, 0.30) !important;
+  border-color: rgba(17, 24, 39, 0.18) !important;
+  backdrop-filter: blur(14px);
+}
+
+.scan-choice-button:hover {
+  background: rgba(255, 255, 255, 0.50) !important;
+  border-color: #111827 !important;
+}
+
+.header-account-button {
+  background: rgba(255, 255, 255, 0.34) !important;
+  color: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.58) !important;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.08);
+}
+
+.header-profile-circle {
+  background: rgba(255, 255, 255, 0.50) !important;
+}
+
+.account-glass-card,
+.logged-panel {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border: 1px solid rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(18px);
+}
+
+.account-item {
+  background: rgba(255, 255, 255, 0.40) !important;
+  border: 1px solid rgba(255, 255, 255, 0.46) !important;
+}
+
+.account-glass-card h1,
+.account-glass-card h2,
+.account-glass-card p,
+.logged-panel h2,
+.logged-panel p,
+.account-item {
+  color: #111827 !important;
+}
