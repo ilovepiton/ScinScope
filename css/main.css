@@ -1651,3 +1651,56 @@ h3 {
   color: #1f2933 !important;
   font-weight: 800;
 }
+/* ===== FIX: LIGHT SPA BACKGROUND ===== */
+
+.video-wallpaper video,
+.account-video-wallpaper video {
+  filter: blur(2px) brightness(1.32) saturate(1.08) !important;
+  transform: scale(1.025) !important;
+}
+
+.home-video-overlay,
+.account-video-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(246, 243, 239, 0.02),
+    rgba(246, 243, 239, 0.01),
+    rgba(17, 24, 39, 0.01)
+  ) !important;
+}
+
+.home-glass-card,
+.spa-glass-card,
+.account-glass-card,
+.plan-card,
+.card {
+  background: rgba(255, 255, 255, 0.24) !important;
+  border: 1px solid rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(16px);
+}
+
+.logged-panel,
+.auth-box,
+.current-plan-box,
+.price-card,
+.premium-note,
+.scan-choice-button,
+.account-item {
+  background: rgba(255, 255, 255, 0.34) !important;
+  border: 1px solid rgba(255, 255, 255, 0.48) !important;
+  backdrop-filter: blur(14px);
+}
+
+.header-account-button {
+  background: rgba(255, 255, 255, 0.32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.58) !important;
+  color: #111827 !important;
+  backdrop-filter: blur(16px);
+}
+
+.active-nav {
+  background: rgba(17, 24, 39, 0.14) !important;
+  color: #111827 !important;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
