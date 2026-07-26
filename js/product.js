@@ -335,6 +335,7 @@ function storeProductScanHistory() {
   history.unshift({
     type: "product",
     label: "Product scan",
+    productScore: 72,
     createdAt: new Date().toISOString()
   });
 

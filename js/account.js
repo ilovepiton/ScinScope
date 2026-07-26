@@ -14,6 +14,7 @@ let currentProfile = null;
 
 const ACCOUNT_PLAN_STORAGE_KEY = "skinscopeSelectedPlan";
 const ACCOUNT_SCAN_HISTORY_KEY = "skinscopeScanHistory";
+const ACCOUNT_VERIFIED_EMAILS_KEY = "skinscopeVerifiedEmails";
 const AVATAR_MAX_FILE_SIZE = 5 * 1024 * 1024;
 const VERIFICATION_CODE_LENGTH = 6;
 const PRODUCTION_ACCOUNT_URL = "https://ilovepiton.github.io/ScinScope/pages/account.html";
@@ -24,12 +25,26 @@ const ACCOUNT_PLAN_LABELS = {
   lifetime: "Lifetime"
 };
 
+function getDisplayMessage(text, fallback) {
+  if (typeof text === "string") {
+    return text.trim() || fallback;
+  }
+
+  if (text && typeof text.message === "string") {
+    return text.message.trim() || fallback;
+  }
+
+  return fallback;
+}
+
 function showVerificationMessage(text, type = "error") {
   const message = document.getElementById("verification-message");
   if (!message) return;
 
+  const displayText = getDisplayMessage(text, "Something went wrong. Please try again.");
+
   message.hidden = false;
-  message.textContent = text;
+  message.textContent = displayText;
   message.classList.remove("error", "success");
   message.classList.add(type);
 }
@@ -45,14 +60,15 @@ function hideVerificationMessage() {
 
 function showPageMessage(text, type = "error") {
   const message = document.getElementById("auth-message");
+  const displayText = getDisplayMessage(text, "Something went wrong. Please try again.");
 
   if (!message) {
-    alert(text);
+    alert(displayText);
     return;
   }
 
   message.hidden = false;
-  message.textContent = text;
+  message.textContent = displayText;
   message.classList.remove("error", "success", "info");
   message.classList.add(type);
 }
@@ -221,10 +237,50 @@ function getCustomVerificationError(error) {
   const message = String(error && error.message ? error.message : error || "");
 
   if (message.toLowerCase().includes("not connected")) {
-    return "SkinScope verification server is not connected yet. I need the live backend URL before custom email codes can send.";
+    return "SkinScope email verification is not connected yet. Your account was not created or logged in.";
   }
 
   return message || "SkinScope verification failed. Please try again.";
+}
+
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function getSkinScopeVerifiedEmails() {
+  try {
+    const emails = JSON.parse(localStorage.getItem(ACCOUNT_VERIFIED_EMAILS_KEY)) || [];
+    return Array.isArray(emails) ? emails.map(normalizeEmail).filter(Boolean) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function isEmailVerifiedBySkinScope(email) {
+  return getSkinScopeVerifiedEmails().includes(normalizeEmail(email));
+}
+
+function markEmailVerifiedBySkinScope(email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return;
+
+  const emails = getSkinScopeVerifiedEmails();
+  if (!emails.includes(normalizedEmail)) {
+    emails.push(normalizedEmail);
+    localStorage.setItem(ACCOUNT_VERIFIED_EMAILS_KEY, JSON.stringify(emails.slice(-20)));
+  }
+}
+
+async function rejectUnverifiedSession(message) {
+  if (supabaseClient) {
+    await supabaseClient.auth.signOut();
+  }
+
+  currentUser = null;
+  currentProfile = null;
+  showLoggedOut();
+  switchToRegister();
+  showPageMessage(message, "error");
 }
 
 async function sendCustomVerificationCode(email, name) {
@@ -611,6 +667,11 @@ function showLoggedOut() {
 }
 
 async function showLoggedIn(user) {
+  if (!isEmailVerifiedBySkinScope(user.email)) {
+    await rejectUnverifiedSession("Finish SkinScope email verification before logging in. You are not signed in yet.");
+    return;
+  }
+
   currentUser = user;
 
   document.getElementById("auth-panel").hidden = true;
@@ -719,47 +780,18 @@ async function registerUser(event) {
   setButtonProcessing("register-submit-button", true, "Create Account", "Creating...");
 
   try {
-    if (hasCustomVerificationEndpoint()) {
-      pendingVerificationMode = "custom";
-      await sendCustomVerificationCode(email, name);
-      showPageMessage("SkinScope sent a verification code to your email.", "success");
-      openVerificationModal(email);
+    pendingVerificationMode = "custom";
+
+    if (!hasCustomVerificationEndpoint()) {
+      showPageMessage(getCustomVerificationError(new Error("SkinScope verification server is not connected yet.")));
       return;
     }
 
-    pendingVerificationMode = "supabase";
-
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        emailRedirectTo: getAccountRedirectUrl(),
-        data: {
-          name: name
-        }
-      }
-    });
-
-    if (error) {
-      showPageMessage(getFriendlyAuthError(error.message));
-      return;
-    }
-
-    if (data && data.session && data.session.user) {
-      showPageMessage("Account created. You are signed in.", "success");
-      await showLoggedIn(data.session.user);
-      return;
-    }
-
-    showPageMessage("Account created. Check your email for the verification link or code.", "success");
+    await sendCustomVerificationCode(email, name);
+    showPageMessage("SkinScope sent a verification code to your email.", "success");
     openVerificationModal(email);
   } catch (error) {
-    const message =
-      pendingVerificationMode === "custom"
-        ? getCustomVerificationError(error)
-        : getFriendlyAuthError(error.message);
-
-    showPageMessage(message);
+    showPageMessage(getCustomVerificationError(error));
   } finally {
     setButtonProcessing("register-submit-button", false, "Create Account", "Creating...");
   }
@@ -778,15 +810,32 @@ async function createAccountAfterCustomVerification() {
   });
 
   if (error) {
+    const message = String(error.message || "").toLowerCase();
+
+    if (message.includes("already registered") || message.includes("already exists")) {
+      const loginResult = await supabaseClient.auth.signInWithPassword({
+        email: pendingEmail,
+        password: pendingPassword
+      });
+
+      if (loginResult.data && loginResult.data.user) {
+        markEmailVerifiedBySkinScope(pendingEmail);
+        await showLoggedIn(loginResult.data.user);
+        return;
+      }
+    }
+
     throw error;
   }
 
   if (data.session && data.session.user) {
+    markEmailVerifiedBySkinScope(pendingEmail);
     await showLoggedIn(data.session.user);
     return;
   }
 
   if (data.user && data.user.email_confirmed_at) {
+    markEmailVerifiedBySkinScope(pendingEmail);
     await showLoggedIn(data.user);
     return;
   }
@@ -798,6 +847,7 @@ async function createAccountAfterCustomVerification() {
     });
 
     if (loginResult.data && loginResult.data.user) {
+      markEmailVerifiedBySkinScope(pendingEmail);
       await showLoggedIn(loginResult.data.user);
       return;
     }
@@ -900,6 +950,7 @@ async function confirmAccount(event) {
   try {
     if (pendingVerificationMode === "custom") {
       await confirmCustomVerificationCode(pendingEmail, code);
+      markEmailVerifiedBySkinScope(pendingEmail);
       closeVerificationModal();
       showPageMessage("Email verified by SkinScope. Creating your account...", "success");
       await createAccountAfterCustomVerification();

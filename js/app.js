@@ -324,8 +324,13 @@ function storeScanHistory(type) {
   history.unshift({
     type: type,
     label: label,
+    skinScore: type === "face" ? 68 : undefined,
     createdAt: new Date().toISOString()
   });
+
+  if (type === "face") {
+    localStorage.setItem("skinscopeSkinPercent", "68");
+  }
 
   localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(history.slice(0, 8)));
 }
