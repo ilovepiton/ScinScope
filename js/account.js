@@ -155,32 +155,11 @@ function toggleRegisterPassword() {
   }
 }
 
-function toggleCodeVisibility() {
-  const inputs = document.querySelectorAll(".code-input");
-  const button = document.getElementById("toggle-code-button");
-  if (!inputs.length) return;
-
-  const hidden = inputs[0].type === "password";
-
-  inputs.forEach(function (input) {
-    input.type = hidden ? "text" : "password";
-  });
-
-  button.textContent = hidden ? "Hide Code" : "Show Code";
-  button.setAttribute("aria-pressed", hidden ? "true" : "false");
-}
-
 function clearCodeInputs() {
   document.querySelectorAll(".code-input").forEach(function (input) {
     input.value = "";
-    input.type = "password";
+    input.type = "text";
   });
-
-  const button = document.getElementById("toggle-code-button");
-  if (button) {
-    button.textContent = "Show Code";
-    button.setAttribute("aria-pressed", "false");
-  }
 }
 
 function getCodeValue() {
@@ -1191,7 +1170,6 @@ function setupAccountPage() {
 
   document.getElementById("toggle-login-password").onclick = toggleLoginPassword;
   document.getElementById("toggle-register-password").onclick = toggleRegisterPassword;
-  document.getElementById("toggle-code-button").onclick = toggleCodeVisibility;
 
   document.getElementById("login-form").onsubmit = loginUser;
   document.getElementById("register-form").onsubmit = registerUser;
