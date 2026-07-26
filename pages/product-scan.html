@@ -9,8 +9,8 @@
 
 <body class="account-video-page product-scan-page">
   <div class="account-video-wallpaper">
-    <video autoplay muted loop playsinline>
-      <source src="../assets/spa.mp4" type="video/mp4" />
+    <video autoplay muted loop playsinline poster="../assets/spa-wallpaper-poster.jpg">
+      <source src="../assets/spa-wallpaper.mp4" type="video/mp4" />
     </video>
   </div>
 
@@ -31,10 +31,17 @@
         <button id="header-account-button" class="header-account-button" type="button">
           <span class="header-profile-circle">
             <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
-            <span id="header-avatar-fallback">👤</span>
+            <span id="header-avatar-fallback" class="avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
           </span>
           <span id="header-account-name">Account</span>
-          <span>▼</span>
+          <svg class="header-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 10l5 5 5-5"></path>
+          </svg>
         </button>
       </div>
     </nav>
@@ -53,13 +60,26 @@
 
       <div class="scan-actions">
         <button id="open-product-camera-button" class="scan-choice-button button-reset" type="button">
-          <span>📸</span>
+          <span class="choice-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <path d="M9 10.5l2.2-3h9.6l2.2 3H26a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-10a3 3 0 0 1 3-3h3z"></path>
+              <circle cx="16" cy="18.5" r="5.2"></circle>
+              <path d="M23.5 14h.1"></path>
+            </svg>
+          </span>
           <strong>Take Product Photo</strong>
           <small>Use camera inside the app</small>
         </button>
 
-        <label class="scan-choice-button">
-          <span>🧴</span>
+        <label class="scan-choice-button" for="product-file-input" tabindex="0" role="button">
+          <span class="choice-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <path d="M13 4h6v5h-6z"></path>
+              <path d="M11 9h10l1.4 3.4V25a3 3 0 0 1-3 3h-6.8a3 3 0 0 1-3-3V12.4L11 9z"></path>
+              <path d="M12.5 17h7"></path>
+              <path d="M12.5 21h7"></path>
+            </svg>
+          </span>
           <strong>Upload Product File</strong>
           <small>Choose product photo from your device</small>
           <input id="product-file-input" class="hidden-file-input" type="file" accept="image/*" />
@@ -73,20 +93,24 @@
 
         <div class="selected-photo-actions">
           <button id="change-product-photo-button" class="secondary-button button-reset" type="button">
-            Change Product Photo
+            Remove or Replace
           </button>
         </div>
       </div>
 
-      <button id="analyze-product-button" class="primary-button button-reset analyze-button" type="button" disabled>
+      <p id="product-scan-message" class="status-message" role="status" aria-live="polite">
+        Take or upload a product photo to begin.
+      </p>
+
+      <button id="analyze-product-button" class="primary-button button-reset analyze-button disabled-button" type="button" disabled>
         Analyze Product
       </button>
     </section>
   </main>
 
-  <div id="product-camera-modal" class="camera-modal" hidden>
+  <div id="product-camera-modal" class="camera-modal" role="dialog" aria-modal="true" aria-labelledby="product-camera-modal-title" hidden>
     <div class="camera-window">
-      <h2>Take product photo</h2>
+      <h2 id="product-camera-modal-title">Take product photo</h2>
       <p class="camera-tip">Place the product inside the frame and take a clear photo.</p>
 
       <div class="camera-frame">

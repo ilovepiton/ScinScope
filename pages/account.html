@@ -10,8 +10,8 @@
 <body class="account-video-page">
 
   <div class="account-video-wallpaper">
-    <video autoplay muted loop playsinline>
-      <source src="/ScinScope/assets/account-wallpaper.mp4" type="video/mp4" />
+    <video autoplay muted loop playsinline poster="/ScinScope/assets/spa-wallpaper-poster.jpg">
+      <source src="/ScinScope/assets/spa-wallpaper.mp4" type="video/mp4" />
     </video>
   </div>
 
@@ -25,16 +25,23 @@
       <a href="/ScinScope/pages/scan.html">Face Scan</a>
       <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
       <a href="/ScinScope/pages/plan.html">Plan</a>
-      <a id="account-nav-link" href="/ScinScope/pages/account.html">Account</a>
+      <a id="account-nav-link" class="active-nav" href="/ScinScope/pages/account.html">Account</a>
 
       <div id="header-account-menu" class="header-account-menu" hidden>
         <button type="button" id="header-account-button" class="header-account-button">
           <span class="header-profile-circle">
             <img id="header-account-avatar" class="header-account-avatar" src="" alt="Profile picture" hidden />
-            <span id="header-avatar-fallback">👤</span>
+            <span id="header-avatar-fallback" class="avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
           </span>
           <span id="header-account-name">Account</span>
-          <span>▼</span>
+          <svg class="header-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 10l5 5 5-5"></path>
+          </svg>
         </button>
       </div>
     </nav>
@@ -51,62 +58,64 @@
       </p>
 
       <div id="auth-panel">
-        <div class="auth-tabs">
-          <button type="button" id="login-tab" class="auth-tab active-auth-tab">
+        <div class="auth-tabs" role="tablist" aria-label="Account forms">
+          <button type="button" id="login-tab" class="auth-tab active-auth-tab" role="tab" aria-selected="true" aria-controls="login-form">
             Login
           </button>
 
-          <button type="button" id="register-tab" class="auth-tab">
+          <button type="button" id="register-tab" class="auth-tab" role="tab" aria-selected="false" aria-controls="register-form">
             Register
           </button>
         </div>
 
-        <form id="login-form" class="auth-form">
-          <label>
+        <p id="auth-message" class="status-message auth-message" role="status" aria-live="polite"></p>
+
+        <form id="login-form" class="auth-form" aria-labelledby="login-tab" novalidate>
+          <label for="login-email">
             Email
-            <input id="login-email" type="email" placeholder="you@example.com" required />
+            <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email" required />
           </label>
 
-          <label>
+          <label for="login-password">
             Password
-            <input id="login-password" type="password" placeholder="Your password" minlength="8" required />
+            <input id="login-password" type="password" placeholder="Your password" minlength="8" autocomplete="current-password" required />
           </label>
 
-          <button type="button" id="toggle-login-password" class="secondary-button button-reset password-toggle-button">
+          <button type="button" id="toggle-login-password" class="secondary-button button-reset password-toggle-button" aria-controls="login-password" aria-pressed="false">
             Show Password
           </button>
 
-          <button type="submit" class="primary-button button-reset">
+          <button type="submit" id="login-submit-button" class="primary-button button-reset">
             Login
           </button>
         </form>
 
-        <form id="register-form" class="auth-form" hidden>
-          <label>
+        <form id="register-form" class="auth-form" aria-labelledby="register-tab" hidden novalidate>
+          <label for="register-name">
             Name
-            <input id="register-name" type="text" placeholder="Your name" required />
+            <input id="register-name" type="text" placeholder="Your name" autocomplete="name" required />
           </label>
 
-          <label>
+          <label for="register-email">
             Email
-            <input id="register-email" type="email" placeholder="you@example.com" required />
+            <input id="register-email" type="email" placeholder="you@example.com" autocomplete="email" required />
           </label>
 
-          <label>
+          <label for="register-password">
             Password
-            <input id="register-password" type="password" placeholder="At least 8 letters or numbers" minlength="8" required />
+            <input id="register-password" type="password" placeholder="At least 8 letters or numbers" minlength="8" autocomplete="new-password" required />
           </label>
 
-          <label>
+          <label for="register-repeat-password">
             Repeat Password
-            <input id="register-repeat-password" type="password" placeholder="Repeat password" minlength="8" required />
+            <input id="register-repeat-password" type="password" placeholder="Repeat password" minlength="8" autocomplete="new-password" required />
           </label>
 
-          <button type="button" id="toggle-register-password" class="secondary-button button-reset password-toggle-button">
+          <button type="button" id="toggle-register-password" class="secondary-button button-reset password-toggle-button" aria-controls="register-password register-repeat-password" aria-pressed="false">
             Show Password
           </button>
 
-          <button type="submit" class="primary-button button-reset">
+          <button type="submit" id="register-submit-button" class="primary-button button-reset">
             Create Account
           </button>
         </form>
@@ -115,7 +124,12 @@
       <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
         <div class="profile-preview-row">
           <div class="profile-avatar-large" id="profile-avatar-large">
-            <span id="profile-avatar-fallback">👤</span>
+            <span id="profile-avatar-fallback" class="avatar-fallback large-avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
             <img id="profile-avatar-image" src="" alt="Profile picture" hidden />
           </div>
 
@@ -142,6 +156,13 @@
           </div>
         </div>
 
+        <div class="account-list scan-history-list">
+          <div class="account-item scan-history-item">
+            <strong>Saved scan history:</strong>
+            <span id="account-scan-history">Loading...</span>
+          </div>
+        </div>
+
         <div class="hero-buttons">
           <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
           <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
@@ -154,14 +175,14 @@
     </section>
   </main>
 
-  <div id="verification-modal" class="verification-modal" hidden>
+  <div id="verification-modal" class="verification-modal" role="dialog" aria-modal="true" aria-labelledby="verification-title" hidden>
     <div class="verification-window">
       <p class="beta-label">Email verification</p>
 
-      <h2>Check your email</h2>
+      <h2 id="verification-title">Check your email</h2>
 
       <p class="verification-text">
-        We’ve sent a verification code to your email. Enter it below to confirm this is you.
+        We’ve sent a verification email. Click the link there, or enter the 6-digit code if your email includes one.
       </p>
 
       <p id="verification-email-text" class="verification-email"></p>
@@ -175,11 +196,9 @@
           <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
           <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
           <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
-          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
-          <input class="code-input" maxlength="1" inputmode="numeric" type="password" />
         </div>
 
-        <button type="button" id="toggle-code-button" class="secondary-button button-reset password-toggle-button">
+        <button type="button" id="toggle-code-button" class="secondary-button button-reset password-toggle-button" aria-controls="code-boxes" aria-pressed="false">
           Show Code
         </button>
 
@@ -200,22 +219,30 @@
     </div>
   </div>
 
-  <div id="account-drawer" class="account-drawer" hidden>
+  <div id="account-drawer" class="account-drawer" role="dialog" aria-modal="true" aria-labelledby="account-drawer-title" hidden>
     <div class="account-drawer-panel">
       <div class="account-drawer-header">
         <div>
           <p class="beta-label">Account settings</p>
-          <h2>My SkinScope Profile</h2>
+          <h2 id="account-drawer-title">My SkinScope Profile</h2>
         </div>
 
-        <button type="button" id="close-account-drawer-button" class="drawer-close-button">
-          ✕
+        <button type="button" id="close-account-drawer-button" class="drawer-close-button" aria-label="Close account settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 6l12 12"></path>
+            <path d="M18 6L6 18"></path>
+          </svg>
         </button>
       </div>
 
       <div class="drawer-profile-top">
         <div class="drawer-profile-avatar">
-          <span id="drawer-avatar-fallback">👤</span>
+          <span id="drawer-avatar-fallback" class="avatar-fallback large-avatar-fallback" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+            </svg>
+          </span>
           <img id="drawer-avatar-image" src="" alt="Profile picture" hidden />
         </div>
 
@@ -261,6 +288,11 @@
       </div>
 
       <div class="drawer-section">
+        <h3>Recent scans</h3>
+        <p id="drawer-scan-history">No saved scan history yet.</p>
+      </div>
+
+      <div class="drawer-section">
         <h3>Logout</h3>
 
         <p>
@@ -274,9 +306,9 @@
     </div>
   </div>
 
-  <div id="logout-confirm-modal" class="logout-confirm-modal" hidden>
+  <div id="logout-confirm-modal" class="logout-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title" hidden>
     <div class="logout-confirm-box">
-      <h2>Are you sure you want to log out?</h2>
+      <h2 id="logout-confirm-title">Are you sure you want to log out?</h2>
 
       <p>
         You can log back in anytime with your email and password.

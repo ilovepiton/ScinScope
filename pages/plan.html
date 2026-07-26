@@ -9,8 +9,8 @@
 
 <body class="account-video-page plan-page">
   <div class="account-video-wallpaper">
-    <video autoplay muted loop playsinline>
-      <source src="../assets/spa.mp4" type="video/mp4" />
+    <video autoplay muted loop playsinline poster="../assets/spa-wallpaper-poster.jpg">
+      <source src="../assets/spa-wallpaper.mp4" type="video/mp4" />
     </video>
   </div>
 
@@ -31,10 +31,17 @@
         <button id="header-account-button" class="header-account-button" type="button">
           <span class="header-profile-circle">
             <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
-            <span id="header-avatar-fallback">👤</span>
+            <span id="header-avatar-fallback" class="avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
           </span>
           <span id="header-account-name">Account</span>
-          <span>▼</span>
+          <svg class="header-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 10l5 5 5-5"></path>
+          </svg>
         </button>
       </div>
     </nav>
@@ -47,17 +54,17 @@
       <h1>Premium skin coaching</h1>
 
       <p class="hero-text">
-        Your current plan is <strong>Premium</strong>. SkinScope Premium gives you daily AI skin analysis,
-        product checks, progress tracking, and a cleaner personal skincare routine.
+        Choose a demo plan state for SkinScope beta. This updates your local app state only and does not process payment.
       </p>
 
       <div class="current-plan-box">
         <span>Current plan</span>
-        <strong>Premium</strong>
+        <strong id="current-plan-name">Free beta</strong>
+        <small id="current-plan-note">Demo plan state stored on this device.</small>
       </div>
 
       <div class="plan-grid">
-        <article class="price-card featured-plan">
+        <article class="price-card" data-plan-card="monthly">
           <span class="plan-name">Premium Monthly</span>
           <h2>€3.99<span>/month</span></h2>
 
@@ -69,10 +76,12 @@
             <li>Progress tracking</li>
           </ul>
 
-          <a class="primary-button" href="account.html">Current Plan</a>
+          <button id="select-monthly-plan-button" class="primary-button button-reset plan-action-button" type="button" data-plan="monthly">
+            Choose Monthly
+          </button>
         </article>
 
-        <article class="price-card">
+        <article class="price-card" data-plan-card="lifetime">
           <span class="plan-name">Lifetime</span>
           <h2>€78.99 <span>one-time</span></h2>
 
@@ -83,9 +92,22 @@
             <li>Future premium features included</li>
           </ul>
 
-          <a class="secondary-button" href="account.html">Upgrade Later</a>
+          <button id="select-lifetime-plan-button" class="secondary-button button-reset plan-action-button" type="button" data-plan="lifetime">
+            Choose Lifetime
+          </button>
         </article>
       </div>
+
+      <div class="plan-actions-row">
+        <button id="upgrade-later-button" class="secondary-button button-reset" type="button">
+          Upgrade Later
+        </button>
+        <a class="secondary-button" href="account.html">View Account</a>
+      </div>
+
+      <p id="plan-message" class="status-message plan-message" role="status" aria-live="polite">
+        Checkout is not connected yet, so plan selection is shown as polished demo state.
+      </p>
 
       <div class="premium-note">
         <h2>What Premium unlocks</h2>
@@ -100,5 +122,6 @@
   <script src="../js/supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/global-auth.js"></script>
+  <script src="../js/plan.js"></script>
 </body>
 </html>
