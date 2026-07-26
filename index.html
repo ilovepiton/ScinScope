@@ -9,8 +9,8 @@
 
 <body class="home-video-page">
   <div class="video-wallpaper">
-    <video id="home-bg-video" autoplay muted loop playsinline>
-      <source src="/ScinScope/assets/spa.mp4" type="video/mp4" />
+    <video id="home-bg-video" autoplay muted loop playsinline poster="/ScinScope/assets/spa-wallpaper-poster.jpg">
+      <source src="/ScinScope/assets/spa-wallpaper.mp4" type="video/mp4" />
     </video>
   </div>
 
@@ -31,10 +31,17 @@
         <button id="header-account-button" class="header-account-button" type="button">
           <span class="header-profile-circle">
             <img id="header-account-avatar" class="header-account-avatar" alt="" hidden />
-            <span id="header-avatar-fallback">👤</span>
+            <span id="header-avatar-fallback" class="avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
           </span>
           <span id="header-account-name">Account</span>
-          <span>▼</span>
+          <svg class="header-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 10l5 5 5-5"></path>
+          </svg>
         </button>
       </div>
     </nav>
@@ -60,12 +67,12 @@
         <p>Save your progress and daily results.</p>
 
         <div class="auth-buttons">
-          <a class="secondary-button small-button glass-button" href="/ScinScope/pages/account.html">Login</a>
-          <a class="primary-button small-button" href="/ScinScope/pages/account.html">Register</a>
+          <a class="secondary-button small-button glass-button" href="/ScinScope/pages/account.html?tab=login">Login</a>
+          <a class="primary-button small-button" href="/ScinScope/pages/account.html?tab=register">Register</a>
         </div>
       </div>
 
-      <button type="button" id="sound-toggle-button" class="sound-button" onclick="toggleHomeSound()">
+      <button type="button" id="sound-toggle-button" class="sound-button" aria-pressed="false">
         Sound Off
       </button>
     </section>
@@ -191,18 +198,33 @@
     const video = document.getElementById("home-bg-video");
     const soundButton = document.getElementById("sound-toggle-button");
 
+    const SOUND_STORAGE_KEY = "skinscopeHomeSound";
+
+    function playHomeVideo() {
+      if (!video) return;
+
+      const playPromise = video.play();
+
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(function () {});
+      }
+    }
+
     function setSoundState(isOn) {
       if (!video || !soundButton) return;
 
       if (isOn) {
         video.muted = false;
         video.volume = 0.45;
-        video.play();
+        playHomeVideo();
         soundButton.textContent = "Sound On";
       } else {
         video.muted = true;
         soundButton.textContent = "Sound Off";
       }
+
+      soundButton.setAttribute("aria-pressed", String(isOn));
+      localStorage.setItem(SOUND_STORAGE_KEY, isOn ? "on" : "off");
     }
 
     function toggleHomeSound() {
@@ -212,9 +234,15 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       if (!video) return;
-      video.muted = true;
-      video.play();
-      setSoundState(false);
+      const savedSoundState = localStorage.getItem(SOUND_STORAGE_KEY) === "on";
+
+      video.muted = !savedSoundState;
+      playHomeVideo();
+      setSoundState(savedSoundState);
+
+      if (soundButton) {
+        soundButton.addEventListener("click", toggleHomeSound);
+      }
     });
   </script>
 </body>
