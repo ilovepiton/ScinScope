@@ -3,6 +3,32 @@ const globalSupabaseClient =
     ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
+const GLOBAL_VERIFIED_EMAILS_KEY = "skinscopeVerifiedEmails";
+
+function normalizeGlobalEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function getGlobalVerifiedEmails() {
+  try {
+    const emails = JSON.parse(localStorage.getItem(GLOBAL_VERIFIED_EMAILS_KEY)) || [];
+    return Array.isArray(emails) ? emails.map(normalizeGlobalEmail).filter(Boolean) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function isGlobalUserVerifiedBySkinScope(user) {
+  return Boolean(
+    user &&
+    (
+      getGlobalVerifiedEmails().includes(normalizeGlobalEmail(user.email)) ||
+      user.user_metadata?.skinscope_verified === true ||
+      user.user_metadata?.skinscope_verified === "true"
+    )
+  );
+}
+
 function getBasePath() {
   const path = window.location.pathname;
 
@@ -105,6 +131,12 @@ async function checkGlobalAuthHeader() {
   const { data } = await globalSupabaseClient.auth.getSession();
 
   if (data.session && data.session.user) {
+    if (!isGlobalUserVerifiedBySkinScope(data.session.user)) {
+      await globalSupabaseClient.auth.signOut();
+      showGlobalLoggedOutHeader();
+      return;
+    }
+
     await showGlobalLoggedInHeader(data.session.user);
   } else {
     showGlobalLoggedOutHeader();
