@@ -242,8 +242,8 @@ h3 {
   inset: 0;
   z-index: -3;
   background:
-    linear-gradient(rgba(246, 243, 239, 0.18), rgba(246, 243, 239, 0.18)),
-    url("/ScinScope/assets/spa-wallpaper.jpg");
+    radial-gradient(circle at 24% 18%, rgba(255, 255, 255, 0.34), transparent 32%),
+    linear-gradient(135deg, rgba(246, 243, 239, 0.34), rgba(190, 224, 210, 0.22));
   background-size: cover;
   background-position: center;
   filter: blur(3px);
@@ -1197,7 +1197,7 @@ h3 {
 }
 
 .face-preview .face-circle::after {
-  content: "🎀";
+  content: "";
   position: absolute;
   top: -2px;
   right: -2px;
@@ -1703,4 +1703,612 @@ h3 {
   color: #111827 !important;
   border-radius: 999px;
   padding: 8px 12px;
+}
+
+/* ===== AUDIT REPAIR PASS ===== */
+
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+.primary-button,
+.secondary-button,
+.sound-button,
+.auth-tab,
+.scan-choice-button,
+.header-account-button,
+.drawer-close-button {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.sound-button:hover,
+.auth-tab:hover,
+.header-account-button:hover {
+  transform: translateY(-1px);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+label[role="button"]:focus-visible {
+  outline: 3px solid rgba(17, 24, 39, 0.78);
+  outline-offset: 3px;
+}
+
+.disabled-button,
+button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.status-message {
+  width: min(100%, 620px);
+  margin: 18px auto 0;
+  padding: 13px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.44);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  color: #111827;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.status-message:empty {
+  display: none;
+}
+
+.status-message.error {
+  background: rgba(255, 238, 238, 0.72);
+  border-color: rgba(190, 18, 60, 0.28);
+  color: #7f1d1d;
+}
+
+.status-message.success {
+  background: rgba(231, 248, 239, 0.72);
+  border-color: rgba(22, 131, 74, 0.28);
+  color: #14532d;
+}
+
+.status-message.info {
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.auth-message {
+  margin: 0 0 18px;
+  text-align: left;
+}
+
+.choice-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.48);
+  color: #111827;
+  font-size: 0 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.54);
+}
+
+.choice-icon svg,
+.avatar-fallback svg,
+.header-caret,
+.drawer-close-button svg {
+  display: block;
+}
+
+.choice-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.choice-icon path,
+.choice-icon circle,
+.choice-icon rect,
+.avatar-fallback path,
+.avatar-fallback circle,
+.header-caret path,
+.drawer-close-button path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #111827;
+}
+
+.avatar-fallback svg {
+  width: 20px;
+  height: 20px;
+}
+
+.large-avatar-fallback svg {
+  width: 46px;
+  height: 46px;
+}
+
+.header-caret {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.drawer-close-button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+}
+
+.drawer-close-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.drawer-close-button:hover {
+  transform: rotate(4deg);
+}
+
+.scan-choice-button {
+  min-width: 0;
+}
+
+.scan-choice-button strong,
+.scan-choice-button small,
+.primary-button,
+.secondary-button,
+.sound-button,
+.auth-tab {
+  overflow-wrap: anywhere;
+}
+
+.scan-choice-button input:focus-visible + span {
+  outline: 3px solid rgba(17, 24, 39, 0.78);
+}
+
+.selected-photo-actions {
+  gap: 12px;
+}
+
+.metric-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-weight: 900;
+}
+
+.metric-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: inline-block;
+  position: relative;
+  flex: 0 0 28px;
+  background: #eef8f1;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.metric-icon::before,
+.metric-icon::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 2px solid #111827;
+  border-radius: 999px;
+}
+
+.metric-hydration-icon {
+  background: #e7f2ff;
+}
+
+.metric-hydration-icon::before {
+  inset: 6px 9px 5px;
+  border-radius: 999px 999px 999px 4px;
+  transform: rotate(45deg);
+}
+
+.metric-elasticity-icon,
+.metric-lines-icon {
+  background: #fff0f4;
+}
+
+.metric-elasticity-icon::before,
+.metric-lines-icon::before {
+  inset: 8px 6px;
+  border-radius: 999px;
+}
+
+.metric-texture-icon,
+.metric-pores-icon {
+  background: #f5f3ff;
+}
+
+.metric-texture-icon::before,
+.metric-pores-icon::before {
+  inset: 6px;
+  border-radius: 6px;
+}
+
+.metric-acne-icon,
+.metric-redness-icon {
+  background: #fff1f2;
+}
+
+.metric-acne-icon::before,
+.metric-redness-icon::before {
+  inset: 9px;
+  background: #111827;
+  border: 0;
+}
+
+.metric-age-icon,
+.metric-spots-icon,
+.metric-eye-icon {
+  background: #f0fdf4;
+}
+
+.metric-age-icon::before,
+.metric-spots-icon::before,
+.metric-eye-icon::before {
+  inset: 7px;
+}
+
+.metric-score-icon::after,
+.metric-age-icon::after,
+.metric-texture-icon::after,
+.metric-pores-icon::after {
+  display: none;
+}
+
+.face-preview .face-circle::after {
+  content: "";
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 18px;
+  border-radius: 999px 999px 999px 2px;
+  background: linear-gradient(135deg, #f7c7d2, #ffffff);
+  border: 2px solid #ffffff;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.16);
+  transform: rotate(18deg);
+}
+
+.product-result-card .hero-text {
+  margin-top: -8px;
+}
+
+.current-plan-box {
+  display: grid;
+  gap: 8px;
+}
+
+.current-plan-box small {
+  color: #374151;
+  font-weight: 800;
+}
+
+.price-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-card ul {
+  flex: 1;
+}
+
+.price-card[aria-current="true"] {
+  border: 2px solid #111827 !important;
+  box-shadow: 0 28px 80px rgba(17, 24, 39, 0.16);
+}
+
+.plan-action-button {
+  width: 100%;
+}
+
+.plan-actions-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 12px 0 8px;
+}
+
+.plan-message {
+  text-align: left;
+  margin-left: 0;
+}
+
+.scan-history-item {
+  align-items: flex-start;
+}
+
+.scan-history-item span {
+  text-align: right;
+}
+
+.auth-form input:focus,
+.drawer-input:focus {
+  border-color: rgba(17, 24, 39, 0.68);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 18px 5%;
+  }
+
+  nav {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  nav a,
+  .header-account-button {
+    font-size: 14px;
+  }
+
+  .home-menu-layout {
+    padding: 28px 5% 20px;
+  }
+
+  .home-glass-card,
+  .card {
+    border-radius: 22px;
+    padding: 22px;
+  }
+
+  .home-glass-card h1,
+  h1,
+  .card h1 {
+    font-size: 32px;
+    line-height: 1.12;
+  }
+
+  .hero-text {
+    font-size: 16px;
+  }
+
+  .hero-buttons,
+  .auth-buttons,
+  .camera-actions,
+  .verification-actions,
+  .plan-actions-row {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .sound-button,
+  .auth-tab {
+    width: 100%;
+  }
+
+  .scan-actions {
+    gap: 14px;
+  }
+
+  .scan-choice-button {
+    min-height: 160px;
+    padding: 20px 16px;
+  }
+
+  .scan-choice-button strong {
+    font-size: 20px;
+  }
+
+  .account-item,
+  .drawer-info-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .scan-history-item span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 430px) {
+  .page,
+  .dashboard-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .home-results-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .result-image-card,
+  .result-image-card-main {
+    min-height: 300px;
+  }
+
+  .code-boxes {
+    gap: 5px;
+  }
+
+  .code-input {
+    width: 30px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .verification-window,
+  .camera-window,
+  .logout-confirm-box {
+    padding: 22px 18px;
+    border-radius: 24px;
+  }
+
+  .account-drawer-panel {
+    padding: 20px 16px;
+    border-radius: 24px;
+  }
+}
+
+/* ===== SPA VIDEO FALLBACK + QUALITY TUNE ===== */
+
+.video-wallpaper,
+.account-video-wallpaper {
+  background:
+    linear-gradient(rgba(255, 246, 232, 0.06), rgba(255, 246, 232, 0.06)),
+    url("/ScinScope/assets/spa-wallpaper-poster.jpg") center / cover no-repeat;
+}
+
+.video-wallpaper video,
+.account-video-wallpaper video {
+  filter: blur(1px) brightness(1.12) saturate(1.04) !important;
+  transform: scale(1.012) !important;
+}
+
+.home-video-overlay,
+.account-video-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 247, 233, 0.10),
+    rgba(255, 247, 233, 0.05),
+    rgba(17, 24, 39, 0.03)
+  ) !important;
+}
+
+/* ===== NAV + RESULT GLASS POLISH ===== */
+
+.face-preview .face-circle::after {
+  content: none !important;
+  display: none !important;
+}
+
+.site-header nav a.active-nav {
+  padding: 9px 13px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.24) !important;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 10px 28px rgba(17, 24, 39, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.result-page,
+.product-result-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(248, 245, 239, 0.82), rgba(232, 226, 216, 0.68)),
+    url("/ScinScope/assets/spa-wallpaper-poster.jpg") center / cover fixed no-repeat;
+}
+
+.result-page::before,
+.product-result-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.64), transparent 36%),
+    radial-gradient(circle at 86% 16%, rgba(255, 235, 207, 0.46), transparent 34%),
+    rgba(255, 250, 244, 0.42);
+  backdrop-filter: blur(10px) saturate(1.04);
+}
+
+.result-page .dashboard-page,
+.product-result-page .page {
+  background: transparent;
+}
+
+.metric-card,
+.product-report-box,
+.product-result-card {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border: 1px solid rgba(255, 255, 255, 0.74) !important;
+  box-shadow:
+    0 22px 60px rgba(31, 41, 51, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(18px) saturate(1.04);
+}
+
+.metric-card {
+  border-radius: 22px;
+}
+
+.product-report-box {
+  border-radius: 22px;
+}
+
+.product-result-layout {
+  padding: 20px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  backdrop-filter: blur(14px);
+}
+
+.bar {
+  background: rgba(17, 24, 39, 0.14);
+}
+
+.metric-icon {
+  background-color: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(8px);
+}
+
+#face-placeholder,
+#product-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(17, 24, 39, 0.66);
+  font-weight: 900;
+  text-align: center;
+}
+
+.face-circle,
+.product-result-image {
+  position: relative;
+}
+
+/* ===== FINISHED SPA BACKDROP ===== */
+
+.home-video-overlay,
+.account-video-overlay {
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255, 255, 255, 0.22), transparent 28%),
+    radial-gradient(circle at 76% 12%, rgba(255, 213, 166, 0.18), transparent 30%),
+    linear-gradient(180deg, rgba(255, 245, 230, 0.10), rgba(18, 24, 35, 0.18)),
+    linear-gradient(90deg, rgba(255, 247, 233, 0.10), rgba(255, 247, 233, 0.04)) !important;
+}
+
+.home-glass-card,
+.spa-glass-card,
+.account-glass-card,
+.plan-card {
+  box-shadow:
+    0 32px 90px rgba(17, 24, 39, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52);
+}
+
+.site-header,
+.page,
+.home-menu-layout,
+.reviews-section,
+.dashboard-page {
+  position: relative;
 }
