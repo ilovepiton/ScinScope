@@ -724,6 +724,220 @@ h3 {
   margin-top: 14px;
 }
 
+/* ===== SKIN PET ===== */
+
+.skin-pet-widget {
+  position: fixed;
+  left: 22px;
+  bottom: 20px;
+  z-index: 90;
+  width: 126px;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.skin-pet-bot {
+  position: relative;
+  width: 84px;
+  height: 98px;
+  filter: drop-shadow(0 16px 22px rgba(17, 24, 39, 0.18));
+}
+
+.skin-pet-antenna {
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  width: 4px;
+  height: 15px;
+  border-radius: 999px;
+  background: #f8fafc;
+  transform: translateX(-50%);
+}
+
+.skin-pet-antenna::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid rgba(17, 24, 39, 0.10);
+  transform: translateX(-50%);
+}
+
+.skin-pet-head {
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  width: 64px;
+  height: 52px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #edf4ff);
+  border: 2px solid rgba(17, 24, 39, 0.10);
+}
+
+.skin-pet-head::before {
+  content: "";
+  position: absolute;
+  inset: 13px 10px 12px;
+  border-radius: 12px;
+  background: #182233;
+}
+
+.skin-pet-eye,
+.skin-pet-mouth {
+  position: absolute;
+  z-index: 2;
+  background: #a7f3ff;
+  box-shadow: 0 0 10px rgba(103, 232, 249, 0.52);
+}
+
+.skin-pet-eye {
+  top: 30px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+}
+
+.skin-pet-eye-left {
+  left: 28px;
+}
+
+.skin-pet-eye-right {
+  right: 28px;
+}
+
+.skin-pet-mouth {
+  left: 38px;
+  top: 43px;
+  width: 10px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.skin-pet-body {
+  position: absolute;
+  left: 17px;
+  top: 62px;
+  width: 50px;
+  height: 29px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #eef4ff);
+  border: 2px solid rgba(17, 24, 39, 0.10);
+}
+
+.skin-pet-body span {
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  width: 17px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.22);
+  transform: translateX(-50%);
+}
+
+.skin-pet-arms::before,
+.skin-pet-arms::after {
+  content: "";
+  position: absolute;
+  top: 66px;
+  width: 12px;
+  height: 26px;
+  border-radius: 999px;
+  background: #f8fbff;
+  border: 2px solid rgba(17, 24, 39, 0.10);
+}
+
+.skin-pet-arms::before {
+  left: 4px;
+  transform: rotate(12deg);
+}
+
+.skin-pet-arms::after {
+  right: 4px;
+  transform: rotate(-12deg);
+}
+
+.skin-pet-feet::before,
+.skin-pet-feet::after {
+  content: "";
+  position: absolute;
+  top: 89px;
+  width: 18px;
+  height: 10px;
+  border-radius: 999px 999px 8px 8px;
+  background: #f8fbff;
+  border: 2px solid rgba(17, 24, 39, 0.10);
+}
+
+.skin-pet-feet::before {
+  left: 20px;
+}
+
+.skin-pet-feet::after {
+  right: 20px;
+}
+
+.skin-pet-meter {
+  width: 126px;
+  padding: 9px 10px 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 14px 32px rgba(17, 24, 39, 0.14);
+  backdrop-filter: blur(14px);
+}
+
+.skin-pet-label-row,
+.skin-pet-scale {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skin-pet-label-row {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.skin-pet-label-row strong {
+  font-size: 15px;
+}
+
+.skin-pet-scale {
+  margin-top: 3px;
+  color: rgba(17, 24, 39, 0.62);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.skin-pet-bar {
+  position: relative;
+  height: 9px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2fd27a 0%, #f6df5c 54%, #f15f68 100%);
+  box-shadow: inset 0 1px 3px rgba(17, 24, 39, 0.18);
+}
+
+.skin-pet-marker {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid #111827;
+  box-shadow: 0 5px 12px rgba(17, 24, 39, 0.22);
+  transform: translate(-50%, -50%);
+}
+
 /* ===== ACCOUNT DRAWER ===== */
 
 .account-drawer {
@@ -2161,6 +2375,14 @@ button:disabled {
   .account-drawer-panel {
     padding: 20px 16px;
     border-radius: 24px;
+  }
+
+  .skin-pet-widget {
+    left: 12px;
+    bottom: 12px;
+    width: 104px;
+    transform: scale(0.86);
+    transform-origin: left bottom;
   }
 }
 
