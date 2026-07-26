@@ -1,0 +1,1 @@
+const SKINSCOPE_VERIFY_ENDPOINT = "";

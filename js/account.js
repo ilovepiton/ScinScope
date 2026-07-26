@@ -5,6 +5,8 @@ const supabaseClient =
 
 let pendingEmail = "";
 let pendingPassword = "";
+let pendingName = "";
+let pendingVerificationMode = "supabase";
 let resendTimer = null;
 let resendSeconds = 0;
 let currentUser = null;
@@ -195,6 +197,69 @@ function getAccountRedirectUrl() {
   }
 
   return PRODUCTION_ACCOUNT_URL;
+}
+
+function getCustomVerificationEndpoint() {
+  if (typeof SKINSCOPE_VERIFY_ENDPOINT !== "string") return "";
+  return SKINSCOPE_VERIFY_ENDPOINT.trim().replace(/\/+$/, "");
+}
+
+function hasCustomVerificationEndpoint() {
+  return getCustomVerificationEndpoint().length > 0;
+}
+
+async function callCustomVerification(path, payload) {
+  const endpoint = getCustomVerificationEndpoint();
+
+  if (!endpoint) {
+    throw new Error("SkinScope verification server is not connected yet.");
+  }
+
+  const response = await fetch(endpoint + path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  let data = {};
+
+  try {
+    data = await response.json();
+  } catch (error) {
+    data = {};
+  }
+
+  if (!response.ok || data.ok === false) {
+    throw new Error(data.message || "SkinScope verification failed. Please try again.");
+  }
+
+  return data;
+}
+
+function getCustomVerificationError(error) {
+  const message = String(error && error.message ? error.message : error || "");
+
+  if (message.toLowerCase().includes("not connected")) {
+    return "SkinScope verification server is not connected yet. I need the live backend URL before custom email codes can send.";
+  }
+
+  return message || "SkinScope verification failed. Please try again.";
+}
+
+async function sendCustomVerificationCode(email, name) {
+  return callCustomVerification("/verification/start", {
+    email: email,
+    name: name
+  });
+}
+
+async function confirmCustomVerificationCode(email, code) {
+  return callCustomVerification("/verification/confirm", {
+    email: email,
+    code: code
+  });
 }
 
 function startResendCooldown(seconds) {
@@ -670,11 +735,22 @@ async function registerUser(event) {
 
   pendingEmail = email;
   pendingPassword = password;
+  pendingName = name;
 
   setButtonProcessing("register-submit-button", true, "Create Account", "Creating...");
 
   try {
-    const { error } = await supabaseClient.auth.signUp({
+    if (hasCustomVerificationEndpoint()) {
+      pendingVerificationMode = "custom";
+      await sendCustomVerificationCode(email, name);
+      showPageMessage("SkinScope sent a verification code to your email.", "success");
+      openVerificationModal(email);
+      return;
+    }
+
+    pendingVerificationMode = "supabase";
+
+    const { data, error } = await supabaseClient.auth.signUp({
       email: email,
       password: password,
       options: {
@@ -690,11 +766,65 @@ async function registerUser(event) {
       return;
     }
 
+    if (data && data.session && data.session.user) {
+      showPageMessage("Account created. You are signed in.", "success");
+      await showLoggedIn(data.session.user);
+      return;
+    }
+
     showPageMessage("Account created. Check your email for the verification link or code.", "success");
     openVerificationModal(email);
+  } catch (error) {
+    const message =
+      pendingVerificationMode === "custom"
+        ? getCustomVerificationError(error)
+        : getFriendlyAuthError(error.message);
+
+    showPageMessage(message);
   } finally {
     setButtonProcessing("register-submit-button", false, "Create Account", "Creating...");
   }
+}
+
+async function createAccountAfterCustomVerification() {
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: pendingEmail,
+    password: pendingPassword,
+    options: {
+      emailRedirectTo: getAccountRedirectUrl(),
+      data: {
+        name: pendingName
+      }
+    }
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (data.session && data.session.user) {
+    await showLoggedIn(data.session.user);
+    return;
+  }
+
+  if (data.user && data.user.email_confirmed_at) {
+    await showLoggedIn(data.user);
+    return;
+  }
+
+  if (pendingEmail && pendingPassword) {
+    const loginResult = await supabaseClient.auth.signInWithPassword({
+      email: pendingEmail,
+      password: pendingPassword
+    });
+
+    if (loginResult.data && loginResult.data.user) {
+      await showLoggedIn(loginResult.data.user);
+      return;
+    }
+  }
+
+  throw new Error("Email is verified by SkinScope, but Supabase still requires email confirmation. Turn off Supabase email confirmation after connecting the custom verifier.");
 }
 
 async function loginUser(event) {
@@ -735,6 +865,7 @@ async function loginUser(event) {
         message.includes("not confirmed") ||
         message.includes("confirm")
       ) {
+        pendingVerificationMode = "supabase";
         openVerificationModal(email);
         showVerificationMessage("Please enter the code from your email to confirm your account.", "error");
         return;
@@ -788,6 +919,14 @@ async function confirmAccount(event) {
   }
 
   try {
+    if (pendingVerificationMode === "custom") {
+      await confirmCustomVerificationCode(pendingEmail, code);
+      closeVerificationModal();
+      showPageMessage("Email verified by SkinScope. Creating your account...", "success");
+      await createAccountAfterCustomVerification();
+      return;
+    }
+
     const { data, error } = await supabaseClient.auth.verifyOtp({
       email: pendingEmail,
       token: code,
@@ -795,7 +934,12 @@ async function confirmAccount(event) {
     });
 
     if (error) {
-      showVerificationMessage(getFriendlyAuthError(error.message), "error");
+      const message =
+        pendingVerificationMode === "custom"
+          ? getCustomVerificationError(error)
+          : getFriendlyAuthError(error.message);
+
+      showVerificationMessage(message, "error");
       return;
     }
 
@@ -820,6 +964,13 @@ async function confirmAccount(event) {
 
     showPageMessage("Account confirmed. Please login.", "success");
     switchToLogin();
+  } catch (error) {
+    const message =
+      pendingVerificationMode === "custom"
+        ? getCustomVerificationError(error)
+        : getFriendlyAuthError(error.message);
+
+    showVerificationMessage(message, "error");
   } finally {
     if (submitButton) {
       submitButton.disabled = false;
@@ -845,6 +996,18 @@ async function resendCode() {
   const button = document.getElementById("resend-code-button");
 
   if (button && button.disabled) {
+    return;
+  }
+
+  if (pendingVerificationMode === "custom") {
+    try {
+      await sendCustomVerificationCode(pendingEmail, pendingName);
+      showVerificationMessage("A new SkinScope verification code has been sent.", "success");
+      startResendCooldown(30);
+    } catch (error) {
+      showVerificationMessage(getCustomVerificationError(error), "error");
+    }
+
     return;
   }
 
