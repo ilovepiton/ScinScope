@@ -1,4 +1,7 @@
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient =
+  window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined"
+    ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 let pendingEmail = "";
 let pendingPassword = "";
@@ -6,6 +9,18 @@ let resendTimer = null;
 let resendSeconds = 0;
 let currentUser = null;
 let currentProfile = null;
+
+const ACCOUNT_PLAN_STORAGE_KEY = "skinscopeSelectedPlan";
+const ACCOUNT_SCAN_HISTORY_KEY = "skinscopeScanHistory";
+const AVATAR_MAX_FILE_SIZE = 5 * 1024 * 1024;
+const VERIFICATION_CODE_LENGTH = 6;
+const PRODUCTION_ACCOUNT_URL = "https://ilovepiton.github.io/ScinScope/pages/account.html";
+
+const ACCOUNT_PLAN_LABELS = {
+  free: "Free beta",
+  monthly: "Premium Monthly",
+  lifetime: "Lifetime"
+};
 
 function showVerificationMessage(text, type = "error") {
   const message = document.getElementById("verification-message");
@@ -26,8 +41,36 @@ function hideVerificationMessage() {
   message.classList.remove("error", "success");
 }
 
-function showPageMessage(text) {
-  alert(text);
+function showPageMessage(text, type = "error") {
+  const message = document.getElementById("auth-message");
+
+  if (!message) {
+    alert(text);
+    return;
+  }
+
+  message.hidden = false;
+  message.textContent = text;
+  message.classList.remove("error", "success", "info");
+  message.classList.add(type);
+}
+
+function clearPageMessage() {
+  const message = document.getElementById("auth-message");
+  if (!message) return;
+
+  message.hidden = true;
+  message.textContent = "";
+  message.classList.remove("error", "success", "info");
+}
+
+function setButtonProcessing(buttonId, isProcessing, label, processingLabel) {
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+
+  button.disabled = isProcessing;
+  button.classList.toggle("disabled-button", isProcessing);
+  button.textContent = isProcessing ? processingLabel : label;
 }
 
 function showDrawerMessage(id, text, type = "error") {
@@ -50,19 +93,31 @@ function hideDrawerMessage(id) {
 }
 
 function switchToLogin() {
-  document.getElementById("login-tab").classList.add("active-auth-tab");
-  document.getElementById("register-tab").classList.remove("active-auth-tab");
+  const loginTab = document.getElementById("login-tab");
+  const registerTab = document.getElementById("register-tab");
+
+  loginTab.classList.add("active-auth-tab");
+  registerTab.classList.remove("active-auth-tab");
+  loginTab.setAttribute("aria-selected", "true");
+  registerTab.setAttribute("aria-selected", "false");
 
   document.getElementById("login-form").hidden = false;
   document.getElementById("register-form").hidden = true;
+  clearPageMessage();
 }
 
 function switchToRegister() {
-  document.getElementById("register-tab").classList.add("active-auth-tab");
-  document.getElementById("login-tab").classList.remove("active-auth-tab");
+  const loginTab = document.getElementById("login-tab");
+  const registerTab = document.getElementById("register-tab");
+
+  registerTab.classList.add("active-auth-tab");
+  loginTab.classList.remove("active-auth-tab");
+  registerTab.setAttribute("aria-selected", "true");
+  loginTab.setAttribute("aria-selected", "false");
 
   document.getElementById("register-form").hidden = false;
   document.getElementById("login-form").hidden = true;
+  clearPageMessage();
 }
 
 function toggleLoginPassword() {
@@ -72,9 +127,11 @@ function toggleLoginPassword() {
   if (input.type === "password") {
     input.type = "text";
     button.textContent = "Hide Password";
+    button.setAttribute("aria-pressed", "true");
   } else {
     input.type = "password";
     button.textContent = "Show Password";
+    button.setAttribute("aria-pressed", "false");
   }
 }
 
@@ -87,10 +144,12 @@ function toggleRegisterPassword() {
     password.type = "text";
     repeat.type = "text";
     button.textContent = "Hide Password";
+    button.setAttribute("aria-pressed", "true");
   } else {
     password.type = "password";
     repeat.type = "password";
     button.textContent = "Show Password";
+    button.setAttribute("aria-pressed", "false");
   }
 }
 
@@ -106,6 +165,7 @@ function toggleCodeVisibility() {
   });
 
   button.textContent = hidden ? "Hide Code" : "Show Code";
+  button.setAttribute("aria-pressed", hidden ? "true" : "false");
 }
 
 function clearCodeInputs() {
@@ -115,7 +175,10 @@ function clearCodeInputs() {
   });
 
   const button = document.getElementById("toggle-code-button");
-  if (button) button.textContent = "Show Code";
+  if (button) {
+    button.textContent = "Show Code";
+    button.setAttribute("aria-pressed", "false");
+  }
 }
 
 function getCodeValue() {
@@ -124,6 +187,14 @@ function getCodeValue() {
       return input.value.trim();
     })
     .join("");
+}
+
+function getAccountRedirectUrl() {
+  if (window.location.hostname === "ilovepiton.github.io") {
+    return new URL("/ScinScope/pages/account.html", window.location.origin).href;
+  }
+
+  return PRODUCTION_ACCOUNT_URL;
 }
 
 function startResendCooldown(seconds) {
@@ -181,6 +252,11 @@ function openVerificationModal(email) {
 function closeVerificationModal() {
   document.getElementById("verification-modal").hidden = true;
   hideVerificationMessage();
+
+  if (resendTimer) {
+    clearInterval(resendTimer);
+    resendTimer = null;
+  }
 }
 
 function setupCodeInputs() {
@@ -207,7 +283,7 @@ function setupCodeInputs() {
       const pasted = event.clipboardData
         .getData("text")
         .replace(/\D/g, "")
-        .slice(0, 8);
+        .slice(0, VERIFICATION_CODE_LENGTH);
 
       pasted.split("").forEach(function (number, pastedIndex) {
         if (inputs[pastedIndex]) {
@@ -256,6 +332,15 @@ function validateName(name) {
 
   if (name.length > 24) {
     showPageMessage("Name is too long. Please use 24 characters or less.");
+    return false;
+  }
+
+  return true;
+}
+
+function validateEmail(email) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showPageMessage("Please enter a valid email address.");
     return false;
   }
 
@@ -353,6 +438,49 @@ function getProfileAvatarUrl(profile) {
   return "";
 }
 
+function getStoredAccountPlan() {
+  const storedPlan = localStorage.getItem(ACCOUNT_PLAN_STORAGE_KEY);
+  return ACCOUNT_PLAN_LABELS[storedPlan] ? storedPlan : "free";
+}
+
+function getAccountPlanLabel(plan) {
+  return ACCOUNT_PLAN_LABELS[plan] || ACCOUNT_PLAN_LABELS.free;
+}
+
+function getStoredScanHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(ACCOUNT_SCAN_HISTORY_KEY)) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function formatScanHistory() {
+  const history = getStoredScanHistory();
+
+  if (!history.length) {
+    return "No saved scan history yet.";
+  }
+
+  return history
+    .slice(0, 3)
+    .map(function (item) {
+      const date = new Date(item.createdAt);
+      const dateLabel = Number.isNaN(date.getTime()) ? "recently" : date.toLocaleDateString();
+      return item.label + " on " + dateLabel;
+    })
+    .join("; ");
+}
+
+function renderScanHistory() {
+  const summary = formatScanHistory();
+  const accountHistory = document.getElementById("account-scan-history");
+  const drawerHistory = document.getElementById("drawer-scan-history");
+
+  if (accountHistory) accountHistory.textContent = summary;
+  if (drawerHistory) drawerHistory.textContent = summary;
+}
+
 function setAvatarImages(url) {
   const profileImage = document.getElementById("profile-avatar-image");
   const profileFallback = document.getElementById("profile-avatar-fallback");
@@ -432,6 +560,7 @@ function showLoggedOut() {
   document.getElementById("auth-panel").hidden = false;
   document.getElementById("logged-panel").hidden = true;
   document.getElementById("header-account-menu").hidden = true;
+  setAvatarImages("");
 
   const accountNavLink = document.getElementById("account-nav-link");
   if (accountNavLink) accountNavLink.hidden = false;
@@ -460,6 +589,7 @@ async function showLoggedIn(user) {
   document.getElementById("drawer-email").textContent = user.email;
 
   setAvatarImages(avatarUrl);
+  renderScanHistory();
 
   await loadSubscription(user.id);
 }
@@ -480,13 +610,16 @@ async function loadSubscription(userId) {
     .single();
 
   if (error || !data) {
-    statusEl.textContent = "active";
-    planEl.textContent = "trial";
-    trialEl.textContent = "7 days after registration";
+    const storedPlan = getStoredAccountPlan();
+    const planLabel = getAccountPlanLabel(storedPlan);
 
-    drawerPlan.textContent = "trial";
+    statusEl.textContent = "active";
+    planEl.textContent = planLabel + " (demo)";
+    trialEl.textContent = storedPlan === "free" ? "7 days after registration" : "Demo selection only";
+
+    drawerPlan.textContent = planLabel + " (demo)";
     drawerStatus.textContent = "active";
-    drawerTrial.textContent = "7 days after registration";
+    drawerTrial.textContent = storedPlan === "free" ? "7 days after registration" : "Demo selection only";
     return;
   }
 
@@ -511,6 +644,11 @@ async function loadSubscription(userId) {
 async function registerUser(event) {
   event.preventDefault();
 
+  if (!supabaseClient) {
+    showPageMessage("Authentication is unavailable because Supabase did not load. Check the network connection and Supabase config.");
+    return;
+  }
+
   const name = document.getElementById("register-name").value.trim();
   const email = document.getElementById("register-email").value.trim();
   const password = document.getElementById("register-password").value.trim();
@@ -522,6 +660,7 @@ async function registerUser(event) {
   }
 
   if (!validateName(name)) return;
+  if (!validateEmail(email)) return;
   if (!validatePassword(password)) return;
 
   if (password !== repeatPassword) {
@@ -532,26 +671,39 @@ async function registerUser(event) {
   pendingEmail = email;
   pendingPassword = password;
 
-  const { error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      data: {
-        name: name
+  setButtonProcessing("register-submit-button", true, "Create Account", "Creating...");
+
+  try {
+    const { error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        emailRedirectTo: getAccountRedirectUrl(),
+        data: {
+          name: name
+        }
       }
+    });
+
+    if (error) {
+      showPageMessage(getFriendlyAuthError(error.message));
+      return;
     }
-  });
 
-  if (error) {
-    showPageMessage(getFriendlyAuthError(error.message));
-    return;
+    showPageMessage("Account created. Check your email for the verification link or code.", "success");
+    openVerificationModal(email);
+  } finally {
+    setButtonProcessing("register-submit-button", false, "Create Account", "Creating...");
   }
-
-  openVerificationModal(email);
 }
 
 async function loginUser(event) {
   event.preventDefault();
+
+  if (!supabaseClient) {
+    showPageMessage("Authentication is unavailable because Supabase did not load. Check the network connection and Supabase config.");
+    return;
+  }
 
   const email = document.getElementById("login-email").value.trim();
   const password = document.getElementById("login-password").value.trim();
@@ -561,40 +713,53 @@ async function loginUser(event) {
     return;
   }
 
+  if (!validateEmail(email)) return;
   if (!validatePassword(password)) return;
 
   pendingEmail = email;
   pendingPassword = password;
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
+  setButtonProcessing("login-submit-button", true, "Login", "Logging in...");
 
-  if (error) {
-    const message = error.message.toLowerCase();
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
 
-    if (
-      message.includes("email not confirmed") ||
-      message.includes("not confirmed") ||
-      message.includes("confirm")
-    ) {
-      openVerificationModal(email);
-      showVerificationMessage("Please enter the code from your email to confirm your account.", "error");
+    if (error) {
+      const message = error.message.toLowerCase();
+
+      if (
+        message.includes("email not confirmed") ||
+        message.includes("not confirmed") ||
+        message.includes("confirm")
+      ) {
+        openVerificationModal(email);
+        showVerificationMessage("Please enter the code from your email to confirm your account.", "error");
+        return;
+      }
+
+      showPageMessage(getFriendlyAuthError(error.message));
       return;
     }
 
-    showPageMessage(getFriendlyAuthError(error.message));
-    return;
-  }
-
-  if (data.user) {
-    await showLoggedIn(data.user);
+    if (data.user) {
+      showPageMessage("Logged in successfully.", "success");
+      await showLoggedIn(data.user);
+    }
+  } finally {
+    setButtonProcessing("login-submit-button", false, "Login", "Logging in...");
   }
 }
 
 async function confirmAccount(event) {
   event.preventDefault();
+
+  if (!supabaseClient) {
+    showVerificationMessage("Authentication is unavailable because Supabase did not load.", "error");
+    return;
+  }
 
   hideVerificationMessage();
 
@@ -605,47 +770,72 @@ async function confirmAccount(event) {
     return;
   }
 
-  if (code.length !== 8) {
-    showVerificationMessage("Please enter the full verification code from your email.", "error");
+  if (code.length !== VERIFICATION_CODE_LENGTH) {
+    showVerificationMessage("Please enter the full " + VERIFICATION_CODE_LENGTH + "-digit code from your email, or click the verification link in the email.", "error");
     return;
   }
 
-  const { data, error } = await supabaseClient.auth.verifyOtp({
-    email: pendingEmail,
-    token: code,
-    type: "email"
-  });
+  const submitButton = document.querySelector("#verification-form .verification-submit");
 
-  if (error) {
-    showVerificationMessage(getFriendlyAuthError(error.message), "error");
+  if (submitButton && submitButton.disabled) {
     return;
   }
 
-  closeVerificationModal();
-
-  if (data.user) {
-    await showLoggedIn(data.user);
-    return;
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.classList.add("disabled-button");
+    submitButton.textContent = "Confirming...";
   }
 
-  if (pendingEmail && pendingPassword) {
-    const loginResult = await supabaseClient.auth.signInWithPassword({
+  try {
+    const { data, error } = await supabaseClient.auth.verifyOtp({
       email: pendingEmail,
-      password: pendingPassword
+      token: code,
+      type: "email"
     });
 
-    if (loginResult.data && loginResult.data.user) {
-      await showLoggedIn(loginResult.data.user);
+    if (error) {
+      showVerificationMessage(getFriendlyAuthError(error.message), "error");
       return;
     }
-  }
 
-  showPageMessage("Account confirmed. Please login.");
-  switchToLogin();
+    closeVerificationModal();
+
+    if (data.user) {
+      await showLoggedIn(data.user);
+      return;
+    }
+
+    if (pendingEmail && pendingPassword) {
+      const loginResult = await supabaseClient.auth.signInWithPassword({
+        email: pendingEmail,
+        password: pendingPassword
+      });
+
+      if (loginResult.data && loginResult.data.user) {
+        await showLoggedIn(loginResult.data.user);
+        return;
+      }
+    }
+
+    showPageMessage("Account confirmed. Please login.", "success");
+    switchToLogin();
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.classList.remove("disabled-button");
+      submitButton.textContent = "Confirm Account";
+    }
+  }
 }
 
 async function resendCode() {
   hideVerificationMessage();
+
+  if (!supabaseClient) {
+    showVerificationMessage("Authentication is unavailable because Supabase did not load.", "error");
+    return;
+  }
 
   if (!pendingEmail) {
     showVerificationMessage("Email is missing. Please register or login again.", "error");
@@ -660,7 +850,10 @@ async function resendCode() {
 
   const { error } = await supabaseClient.auth.resend({
     type: "signup",
-    email: pendingEmail
+    email: pendingEmail,
+    options: {
+      emailRedirectTo: getAccountRedirectUrl()
+    }
   });
 
   if (error) {
@@ -677,7 +870,7 @@ async function resendCode() {
     return;
   }
 
-  showVerificationMessage("A new verification code has been sent.", "success");
+  showVerificationMessage("A new verification email has been sent.", "success");
   startResendCooldown(60);
 }
 
@@ -699,6 +892,12 @@ function closeLogoutConfirm() {
 }
 
 async function logoutUser() {
+  if (!supabaseClient) {
+    showLoggedOut();
+    switchToLogin();
+    return;
+  }
+
   await supabaseClient.auth.signOut();
 
   closeLogoutConfirm();
@@ -716,8 +915,18 @@ async function changeProfilePicture(file) {
 
   hideDrawerMessage("avatar-message");
 
+  if (!supabaseClient) {
+    showDrawerMessage("avatar-message", "Profile picture upload is unavailable because Supabase did not load.", "error");
+    return;
+  }
+
   if (!isLikelyImage(file)) {
     showDrawerMessage("avatar-message", "Please upload an image file.", "error");
+    return;
+  }
+
+  if (file.size > AVATAR_MAX_FILE_SIZE) {
+    showDrawerMessage("avatar-message", "Profile picture is too large. Please choose an image under 5 MB.", "error");
     return;
   }
 
@@ -763,14 +972,54 @@ async function changeProfilePicture(file) {
 }
 
 async function checkSession() {
+  if (!supabaseClient) {
+    showLoggedOut();
+    showPageMessage("Authentication is unavailable because Supabase did not load. Check the network connection and Supabase config.", "error");
+    return;
+  }
+
   const { data } = await supabaseClient.auth.getSession();
 
   if (data.session && data.session.user) {
     await showLoggedIn(data.session.user);
   } else {
     showLoggedOut();
+  }
+}
+
+function openInitialAuthTab() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedTab = params.get("tab");
+
+  if (requestedTab === "register") {
+    switchToRegister();
+  } else {
     switchToLogin();
   }
+}
+
+function setupDialogEscapeKey() {
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+
+    const verificationModal = document.getElementById("verification-modal");
+    const drawer = document.getElementById("account-drawer");
+    const logoutModal = document.getElementById("logout-confirm-modal");
+
+    if (logoutModal && !logoutModal.hidden) {
+      closeLogoutConfirm();
+      return;
+    }
+
+    if (drawer && !drawer.hidden) {
+      closeAccountDrawer();
+      return;
+    }
+
+    if (verificationModal && !verificationModal.hidden) {
+      closeVerificationModal();
+    }
+  });
 }
 
 function setupAccountPage() {
@@ -806,9 +1055,25 @@ function setupAccountPage() {
   };
 
   setupCodeInputs();
+  setupDialogEscapeKey();
+  openInitialAuthTab();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   setupAccountPage();
   checkSession();
+
+  if (!supabaseClient) return;
+
+  supabaseClient.auth.onAuthStateChange(function (event, session) {
+    if (event === "SIGNED_OUT") {
+      showLoggedOut();
+      switchToLogin();
+      return;
+    }
+
+    if (session && session.user) {
+      showLoggedIn(session.user);
+    }
+  });
 });

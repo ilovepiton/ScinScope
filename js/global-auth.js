@@ -1,4 +1,7 @@
-const globalSupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const globalSupabaseClient =
+  window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined"
+    ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 function getBasePath() {
   const path = window.location.pathname;
@@ -32,6 +35,15 @@ function setGlobalHeaderAvatar(url) {
 }
 
 async function loadGlobalProfile(user) {
+  if (!globalSupabaseClient) {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.name || user.email.split("@")[0],
+      avatar_url: ""
+    };
+  }
+
   const { data, error } = await globalSupabaseClient
     .from("profiles")
     .select("id, email, name, avatar_url")
@@ -85,6 +97,11 @@ async function showGlobalLoggedInHeader(user) {
 }
 
 async function checkGlobalAuthHeader() {
+  if (!globalSupabaseClient) {
+    showGlobalLoggedOutHeader();
+    return;
+  }
+
   const { data } = await globalSupabaseClient.auth.getSession();
 
   if (data.session && data.session.user) {

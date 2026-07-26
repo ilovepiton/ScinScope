@@ -3,12 +3,37 @@ let takingProductPhoto = false;
 
 const PRODUCT_PHOTO_WIDTH = 420;
 const PRODUCT_PHOTO_HEIGHT = 600;
-const PRODUCT_PHOTO_QUALITY = 0.65;
+const PRODUCT_PHOTO_QUALITY = 0.68;
+const PRODUCT_MAX_FILE_SIZE = 8 * 1024 * 1024;
+const PRODUCT_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const PRODUCT_SCAN_HISTORY_KEY = "skinscopeScanHistory";
+
+function getProductPageUrl(pathFromRoot) {
+  const path = window.location.pathname;
+
+  if (path.includes("/ScinScope/")) {
+    return "/ScinScope/" + pathFromRoot;
+  }
+
+  if (path.includes("/pages/")) {
+    return pathFromRoot.replace("pages/", "");
+  }
+
+  return pathFromRoot;
+}
+
+function setProductMessage(text, type = "info") {
+  const message = document.getElementById("product-scan-message");
+  if (!message) return;
+
+  message.textContent = text;
+  message.classList.remove("error", "success", "info");
+  message.classList.add(type);
+}
 
 function compressProductImage(source, sourceWidth, sourceHeight) {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
-
   const targetRatio = PRODUCT_PHOTO_WIDTH / PRODUCT_PHOTO_HEIGHT;
   const sourceRatio = sourceWidth / sourceHeight;
 
@@ -28,19 +53,60 @@ function compressProductImage(source, sourceWidth, sourceHeight) {
   canvas.width = PRODUCT_PHOTO_WIDTH;
   canvas.height = PRODUCT_PHOTO_HEIGHT;
 
-  context.drawImage(
-    source,
-    startX,
-    startY,
-    cropWidth,
-    cropHeight,
-    0,
-    0,
-    PRODUCT_PHOTO_WIDTH,
-    PRODUCT_PHOTO_HEIGHT
-  );
-
+  context.filter = getGentleProductLightFilter(source, startX, startY, cropWidth, cropHeight);
+  context.drawImage(source, startX, startY, cropWidth, cropHeight, 0, 0, PRODUCT_PHOTO_WIDTH, PRODUCT_PHOTO_HEIGHT);
+  context.filter = "none";
   return canvas.toDataURL("image/jpeg", PRODUCT_PHOTO_QUALITY);
+}
+
+function getGentleProductLightFilter(source, startX, startY, width, height) {
+  const sampleCanvas = document.createElement("canvas");
+  const sampleContext = sampleCanvas.getContext("2d", { willReadFrequently: true });
+
+  if (!sampleContext) return "brightness(1.06) contrast(1.03) saturate(1.02)";
+
+  sampleCanvas.width = 24;
+  sampleCanvas.height = 24;
+
+  try {
+    sampleContext.drawImage(source, startX, startY, width, height, 0, 0, sampleCanvas.width, sampleCanvas.height);
+    const pixels = sampleContext.getImageData(0, 0, sampleCanvas.width, sampleCanvas.height).data;
+    let luminanceTotal = 0;
+
+    for (let index = 0; index < pixels.length; index += 4) {
+      luminanceTotal += pixels[index] * 0.2126 + pixels[index + 1] * 0.7152 + pixels[index + 2] * 0.0722;
+    }
+
+    const averageLuminance = luminanceTotal / (pixels.length / 4);
+    const brightness =
+      averageLuminance < 72 ? 1.22 :
+      averageLuminance < 105 ? 1.16 :
+      averageLuminance < 140 ? 1.09 :
+      1.03;
+
+    return "brightness(" + brightness + ") contrast(1.035) saturate(1.02)";
+  } catch (error) {
+    return "brightness(1.07) contrast(1.03) saturate(1.02)";
+  }
+}
+
+function setProductAnalyzeButton(enabled) {
+  const button = document.getElementById("analyze-product-button");
+  if (!button) return;
+
+  button.disabled = !enabled;
+  button.classList.toggle("disabled-button", !enabled);
+}
+
+function showProductPreview(photoData) {
+  const previewBox = document.getElementById("selected-product-box");
+  const previewImage = document.getElementById("selected-product-photo");
+
+  if (!previewBox || !previewImage) return;
+
+  previewImage.src = photoData;
+  previewBox.hidden = false;
+  setProductAnalyzeButton(true);
 }
 
 function saveProductPhoto(photoData) {
@@ -48,104 +114,99 @@ function saveProductPhoto(photoData) {
     localStorage.removeItem("skinscopeFacePhoto");
     localStorage.setItem("skinscopeProductPhoto", photoData);
     showProductPreview(photoData);
-    enableProductAnalyzeButton();
+    setProductMessage("Product photo is ready. You can analyze it now.", "success");
   } catch (error) {
-    alert("Photo is still too large. Please try another JPG, PNG, or WebP photo.");
+    setProductMessage("Photo is still too large. Please try another JPG, PNG, or WebP photo.", "error");
   }
 }
 
-function showProductPreview(photoData) {
-  const previewBox = document.getElementById("product-preview-box");
-  const previewImage = document.getElementById("product-preview-image");
-  const controlButtons = document.getElementById("product-control-buttons");
-
-  if (!previewBox || !previewImage || !controlButtons) return;
-
-  previewImage.src = photoData;
-  previewBox.hidden = false;
-  controlButtons.hidden = false;
-}
-
-function enableProductAnalyzeButton() {
-  const button = document.getElementById("analyze-product-button");
-  if (!button) return;
-
-  button.classList.remove("disabled-button");
-  button.disabled = false;
-}
-
-function disableProductAnalyzeButton() {
-  const button = document.getElementById("analyze-product-button");
-  if (!button) return;
-
-  button.classList.add("disabled-button");
-  button.disabled = true;
-}
-
 function clearProductPhoto() {
-  const input = document.getElementById("product-photo-input");
-  const previewBox = document.getElementById("product-preview-box");
-  const previewImage = document.getElementById("product-preview-image");
-  const controlButtons = document.getElementById("product-control-buttons");
+  const input = document.getElementById("product-file-input");
+  const previewBox = document.getElementById("selected-product-box");
+  const previewImage = document.getElementById("selected-product-photo");
 
   localStorage.removeItem("skinscopeProductPhoto");
 
   if (input) input.value = "";
-  if (previewImage) previewImage.src = "";
+  if (previewImage) previewImage.removeAttribute("src");
   if (previewBox) previewBox.hidden = true;
-  if (controlButtons) controlButtons.hidden = true;
 
-  disableProductAnalyzeButton();
+  setProductAnalyzeButton(false);
+  setProductMessage("Take or upload a product photo to begin.", "info");
 }
 
-function resetProductScanPage() {
-  const input = document.getElementById("product-photo-input");
-  if (!input) return;
+function validateProductFile(file) {
+  if (!PRODUCT_ALLOWED_TYPES.includes(file.type)) {
+    return "This product photo format is not supported yet. Please use JPG, PNG, or WebP.";
+  }
 
-  localStorage.removeItem("skinscopeProductPhoto");
-  clearProductPhoto();
+  if (file.size > PRODUCT_MAX_FILE_SIZE) {
+    return "This product photo is too large. Please choose an image under 8 MB.";
+  }
+
+  return "";
+}
+
+function handleProductFile(file, input) {
+  const validationError = validateProductFile(file);
+
+  if (validationError) {
+    if (input) input.value = "";
+    setProductMessage(validationError, "error");
+    return;
+  }
+
+  const image = new Image();
+  const imageUrl = URL.createObjectURL(file);
+
+  image.onload = function () {
+    const compressedPhoto = compressProductImage(image, image.naturalWidth, image.naturalHeight);
+    URL.revokeObjectURL(imageUrl);
+    saveProductPhoto(compressedPhoto);
+  };
+
+  image.onerror = function () {
+    URL.revokeObjectURL(imageUrl);
+    if (input) input.value = "";
+    setProductMessage("This image could not be loaded. Please try JPG, PNG, or WebP.", "error");
+  };
+
+  image.src = imageUrl;
 }
 
 function setupProductUpload() {
-  const input = document.getElementById("product-photo-input");
-
+  const input = document.getElementById("product-file-input");
   if (!input) return;
 
   input.addEventListener("change", function () {
     const file = input.files && input.files[0];
-
     if (!file) return;
-
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-
-    if (!allowedTypes.includes(file.type)) {
-      alert("This product photo format is not supported yet. Please use JPG, PNG, or WebP.");
-      input.value = "";
-      return;
-    }
-
-    const image = new Image();
-    const imageUrl = URL.createObjectURL(file);
-
-    image.onload = function () {
-      const compressedPhoto = compressProductImage(
-        image,
-        image.naturalWidth,
-        image.naturalHeight
-      );
-
-      URL.revokeObjectURL(imageUrl);
-      saveProductPhoto(compressedPhoto);
-    };
-
-    image.onerror = function () {
-      URL.revokeObjectURL(imageUrl);
-      alert("This image could not be loaded. Please try JPG, PNG, or WebP.");
-      input.value = "";
-    };
-
-    image.src = imageUrl;
+    handleProductFile(file, input);
   });
+}
+
+function setupProductUploadLabelKeyboard() {
+  const label = document.querySelector("label[for='product-file-input']");
+  const input = document.getElementById("product-file-input");
+
+  if (!label || !input) return;
+
+  label.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      input.click();
+    }
+  });
+}
+
+function stopProductCameraStream() {
+  if (!productCameraStream) return;
+
+  productCameraStream.getTracks().forEach(function (track) {
+    track.stop();
+  });
+
+  productCameraStream = null;
 }
 
 async function openProductCameraModal() {
@@ -155,7 +216,13 @@ async function openProductCameraModal() {
 
   if (!modal || !video) return;
 
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setProductMessage("Camera is not supported in this browser. Please use Upload Product File.", "error");
+    return;
+  }
+
   takingProductPhoto = false;
+  stopProductCameraStream();
 
   if (button) {
     button.textContent = "Take Photo";
@@ -175,13 +242,15 @@ async function openProductCameraModal() {
 
     video.srcObject = productCameraStream;
     modal.hidden = false;
+    setProductMessage("Camera is ready. Capture a clear product photo.", "info");
 
-    try {
-      await video.play();
-    } catch (error) {}
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(function () {});
+    }
   } catch (error) {
-    alert("Camera is not available. Please use Upload File.");
     closeProductCameraModal();
+    setProductMessage("Camera permission was denied or unavailable. Please use Upload Product File.", "error");
   }
 }
 
@@ -190,14 +259,7 @@ function closeProductCameraModal() {
   const video = document.getElementById("product-camera-video");
   const button = document.getElementById("take-product-photo-button");
 
-  if (productCameraStream) {
-    productCameraStream.getTracks().forEach(function (track) {
-      track.stop();
-    });
-
-    productCameraStream = null;
-  }
-
+  stopProductCameraStream();
   takingProductPhoto = false;
 
   if (video) {
@@ -231,15 +293,10 @@ function takeProductCameraPhoto() {
   let attempts = 0;
 
   function tryCapture() {
-    attempts++;
+    attempts += 1;
 
     if (video.videoWidth && video.videoHeight) {
-      const compressedPhoto = compressProductImage(
-        video,
-        video.videoWidth,
-        video.videoHeight
-      );
-
+      const compressedPhoto = compressProductImage(video, video.videoWidth, video.videoHeight);
       saveProductPhoto(compressedPhoto);
       closeProductCameraModal();
       return;
@@ -254,7 +311,7 @@ function takeProductCameraPhoto() {
         button.classList.remove("disabled-button");
       }
 
-      alert("Camera is still loading. Try again in one second.");
+      setProductMessage("Camera is still loading. Try again in one second.", "error");
       return;
     }
 
@@ -264,15 +321,59 @@ function takeProductCameraPhoto() {
   tryCapture();
 }
 
+function getProductScanHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(PRODUCT_SCAN_HISTORY_KEY)) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function storeProductScanHistory() {
+  const history = getProductScanHistory();
+
+  history.unshift({
+    type: "product",
+    label: "Product scan",
+    createdAt: new Date().toISOString()
+  });
+
+  localStorage.setItem(PRODUCT_SCAN_HISTORY_KEY, JSON.stringify(history.slice(0, 8)));
+}
+
 function analyzeProductPhoto() {
   const savedPhoto = localStorage.getItem("skinscopeProductPhoto");
+  const button = document.getElementById("analyze-product-button");
 
   if (!savedPhoto) {
-    alert("Take or upload a product photo first.");
+    setProductMessage("Take or upload a product photo first.", "error");
+    setProductAnalyzeButton(false);
     return;
   }
 
-  window.location.href = "/ScinScope/pages/product-loading.html";
+  if (button) {
+    button.textContent = "Analyzing...";
+    button.disabled = true;
+    button.classList.add("disabled-button");
+  }
+
+  setProductMessage("Preparing your demo compatibility report...", "info");
+  storeProductScanHistory();
+
+  window.setTimeout(function () {
+    window.location.assign(getProductPageUrl("pages/product-loading.html"));
+  }, 250);
+}
+
+function loadSavedProductPhoto() {
+  const savedPhoto = localStorage.getItem("skinscopeProductPhoto");
+
+  if (savedPhoto) {
+    showProductPreview(savedPhoto);
+    setProductMessage("Product photo is ready. You can analyze it now.", "success");
+  } else {
+    setProductAnalyzeButton(false);
+  }
 }
 
 function loadProductResultPhoto() {
@@ -297,38 +398,32 @@ function setupProductButtons() {
   const openCameraButton = document.getElementById("open-product-camera-button");
   const takePhotoButton = document.getElementById("take-product-photo-button");
   const closeCameraButton = document.getElementById("close-product-camera-button");
-  const cancelButton = document.getElementById("cancel-product-button");
+  const changeButton = document.getElementById("change-product-photo-button");
   const analyzeButton = document.getElementById("analyze-product-button");
 
-  if (openCameraButton) {
-    openCameraButton.onclick = openProductCameraModal;
-  }
+  if (openCameraButton) openCameraButton.addEventListener("click", openProductCameraModal);
+  if (takePhotoButton) takePhotoButton.addEventListener("click", takeProductCameraPhoto);
+  if (closeCameraButton) closeCameraButton.addEventListener("click", closeProductCameraModal);
+  if (changeButton) changeButton.addEventListener("click", clearProductPhoto);
+  if (analyzeButton) analyzeButton.addEventListener("click", analyzeProductPhoto);
+}
 
-  if (takePhotoButton) {
-    takePhotoButton.onclick = takeProductCameraPhoto;
+function setupProductCameraCleanup() {
+  window.addEventListener("pagehide", closeProductCameraModal);
+  window.addEventListener("beforeunload", closeProductCameraModal);
 
-    takePhotoButton.ontouchstart = function (event) {
-      event.preventDefault();
-      takeProductCameraPhoto();
-    };
-  }
-
-  if (closeCameraButton) {
-    closeCameraButton.onclick = closeProductCameraModal;
-  }
-
-  if (cancelButton) {
-    cancelButton.onclick = clearProductPhoto;
-  }
-
-  if (analyzeButton) {
-    analyzeButton.onclick = analyzeProductPhoto;
-  }
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeProductCameraModal();
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  resetProductScanPage();
   setupProductUpload();
+  setupProductUploadLabelKeyboard();
   setupProductButtons();
+  setupProductCameraCleanup();
+  loadSavedProductPhoto();
   loadProductResultPhoto();
 });
