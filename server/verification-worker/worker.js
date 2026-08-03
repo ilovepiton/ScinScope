@@ -77,6 +77,15 @@ async function readJson(request) {
   }
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function requireEnvironment(env) {
   const missing = [];
 
@@ -88,15 +97,74 @@ function requireEnvironment(env) {
   return missing;
 }
 
-async function sendEmail(env, email, code) {
-  const appName = env.APP_NAME || "SkinScope";
+async function sendEmail(env, email, code, name = "") {
+  const appName = escapeHtml(env.APP_NAME || "SkinScope");
+  const safeEmail = escapeHtml(email);
+  const safeName = escapeHtml(name);
+  const greeting = safeName ? `Hi ${safeName},` : "Hi,";
+  const spacedCode = code.split("").join(" ");
   const html = `
-    <div style="font-family: Inter, Arial, sans-serif; color: #111827; line-height: 1.5;">
-      <h1 style="margin: 0 0 12px;">${appName} verification code</h1>
-      <p>Your verification code is:</p>
-      <p style="font-size: 32px; font-weight: 800; letter-spacing: 8px; margin: 20px 0;">${code}</p>
-      <p>This code expires in 10 minutes. If you did not request it, you can ignore this email.</p>
-    </div>
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="light dark">
+        <meta name="supported-color-schemes" content="light dark">
+        <title>${appName} verification code</title>
+      </head>
+      <body style="margin:0; padding:0; background:#f6f3ef;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%; min-width:100%; background:linear-gradient(135deg,#f6f3ef 0%,#e9f4ef 48%,#f7e1d6 100%);">
+          <tr>
+            <td align="center" style="padding:32px 14px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%; max-width:620px; border-collapse:separate;">
+                <tr>
+                  <td style="padding:0 0 16px;">
+                    <div style="font-family:Arial,Helvetica,sans-serif; color:#111827; font-size:24px; line-height:1.1; font-weight:900; letter-spacing:0;">${appName}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background:rgba(255,255,255,0.72); background-color:#ffffff; border:1px solid rgba(255,255,255,0.78); border-radius:28px; box-shadow:0 24px 70px rgba(17,24,39,0.12); overflow:hidden;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="padding:34px 30px 26px; font-family:Arial,Helvetica,sans-serif; color:#111827;">
+                          <div style="display:inline-block; padding:8px 14px; border-radius:999px; background:#e7f8ef; color:#16834a; font-size:13px; font-weight:900;">Secure sign-in</div>
+                          <h1 style="margin:18px 0 12px; color:#111827; font-family:Arial,Helvetica,sans-serif; font-size:34px; line-height:1.08; font-weight:900; letter-spacing:0;">Your ${appName} code</h1>
+                          <p style="margin:0 0 18px; color:#374151; font-size:16px; line-height:1.55; font-weight:700;">${greeting} we received a request to sign in to ${appName} with <span style="color:#111827;">${safeEmail}</span>. Enter the code below to continue.</p>
+
+                          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0;">
+                            <tr>
+                              <td align="center" style="padding:24px 12px; border-radius:24px; background:linear-gradient(135deg,#111827 0%,#1f2937 100%); background-color:#111827;">
+                                <div style="font-family:Arial,Helvetica,sans-serif; color:#ffffff; font-size:42px; line-height:1; font-weight:900; letter-spacing:10px; text-align:center;">${spacedCode}</div>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <p style="margin:0; color:#4b5563; font-size:14px; line-height:1.55; font-weight:700;">This code expires in 10 minutes. Use it only if you requested this sign-in. ${appName} will never ask you to share your verification code.</p>
+
+                          <div style="height:1px; background:#e5e7eb; margin:26px 0;"></div>
+
+                          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f7fbf8; border:1px solid #e4f3ea; border-radius:20px;">
+                            <tr>
+                              <td style="padding:18px 18px 16px;">
+                                <p style="margin:0 0 6px; color:#111827; font-size:15px; line-height:1.35; font-weight:900;">A more complete SkinScope experience</p>
+                                <p style="margin:0; color:#4b5563; font-size:13px; line-height:1.5; font-weight:700;">Advanced insights and additional features can help make your skin tracking feel clearer and more personal.</p>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <p style="margin:22px 0 0; color:#6b7280; font-size:12px; line-height:1.5; font-weight:700;">If you did not request this email, you can ignore it. No changes will be made unless the code is entered in ${appName}.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
   `;
 
   const response = await fetch("https://api.resend.com/emails", {
@@ -110,7 +178,7 @@ async function sendEmail(env, email, code) {
       to: [email],
       subject: `${appName} verification code`,
       html,
-      text: `Your ${appName} verification code is ${code}. It expires in 10 minutes.`
+      text: `${greeting}\n\nWe received a request to sign in to ${appName} with ${email}.\n\nYour verification code is: ${code}\n\nThis code expires in 10 minutes. Use it only if you requested this sign-in. ${appName} will never ask you to share your verification code.\n\nIf you did not request this email, you can ignore it.`
     })
   });
 
@@ -180,7 +248,7 @@ async function startVerification(request, env) {
   await env.VERIFY_CODES.put(emailCooldownKey, "1", { expirationTtl: RESEND_COOLDOWN_SECONDS });
   await env.VERIFY_CODES.put(ipCooldownKey, "1", { expirationTtl: RESEND_COOLDOWN_SECONDS });
 
-  await sendEmail(env, email, code);
+  await sendEmail(env, email, code, name);
 
   return jsonResponse(request, env, {
     ok: true,
