@@ -110,10 +110,7 @@
       '<strong>' + percent + '%</strong>'
     ].join("");
 
-    const accountLink = document.querySelector("#account-nav-link") || Array.from(nav.querySelectorAll("a")).find(function (link) {
-      return link.textContent.trim().toLowerCase() === "account";
-    });
-    nav.insertBefore(button, accountLink || null);
+    nav.appendChild(button);
   }
 
   function updatePanelState(open) {
@@ -142,26 +139,13 @@
     }, 20);
   }
 
-  function openScorePanel(options) {
-    const shouldTeleport = options && options.teleport;
-    const button = document.querySelector(".nav-skin-score-button");
-
+  function openScorePanel() {
     updatePanelState(true);
     pulseNavScore();
-
-    if (shouldTeleport) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      if (button) {
-        window.setTimeout(function () {
-          button.scrollIntoView({ block: "nearest", inline: "end", behavior: "smooth" });
-        }, 140);
-      }
-    }
   }
 
   function bindScoreControls() {
     const navScore = document.querySelector(".nav-skin-score-button");
-    const pet = document.querySelector(".skin-pet-widget");
 
     if (navScore && !navScore.dataset.bound) {
       navScore.dataset.bound = "true";
@@ -172,25 +156,13 @@
       });
     }
 
-    if (pet && !pet.dataset.bound) {
-      pet.dataset.bound = "true";
-      pet.addEventListener("click", function (event) {
-        event.stopPropagation();
-        pet.classList.add("is-teleporting");
-        openScorePanel({ teleport: true });
-        window.setTimeout(function () {
-          pet.classList.remove("is-teleporting");
-        }, 620);
-      });
-    }
-
     if (globalControlsBound) return;
     globalControlsBound = true;
 
     document.addEventListener("click", function (event) {
       const target = event.target;
       if (!(target instanceof Element)) return;
-      if (!target.closest(".skin-score-panel") && !target.closest(".nav-skin-score-button") && !target.closest(".skin-pet-widget")) {
+      if (!target.closest(".skin-score-panel") && !target.closest(".nav-skin-score-button")) {
         updatePanelState(false);
       }
     });
@@ -204,44 +176,6 @@
     const percent = getSkinPercent();
     renderNavScore(percent);
     renderScorePanel(percent);
-
-    if (document.querySelector(".skin-pet-widget")) {
-      bindScoreControls();
-      return;
-    }
-
-    const widget = document.createElement("button");
-    widget.type = "button";
-    widget.className = "skin-pet-widget";
-    widget.setAttribute("aria-label", "Open your SkinScope score");
-    widget.innerHTML = [
-      '<div class="skin-pet-bot" aria-hidden="true">',
-      '  <div class="skin-pet-antenna"></div>',
-      '  <div class="skin-pet-head">',
-      '    <span class="skin-pet-eye skin-pet-eye-left"></span>',
-      '    <span class="skin-pet-eye skin-pet-eye-right"></span>',
-      '    <span class="skin-pet-mouth"></span>',
-      '  </div>',
-      '  <div class="skin-pet-body">',
-      '    <span></span>',
-      '  </div>',
-      '  <div class="skin-pet-arms"></div>',
-      '  <div class="skin-pet-feet"></div>',
-      '</div>',
-      '<div class="skin-pet-meter">',
-      '  <div class="skin-pet-label-row">',
-      '    <span>Your skin</span>',
-      '    <strong>' + percent + '%</strong>',
-      '  </div>',
-      '  <div class="skin-pet-scale">',
-      '    <span>1</span>',
-      '    <span>100</span>',
-      '  </div>',
-      scoreBarHtml(percent, "skin-pet-bar", "Your skin percentage"),
-      '</div>'
-    ].join("");
-
-    document.body.appendChild(widget);
     bindScoreControls();
   }
 
