@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SkinScope — Account</title>
+  <link rel="stylesheet" href="/ScinScope/css/main.css?v=skin-score-email-20260803" />
+</head>
+<body class="account-video-page">
+
+  <div class="account-video-wallpaper">
+    <video autoplay muted loop playsinline poster="/ScinScope/assets/spa-wallpaper-poster.jpg">
+      <source src="/ScinScope/assets/spa-wallpaper.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <div class="account-video-overlay"></div>
+
+  <header class="site-header transparent-header">
+    <a class="logo logo-link" href="/ScinScope/index.html">SkinScope</a>
+
+    <nav>
+      <a href="/ScinScope/index.html">Home</a>
+      <a href="/ScinScope/pages/scan.html">Face Scan</a>
+      <a href="/ScinScope/pages/product-scan.html">Product Scan</a>
+      <a href="/ScinScope/pages/plan.html">Plan</a>
+      <a id="account-nav-link" class="active-nav" href="/ScinScope/pages/account.html">Account</a>
+
+      <div id="header-account-menu" class="header-account-menu" hidden>
+        <button type="button" id="header-account-button" class="header-account-button">
+          <span class="header-profile-circle">
+            <img id="header-account-avatar" class="header-account-avatar" src="" alt="Profile picture" hidden />
+            <span id="header-avatar-fallback" class="avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
+          </span>
+          <span id="header-account-name">Account</span>
+          <svg class="header-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 10l5 5 5-5"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page account-video-page-content">
+    <section class="card account-card account-glass-card">
+      <p class="beta-label">Account beta</p>
+
+      <h1>Your SkinScope Account</h1>
+
+      <p class="hero-text">
+        Create an account to save your scans, trial status, skin score, product checks, and progress history.
+      </p>
+
+      <div id="auth-panel">
+        <div class="auth-tabs" role="tablist" aria-label="Account forms">
+          <button type="button" id="login-tab" class="auth-tab active-auth-tab" role="tab" aria-selected="true" aria-controls="login-form">
+            Login
+          </button>
+
+          <button type="button" id="register-tab" class="auth-tab" role="tab" aria-selected="false" aria-controls="register-form">
+            Register
+          </button>
+        </div>
+
+        <p id="auth-message" class="status-message auth-message" role="status" aria-live="polite"></p>
+
+        <form id="login-form" class="auth-form" aria-labelledby="login-tab" novalidate>
+          <label for="login-email">
+            Email
+            <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email" required />
+          </label>
+
+          <label for="login-password">
+            Password
+            <input id="login-password" type="password" placeholder="Your password" minlength="8" autocomplete="current-password" required />
+          </label>
+
+          <button type="button" id="toggle-login-password" class="secondary-button button-reset password-toggle-button" aria-controls="login-password" aria-pressed="false">
+            Show Password
+          </button>
+
+          <button type="submit" id="login-submit-button" class="primary-button button-reset">
+            Login
+          </button>
+        </form>
+
+        <form id="register-form" class="auth-form" aria-labelledby="register-tab" hidden novalidate>
+          <label for="register-name">
+            Name
+            <input id="register-name" type="text" placeholder="Your name" autocomplete="name" required />
+          </label>
+
+          <label for="register-email">
+            Email
+            <input id="register-email" type="email" placeholder="you@example.com" autocomplete="email" required />
+          </label>
+
+          <label for="register-password">
+            Password
+            <input id="register-password" type="password" placeholder="At least 8 letters or numbers" minlength="8" autocomplete="new-password" required />
+          </label>
+
+          <label for="register-repeat-password">
+            Repeat Password
+            <input id="register-repeat-password" type="password" placeholder="Repeat password" minlength="8" autocomplete="new-password" required />
+          </label>
+
+          <button type="button" id="toggle-register-password" class="secondary-button button-reset password-toggle-button" aria-controls="register-password register-repeat-password" aria-pressed="false">
+            Show Password
+          </button>
+
+          <button type="submit" id="register-submit-button" class="primary-button button-reset">
+            Create Account
+          </button>
+        </form>
+      </div>
+
+      <div id="logged-panel" class="logged-panel account-logged-glass" hidden>
+        <div class="profile-preview-row">
+          <div class="profile-avatar-large" id="profile-avatar-large">
+            <span id="profile-avatar-fallback" class="avatar-fallback large-avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+              </svg>
+            </span>
+            <img id="profile-avatar-image" src="" alt="Profile picture" hidden />
+          </div>
+
+          <div>
+            <h2 id="account-welcome">Perfect, you’re signed in!</h2>
+            <p id="account-email-text"></p>
+          </div>
+        </div>
+
+        <div class="account-list">
+          <div class="account-item">
+            <strong>Status:</strong>
+            <span id="account-status">Loading...</span>
+          </div>
+
+          <div class="account-item">
+            <strong>Current plan:</strong>
+            <span id="account-plan">Loading...</span>
+          </div>
+
+          <div class="account-item">
+            <strong>Trial ends:</strong>
+            <span id="account-trial">Loading...</span>
+          </div>
+        </div>
+
+        <div class="account-list scan-history-list">
+          <div class="account-item scan-history-item">
+            <strong>Saved scan history:</strong>
+            <span id="account-scan-history">Loading...</span>
+          </div>
+        </div>
+
+        <div class="hero-buttons">
+          <a class="primary-button" href="/ScinScope/pages/scan.html">Start Skin Scan</a>
+          <a class="secondary-button" href="/ScinScope/pages/product-scan.html">Scan Product</a>
+          <a class="secondary-button" href="/ScinScope/pages/plan.html">Plan</a>
+          <button type="button" id="open-account-drawer-button" class="secondary-button button-reset">
+            Account settings
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="verification-modal" class="verification-modal" role="dialog" aria-modal="true" aria-labelledby="verification-title" hidden>
+    <div class="verification-window">
+      <p class="beta-label">Email verification</p>
+
+      <h2 id="verification-title">Check your email</h2>
+
+      <p class="verification-text">
+        Enter the 6-digit code from your verification email.
+      </p>
+
+      <p id="verification-email-text" class="verification-email"></p>
+      <p id="verification-message" class="verification-message" hidden></p>
+
+      <form id="verification-form">
+        <div class="code-boxes" id="code-boxes">
+          <input class="code-input" maxlength="1" inputmode="numeric" type="text" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="text" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="text" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="text" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="text" />
+          <input class="code-input" maxlength="1" inputmode="numeric" type="text" />
+        </div>
+
+        <button type="submit" class="primary-button button-reset verification-submit">
+          Confirm Account
+        </button>
+
+        <div class="verification-actions">
+          <button type="button" id="resend-code-button" class="secondary-button button-reset">
+            Resend Code
+          </button>
+
+          <button type="button" id="close-verification-button" class="secondary-button button-reset">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="account-drawer" class="account-drawer" role="dialog" aria-modal="true" aria-labelledby="account-drawer-title" hidden>
+    <div class="account-drawer-panel">
+      <div class="account-drawer-header">
+        <div>
+          <p class="beta-label">Account settings</p>
+          <h2 id="account-drawer-title">My SkinScope Profile</h2>
+        </div>
+
+        <button type="button" id="close-account-drawer-button" class="drawer-close-button" aria-label="Close account settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 6l12 12"></path>
+            <path d="M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-profile-top">
+        <div class="drawer-profile-avatar">
+          <span id="drawer-avatar-fallback" class="avatar-fallback large-avatar-fallback" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4.8 20c1.4-4 4-6 7.2-6s5.8 2 7.2 6"></path>
+            </svg>
+          </span>
+          <img id="drawer-avatar-image" src="" alt="Profile picture" hidden />
+        </div>
+
+        <div>
+          <h3 id="drawer-name">Profile</h3>
+          <p id="drawer-email">email@example.com</p>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Profile picture</h3>
+
+        <p>
+          Upload any clear image from your device. It will become your SkinScope profile picture.
+        </p>
+
+        <input id="avatar-file-input" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif" hidden />
+
+        <button type="button" id="change-avatar-button" class="primary-button button-reset">
+          Add profile picture
+        </button>
+
+        <p id="avatar-message" class="drawer-message" hidden></p>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Subscription</h3>
+
+        <div class="drawer-info-row">
+          <strong>Plan:</strong>
+          <span id="drawer-plan">trial</span>
+        </div>
+
+        <div class="drawer-info-row">
+          <strong>Status:</strong>
+          <span id="drawer-status">active</span>
+        </div>
+
+        <div class="drawer-info-row">
+          <strong>Trial ends:</strong>
+          <span id="drawer-trial">—</span>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Recent scans</h3>
+        <p id="drawer-scan-history">No saved scan history yet.</p>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Logout</h3>
+
+        <p>
+          You can log out from this device. Your account data will stay saved.
+        </p>
+
+        <button type="button" id="drawer-logout-button" class="secondary-button button-reset logout-danger-button">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="logout-confirm-modal" class="logout-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title" hidden>
+    <div class="logout-confirm-box">
+      <h2 id="logout-confirm-title">Are you sure you want to log out?</h2>
+
+      <p>
+        You can log back in anytime with your email and password.
+      </p>
+
+      <div class="verification-actions">
+        <button type="button" id="confirm-logout-button" class="primary-button button-reset">
+          Yes, log out
+        </button>
+
+        <button type="button" id="cancel-logout-button" class="secondary-button button-reset">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/ScinScope/js/supabase-config.js"></script>
+  <script src="/ScinScope/js/custom-verification-config.js?v=custom-email-20260810"></script>
+  <script src="/ScinScope/js/account.js?v=custom-email-20260810"></script>
+  <script src="/ScinScope/js/skin-pet.js?v=skin-score-email-20260803"></script>
+</body>
+</html>
