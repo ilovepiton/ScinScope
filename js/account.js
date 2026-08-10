@@ -930,8 +930,11 @@ async function loginUser(event) {
     }
 
     if (data.user) {
-      showPageMessage("Logged in successfully.", "success");
       await showLoggedIn(data.user);
+
+      if (currentUser) {
+        showPageMessage("Logged in successfully.", "success");
+      }
     }
   } finally {
     setButtonProcessing("login-submit-button", false, "Login", "Logging in...");
@@ -980,7 +983,6 @@ async function confirmAccount(event) {
 
     pendingVerificationMode = "custom";
     await confirmCustomVerificationCode(pendingEmail, code);
-    markEmailVerifiedBySkinScope(pendingEmail);
     closeVerificationModal();
     showPageMessage("Email verified by SkinScope. Creating your account...", "success");
     await createAccountAfterCustomVerification();
