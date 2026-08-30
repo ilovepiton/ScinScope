@@ -236,6 +236,7 @@
       gate.setAttribute("aria-label", "SkinScope trial required");
       gate.innerHTML = [
         '<div class="trial-gate-panel">',
+        '  <button type="button" class="trial-gate-close" aria-label="Close">x</button>',
         '  <span class="referral-kicker">Premium trial</span>',
         '  <h2></h2>',
         '  <p></p>',
@@ -254,6 +255,13 @@
     gate.querySelector(".referral-start-button").textContent = user
       ? "Invite a friend for 7-day trial"
       : "Log in to unlock trial";
+
+    const close = gate.querySelector(".trial-gate-close");
+    if (close) {
+      close.onclick = function () {
+        gate.hidden = true;
+      };
+    }
   }
 
   function renderAccountInvite(user) {
