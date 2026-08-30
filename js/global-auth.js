@@ -3,6 +3,8 @@ const globalSupabaseClient =
     ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
+window.globalSupabaseClient = globalSupabaseClient;
+
 const GLOBAL_VERIFIED_EMAILS_KEY = "skinscopeVerifiedEmails";
 
 function normalizeGlobalEmail(email) {

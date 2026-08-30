@@ -718,6 +718,29 @@ async function loadSubscription(userId) {
   const drawerPlan = document.getElementById("drawer-plan");
   const drawerStatus = document.getElementById("drawer-status");
   const drawerTrial = document.getElementById("drawer-trial");
+  const referralTrial =
+    window.SkinScopeTrial && currentUser
+      ? window.SkinScopeTrial.getTrialState(currentUser)
+      : null;
+
+  function showReferralTrial() {
+    const trialDate = referralTrial && referralTrial.trialEndsAt
+      ? new Date(referralTrial.trialEndsAt).toLocaleDateString()
+      : "7 days";
+
+    statusEl.textContent = "trialing";
+    planEl.textContent = "7-day referral trial";
+    trialEl.textContent = trialDate;
+
+    drawerPlan.textContent = "7-day referral trial";
+    drawerStatus.textContent = "trialing";
+    drawerTrial.textContent = trialDate;
+  }
+
+  if (referralTrial && referralTrial.active && !referralTrial.paid) {
+    showReferralTrial();
+    return;
+  }
 
   const { data, error } = await supabaseClient
     .from("subscriptions")
@@ -728,6 +751,11 @@ async function loadSubscription(userId) {
   if (error || !data) {
     const storedPlan = getStoredAccountPlan();
     const planLabel = getAccountPlanLabel(storedPlan);
+
+    if (referralTrial && referralTrial.active && !referralTrial.paid) {
+      showReferralTrial();
+      return;
+    }
 
     statusEl.textContent = "active";
     planEl.textContent = planLabel + " (demo)";
