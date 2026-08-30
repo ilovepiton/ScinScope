@@ -1341,10 +1341,12 @@ h3 {
   width: fit-content;
 }
 
+.trial-gate-panel,
 .referral-modal-panel {
   position: relative;
 }
 
+.trial-gate-close,
 .referral-modal-close {
   position: absolute;
   top: 16px;
