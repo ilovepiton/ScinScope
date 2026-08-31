@@ -49,7 +49,7 @@ function getAccountUrl() {
 function setProtectedNavigationVisibility(isLoggedIn) {
   document.body.classList.toggle("is-logged-in", Boolean(isLoggedIn));
 
-  document.querySelectorAll("nav a").forEach(function (link) {
+  document.querySelectorAll("a").forEach(function (link) {
     const href = link.getAttribute("href") || "";
     const isProtectedLink =
       href.includes("scan.html") ||
