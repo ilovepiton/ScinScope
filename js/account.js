@@ -668,6 +668,12 @@ async function loadProfile(user) {
 }
 
 function showLoggedOut() {
+  if (window.setSkinScopeProtectedNavigation) {
+    window.setSkinScopeProtectedNavigation(false);
+  } else {
+    document.body.classList.remove("is-logged-in");
+  }
+
   document.getElementById("auth-panel").hidden = false;
   document.getElementById("logged-panel").hidden = true;
   document.getElementById("header-account-menu").hidden = true;
@@ -684,6 +690,12 @@ async function showLoggedIn(user) {
   }
 
   currentUser = user;
+
+  if (window.setSkinScopeProtectedNavigation) {
+    window.setSkinScopeProtectedNavigation(true);
+  } else {
+    document.body.classList.add("is-logged-in");
+  }
 
   document.getElementById("auth-panel").hidden = true;
   document.getElementById("logged-panel").hidden = false;

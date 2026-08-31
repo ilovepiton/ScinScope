@@ -248,7 +248,8 @@
     }
 
     gate.hidden = false;
-    gate.querySelector("h2").textContent = getGateTitle();
+    gate.querySelector(".referral-kicker").textContent = user ? "Seven Days Trial" : "Premium trial";
+    gate.querySelector("h2").textContent = user ? "Seven Days Trial" : getGateTitle();
     gate.querySelector("p").textContent = user
       ? "Invite one friend to unlock a 7-day SkinScope trial. After one invite, this offer is locked for the account."
       : "Log in or create an account first, then invite a friend to unlock your 7-day SkinScope trial.";

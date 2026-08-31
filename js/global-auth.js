@@ -1,9 +1,10 @@
 const globalSupabaseClient =
   window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined"
-    ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
 window.globalSupabaseClient = globalSupabaseClient;
+window.SkinScopeAuthReady = true;
 
 const GLOBAL_VERIFIED_EMAILS_KEY = "skinscopeVerifiedEmails";
 
@@ -44,6 +45,27 @@ function getBasePath() {
 function getAccountUrl() {
   return getBasePath() + "account.html";
 }
+
+function setProtectedNavigationVisibility(isLoggedIn) {
+  document.body.classList.toggle("is-logged-in", Boolean(isLoggedIn));
+
+  document.querySelectorAll("nav a").forEach(function (link) {
+    const href = link.getAttribute("href") || "";
+    const isProtectedLink =
+      href.includes("scan.html") ||
+      href.includes("product-scan.html");
+
+    if (isProtectedLink) {
+      link.hidden = !isLoggedIn;
+    }
+  });
+
+  document.querySelectorAll(".nav-skin-score-button, .skin-score-panel").forEach(function (element) {
+    element.hidden = !isLoggedIn;
+  });
+}
+
+window.setSkinScopeProtectedNavigation = setProtectedNavigationVisibility;
 
 function setGlobalHeaderAvatar(url) {
   const img = document.getElementById("header-account-avatar");
@@ -94,6 +116,8 @@ function showGlobalLoggedOutHeader() {
   const accountLink = document.getElementById("account-nav-link");
   const accountMenu = document.getElementById("header-account-menu");
 
+  setProtectedNavigationVisibility(false);
+
   if (accountLink) {
     accountLink.hidden = false;
     accountLink.href = getAccountUrl();
@@ -108,6 +132,8 @@ async function showGlobalLoggedInHeader(user) {
   const accountLink = document.getElementById("account-nav-link");
   const accountMenu = document.getElementById("header-account-menu");
   const accountName = document.getElementById("header-account-name");
+
+  setProtectedNavigationVisibility(true);
 
   if (!accountMenu || !accountName) return;
 
