@@ -1,7 +1,4 @@
-const supabaseClient =
-  window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined"
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : null;
+const skinScopeApi = window.SkinScopeApi || null;
 
 let pendingEmail = "";
 let pendingPassword = "";
@@ -45,7 +42,7 @@ function showVerificationMessage(text, type = "error") {
 
   message.hidden = false;
   message.textContent = displayText;
-  message.classList.remove("error", "success");
+  message.classList.remove("error", "success", "info");
   message.classList.add(type);
 }
 
@@ -55,7 +52,7 @@ function hideVerificationMessage() {
 
   message.hidden = true;
   message.textContent = "";
-  message.classList.remove("error", "success");
+  message.classList.remove("error", "success", "info");
 }
 
 function showPageMessage(text, type = "error") {
@@ -237,7 +234,7 @@ function getCustomVerificationError(error) {
   const message = String(error && error.message ? error.message : error || "");
 
   if (message.toLowerCase().includes("not connected")) {
-    return "Use the Supabase email confirmation link, then log in.";
+    return "Use the SkinScope verification code, then log in.";
   }
 
   return message || "SkinScope verification failed. Please try again.";
@@ -285,8 +282,8 @@ function markEmailVerifiedBySkinScope(email) {
 }
 
 async function rejectUnverifiedSession(message) {
-  if (supabaseClient) {
-    await supabaseClient.auth.signOut();
+  if (skinScopeApi) {
+    await skinScopeApi.logout();
   }
 
   currentUser = null;
@@ -297,17 +294,11 @@ async function rejectUnverifiedSession(message) {
 }
 
 async function sendCustomVerificationCode(email, name) {
-  return callCustomVerification("/verification/start", {
-    email: email,
-    name: name
-  });
+  return skinScopeApi.register(name, email, pendingPassword);
 }
 
 async function confirmCustomVerificationCode(email, code) {
-  return callCustomVerification("/verification/confirm", {
-    email: email,
-    code: code
-  });
+  return skinScopeApi.verify(email, code);
 }
 
 function startResendCooldown(seconds) {
@@ -648,13 +639,11 @@ function setAvatarImages(url) {
 }
 
 async function loadProfile(user) {
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("id, email, name, avatar_url")
-    .eq("id", user.id)
-    .single();
-
-  if (error || !data) {
+  try {
+    const profile = await skinScopeApi.getProfile();
+    currentProfile = profile;
+    return profile;
+  } catch (error) {
     currentProfile = {
       id: user.id,
       email: user.email,
@@ -664,9 +653,6 @@ async function loadProfile(user) {
 
     return currentProfile;
   }
-
-  currentProfile = data;
-  return data;
 }
 
 function showLoggedOut() {
@@ -756,11 +742,14 @@ async function loadSubscription(userId) {
     return;
   }
 
-  const { data, error } = await supabaseClient
-    .from("subscriptions")
-    .select("plan, status, trial_ends_at")
-    .eq("user_id", userId)
-    .single();
+  let data = null;
+  let error = null;
+
+  try {
+    data = await skinScopeApi.getSubscription();
+  } catch (subscriptionError) {
+    error = subscriptionError;
+  }
 
   if (error || !data) {
     const storedPlan = getStoredAccountPlan();
@@ -802,8 +791,8 @@ async function loadSubscription(userId) {
 async function registerUser(event) {
   event.preventDefault();
 
-  if (!supabaseClient) {
-    showPageMessage("Authentication is unavailable because Supabase did not load. Check the network connection and Supabase config.");
+  if (!skinScopeApi) {
+    showPageMessage("SkinScope server is unavailable. Start the SkinScope server and try again.");
     return;
   }
 
@@ -833,16 +822,8 @@ async function registerUser(event) {
   setButtonProcessing("register-submit-button", true, "Create Account", "Creating...");
 
   try {
-    if (hasCustomVerificationEndpoint()) {
-      pendingVerificationMode = "custom";
-      await sendCustomVerificationCode(email, name);
-      showPageMessage("SkinScope sent a verification code to your email.", "success");
-      openVerificationModal(email);
-      return;
-    }
-
-    pendingVerificationMode = "supabase";
-    await createAccountWithSupabaseAuth();
+    pendingVerificationMode = "skinscope";
+    await createAccountWithSkinScopeAuth();
   } catch (error) {
     showPageMessage(getFriendlyAuthError(error.message || error));
   } finally {
@@ -850,106 +831,23 @@ async function registerUser(event) {
   }
 }
 
-async function createAccountWithSupabaseAuth() {
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: pendingEmail,
-    password: pendingPassword,
-    options: {
-      emailRedirectTo: getAccountRedirectUrl(),
-      data: {
-        name: pendingName
-      }
-    }
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  if (data.session && data.session.user) {
-    await showLoggedIn(data.session.user);
-    showPageMessage("Account created. You are logged in.", "success");
-    return;
-  }
-
-  if (data.user) {
-    showPageMessage("Account created. Check your email to confirm it, then log in.", "success");
-    return;
-  }
-
-  showPageMessage("Account request sent. Check your email, then log in.", "success");
+async function createAccountWithSkinScopeAuth() {
+  await skinScopeApi.register(pendingName, pendingEmail, pendingPassword);
+  showPageMessage("SkinScope sent a verification code to your email.", "success");
+  openVerificationModal(pendingEmail);
 }
 
 async function createAccountAfterCustomVerification() {
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: pendingEmail,
-    password: pendingPassword,
-    options: {
-      emailRedirectTo: getAccountRedirectUrl(),
-      data: {
-        name: pendingName,
-        skinscope_verified: true
-      }
-    }
-  });
-
-  if (error) {
-    const message = String(error.message || "").toLowerCase();
-
-    if (message.includes("already registered") || message.includes("already exists")) {
-      const loginResult = await supabaseClient.auth.signInWithPassword({
-        email: pendingEmail,
-        password: pendingPassword
-      });
-
-      if (loginResult.data && loginResult.data.user) {
-        markEmailVerifiedBySkinScope(pendingEmail);
-        await supabaseClient.auth.updateUser({
-          data: {
-            skinscope_verified: true
-          }
-        });
-        await showLoggedIn(loginResult.data.user);
-        return;
-      }
-    }
-
-    throw error;
-  }
-
-  if (data.session && data.session.user) {
-    markEmailVerifiedBySkinScope(pendingEmail);
-    await showLoggedIn(data.session.user);
-    return;
-  }
-
-  if (data.user && data.user.email_confirmed_at) {
-    markEmailVerifiedBySkinScope(pendingEmail);
-    await showLoggedIn(data.user);
-    return;
-  }
-
-  if (pendingEmail && pendingPassword) {
-    const loginResult = await supabaseClient.auth.signInWithPassword({
-      email: pendingEmail,
-      password: pendingPassword
-    });
-
-    if (loginResult.data && loginResult.data.user) {
-      markEmailVerifiedBySkinScope(pendingEmail);
-      await showLoggedIn(loginResult.data.user);
-      return;
-    }
-  }
-
-  throw new Error("Email is verified by SkinScope, but Supabase still requires email confirmation. Turn off Supabase email confirmation after connecting the custom verifier.");
+  const result = await skinScopeApi.verify(pendingEmail, getCodeValue());
+  markEmailVerifiedBySkinScope(pendingEmail);
+  await showLoggedIn(result.user);
 }
 
 async function loginUser(event) {
   event.preventDefault();
 
-  if (!supabaseClient) {
-    showPageMessage("Authentication is unavailable because Supabase did not load. Check the network connection and Supabase config.");
+  if (!skinScopeApi) {
+    showPageMessage("SkinScope server is unavailable. Start the SkinScope server and try again.");
     return;
   }
 
@@ -970,44 +868,22 @@ async function loginUser(event) {
   setButtonProcessing("login-submit-button", true, "Login", "Logging in...");
 
   try {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
-
-    if (error) {
-      const message = error.message.toLowerCase();
-
-      if (
-        message.includes("email not confirmed") ||
-        message.includes("not confirmed") ||
-        message.includes("confirm")
-      ) {
-        if (!hasCustomVerificationEndpoint()) {
-          showPageMessage("Check your email and confirm your account first, then log in.", "info");
-          return;
-        }
-
-        pendingVerificationMode = "custom";
-
-        pendingName = email.split("@")[0];
-        await sendCustomVerificationCode(email, pendingName);
-        openVerificationModal(email);
-        showVerificationMessage("Enter the SkinScope code to finish account verification.", "success");
-        return;
-      }
-
-      showPageMessage(getFriendlyAuthError(error.message));
-      return;
-    }
+    const data = await skinScopeApi.login(email, password);
 
     if (data.user) {
       await showLoggedIn(data.user);
-
-      if (currentUser) {
-        showPageMessage("Logged in successfully.", "success");
-      }
+      showPageMessage("Logged in successfully.", "success");
     }
+  } catch (error) {
+    if (error.code === "email_not_verified" || error.status === 403) {
+      pendingVerificationMode = "skinscope";
+      pendingName = email.split("@")[0];
+      openVerificationModal(email);
+      showVerificationMessage("Enter the SkinScope code to finish account verification.", "success");
+      return;
+    }
+
+    showPageMessage(getFriendlyAuthError(error.message));
   } finally {
     setButtonProcessing("login-submit-button", false, "Login", "Logging in...");
   }
@@ -1016,8 +892,8 @@ async function loginUser(event) {
 async function confirmAccount(event) {
   event.preventDefault();
 
-  if (!supabaseClient) {
-    showVerificationMessage("Authentication is unavailable because Supabase did not load.", "error");
+  if (!skinScopeApi) {
+    showVerificationMessage("SkinScope server is unavailable. Start the SkinScope server and try again.", "error");
     return;
   }
 
@@ -1048,16 +924,12 @@ async function confirmAccount(event) {
   }
 
   try {
-    if (!hasCustomVerificationEndpoint()) {
-      showVerificationMessage("No 6-digit code is needed right now. Confirm your account from the Supabase email link, then log in.", "info");
-      return;
-    }
-
-    pendingVerificationMode = "custom";
-    await confirmCustomVerificationCode(pendingEmail, code);
+    pendingVerificationMode = "skinscope";
+    const result = await confirmCustomVerificationCode(pendingEmail, code);
     closeVerificationModal();
-    showPageMessage("Email verified by SkinScope. Creating your account...", "success");
-    await createAccountAfterCustomVerification();
+    markEmailVerifiedBySkinScope(pendingEmail);
+    await showLoggedIn(result.user);
+    showPageMessage("Email verified. You are logged in.", "success");
   } catch (error) {
     showVerificationMessage(getCustomVerificationError(error), "error");
   } finally {
@@ -1072,8 +944,8 @@ async function confirmAccount(event) {
 async function resendCode() {
   hideVerificationMessage();
 
-  if (!supabaseClient) {
-    showVerificationMessage("Authentication is unavailable because Supabase did not load.", "error");
+  if (!skinScopeApi) {
+    showVerificationMessage("SkinScope server is unavailable. Start the SkinScope server and try again.", "error");
     return;
   }
 
@@ -1088,14 +960,9 @@ async function resendCode() {
     return;
   }
 
-  if (!hasCustomVerificationEndpoint()) {
-    showVerificationMessage("Supabase sends the confirmation email. Check your inbox, then log in after confirming.", "info");
-    return;
-  }
-
   try {
-    pendingVerificationMode = "custom";
-    await sendCustomVerificationCode(pendingEmail, pendingName);
+    pendingVerificationMode = "skinscope";
+    await skinScopeApi.resendVerification(pendingEmail);
     showVerificationMessage("A new SkinScope verification code has been sent.", "success");
     startResendCooldown(30);
   } catch (error) {
@@ -1121,13 +988,13 @@ function closeLogoutConfirm() {
 }
 
 async function logoutUser() {
-  if (!supabaseClient) {
+  if (!skinScopeApi) {
     showLoggedOut();
     switchToLogin();
     return;
   }
 
-  await supabaseClient.auth.signOut();
+  await skinScopeApi.logout();
 
   closeLogoutConfirm();
   closeAccountDrawer();
@@ -1144,8 +1011,8 @@ async function changeProfilePicture(file) {
 
   hideDrawerMessage("avatar-message");
 
-  if (!supabaseClient) {
-    showDrawerMessage("avatar-message", "Profile picture upload is unavailable because Supabase did not load.", "error");
+  if (!skinScopeApi) {
+    showDrawerMessage("avatar-message", "Profile picture upload is unavailable because the SkinScope server is not running.", "error");
     return;
   }
 
@@ -1159,55 +1026,25 @@ async function changeProfilePicture(file) {
     return;
   }
 
-  const fileExt = getSafeFileExtension(file);
-  const fileName = "avatar-" + Date.now() + "." + fileExt;
-  const filePath = currentUser.id + "/" + fileName;
-
-  const uploadResult = await supabaseClient.storage
-    .from("avatars")
-    .upload(filePath, file, {
-      upsert: true,
-      contentType: file.type || "image/jpeg"
-    });
-
-  if (uploadResult.error) {
-    showDrawerMessage("avatar-message", uploadResult.error.message || "Could not upload profile picture.", "error");
+  try {
+    currentProfile = await skinScopeApi.updateAvatar(file);
+  } catch (error) {
+    showDrawerMessage("avatar-message", error.message || "Could not save profile picture.", "error");
     return;
   }
 
-  const publicUrlResult = supabaseClient.storage
-    .from("avatars")
-    .getPublicUrl(filePath);
-
-  const avatarUrl = publicUrlResult.data.publicUrl;
-
-  const updateResult = await supabaseClient
-    .from("profiles")
-    .update({
-      avatar_url: avatarUrl
-    })
-    .eq("id", currentUser.id)
-    .select("id, email, name, avatar_url")
-    .single();
-
-  if (updateResult.error) {
-    showDrawerMessage("avatar-message", updateResult.error.message || "Could not save profile picture.", "error");
-    return;
-  }
-
-  currentProfile = updateResult.data;
+  const avatarUrl = currentProfile.avatar_url || "";
   setAvatarImages(avatarUrl);
   showDrawerMessage("avatar-message", "Profile picture updated.", "success");
 }
 
 async function checkSession() {
-  if (!supabaseClient) {
+  if (!skinScopeApi) {
     showLoggedOut();
-    showPageMessage("Authentication is unavailable because Supabase did not load. Check the network connection and Supabase config.", "error");
     return;
   }
 
-  const { data } = await supabaseClient.auth.getSession();
+  const data = await skinScopeApi.getSession();
 
   if (data.session && data.session.user) {
     await showLoggedIn(data.session.user);
@@ -1290,18 +1127,4 @@ function setupAccountPage() {
 document.addEventListener("DOMContentLoaded", function () {
   setupAccountPage();
   checkSession();
-
-  if (!supabaseClient) return;
-
-  supabaseClient.auth.onAuthStateChange(function (event, session) {
-    if (event === "SIGNED_OUT") {
-      showLoggedOut();
-      switchToLogin();
-      return;
-    }
-
-    if (session && session.user) {
-      showLoggedIn(session.user);
-    }
-  });
 });

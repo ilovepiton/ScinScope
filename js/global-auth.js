@@ -1,31 +1,15 @@
-const globalSupabaseClient =
-  window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined"
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : null;
+const globalSkinScopeApi = window.SkinScopeApi || null;
 
-window.globalSupabaseClient = globalSupabaseClient;
 window.SkinScopeAuthReady = true;
-
-const GLOBAL_VERIFIED_EMAILS_KEY = "skinscopeVerifiedEmails";
 
 function normalizeGlobalEmail(email) {
   return String(email || "").trim().toLowerCase();
-}
-
-function getGlobalVerifiedEmails() {
-  try {
-    const emails = JSON.parse(localStorage.getItem(GLOBAL_VERIFIED_EMAILS_KEY)) || [];
-    return Array.isArray(emails) ? emails.map(normalizeGlobalEmail).filter(Boolean) : [];
-  } catch (error) {
-    return [];
-  }
 }
 
 function isGlobalUserVerifiedBySkinScope(user) {
   return Boolean(
     user &&
     (
-      getGlobalVerifiedEmails().includes(normalizeGlobalEmail(user.email)) ||
       Boolean(user.email_confirmed_at) ||
       Boolean(user.confirmed_at) ||
       user.user_metadata?.skinscope_verified === true ||
@@ -87,7 +71,7 @@ function setGlobalHeaderAvatar(url) {
 }
 
 async function loadGlobalProfile(user) {
-  if (!globalSupabaseClient) {
+  if (!globalSkinScopeApi) {
     return {
       id: user.id,
       email: user.email,
@@ -96,13 +80,9 @@ async function loadGlobalProfile(user) {
     };
   }
 
-  const { data, error } = await globalSupabaseClient
-    .from("profiles")
-    .select("id, email, name, avatar_url")
-    .eq("id", user.id)
-    .single();
-
-  if (error || !data) {
+  try {
+    return await globalSkinScopeApi.getProfile();
+  } catch (error) {
     return {
       id: user.id,
       email: user.email,
@@ -110,8 +90,6 @@ async function loadGlobalProfile(user) {
       avatar_url: ""
     };
   }
-
-  return data;
 }
 
 function showGlobalLoggedOutHeader() {
@@ -153,16 +131,16 @@ async function showGlobalLoggedInHeader(user) {
 }
 
 async function checkGlobalAuthHeader() {
-  if (!globalSupabaseClient) {
+  if (!globalSkinScopeApi) {
     showGlobalLoggedOutHeader();
     return;
   }
 
-  const { data } = await globalSupabaseClient.auth.getSession();
+  const data = await globalSkinScopeApi.getSession();
 
   if (data.session && data.session.user) {
     if (!isGlobalUserVerifiedBySkinScope(data.session.user)) {
-      await globalSupabaseClient.auth.signOut();
+      await globalSkinScopeApi.logout();
       showGlobalLoggedOutHeader();
       return;
     }

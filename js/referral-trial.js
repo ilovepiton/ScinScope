@@ -7,21 +7,9 @@
   const PAID_PLANS = ["monthly", "lifetime"];
 
   let sessionUser = null;
-  let cachedClient = null;
 
-  function getSupabaseClient() {
-    if (cachedClient) return cachedClient;
-    if (window.globalSupabaseClient) {
-      cachedClient = window.globalSupabaseClient;
-      return cachedClient;
-    }
-
-    if (window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined") {
-      cachedClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      return cachedClient;
-    }
-
-    return null;
+  function getSkinScopeApi() {
+    return window.SkinScopeApi || null;
   }
 
   function normalizeEmail(email) {
@@ -122,29 +110,11 @@
   }
 
   async function saveTrialBestEffort(user, state, source) {
-    const client = getSupabaseClient();
-    if (!client || !user) return;
+    const api = getSkinScopeApi();
+    if (!api || !user) return;
 
     try {
-      await client.from("subscriptions").upsert(
-        {
-          user_id: user.id,
-          plan: "trial",
-          status: "trialing",
-          trial_ends_at: state.trialEndsAt
-        },
-        { onConflict: "user_id" }
-      );
-    } catch (error) {}
-
-    try {
-      await client.from("referrals").insert({
-        user_id: user.id,
-        email: user.email,
-        referrer_code: state.invitedBy || state.ownCode || "",
-        status: source,
-        trial_ends_at: state.trialEndsAt
-      });
+      await api.saveTrial(state, source);
     } catch (error) {}
   }
 
@@ -158,12 +128,12 @@
   }
 
   async function getCurrentUser() {
-    const client = getSupabaseClient();
-    if (!client) return null;
+    const api = getSkinScopeApi();
+    if (!api) return null;
 
     try {
-      const result = await client.auth.getSession();
-      sessionUser = result.data && result.data.session ? result.data.session.user : null;
+      const result = await api.getSession();
+      sessionUser = result.session ? result.session.user : null;
       return sessionUser;
     } catch (error) {
       return null;
@@ -490,22 +460,18 @@
       }, 350);
     }
 
-    const client = getSupabaseClient();
-    if (client) {
-      client.auth.onAuthStateChange(function (_event, session) {
-        sessionUser = session && session.user ? session.user : null;
-        applyPendingReferral(sessionUser).then(function () {
-          renderGate(sessionUser);
-          renderAccountInvite(sessionUser);
-          updateAccountTrialText(sessionUser);
+    window.addEventListener("skinscope-auth-changed", async function () {
+      sessionUser = await getCurrentUser();
+      await applyPendingReferral(sessionUser);
+      renderGate(sessionUser);
+      renderAccountInvite(sessionUser);
+      updateAccountTrialText(sessionUser);
 
-          if (sessionUser && localStorage.getItem(POST_LOGIN_ACTION_KEY) === "invite_trial" && !hasAccess(sessionUser)) {
-            localStorage.removeItem(POST_LOGIN_ACTION_KEY);
-            showInviteModal(sessionUser);
-          }
-        });
-      });
-    }
+      if (sessionUser && localStorage.getItem(POST_LOGIN_ACTION_KEY) === "invite_trial" && !hasAccess(sessionUser)) {
+        localStorage.removeItem(POST_LOGIN_ACTION_KEY);
+        showInviteModal(sessionUser);
+      }
+    });
   }
 
   window.SkinScopeTrial = {
