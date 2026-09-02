@@ -463,6 +463,14 @@ function validatePassword(password) {
 function getFriendlyAuthError(errorMessage) {
   const message = String(errorMessage || "").toLowerCase();
 
+  if (message.includes("public https api")) {
+    return "The live GitHub Pages site needs a public HTTPS SkinScope server. Use the local SkinScope link on this Mac for now.";
+  }
+
+  if (message.includes("could not be reached") || message.includes("load failed") || message.includes("failed to fetch")) {
+    return "SkinScope server could not be reached. Make sure the SkinScope server is running, then use the local site link.";
+  }
+
   if (message.includes("rate limit") || message.includes("email rate limit")) {
     return "Too many email attempts. Please wait a few minutes before requesting a new code.";
   }
@@ -832,8 +840,8 @@ async function registerUser(event) {
 }
 
 async function createAccountWithSkinScopeAuth() {
-  await skinScopeApi.register(pendingName, pendingEmail, pendingPassword);
-  showPageMessage("SkinScope sent a verification code to your email.", "success");
+  const result = await skinScopeApi.register(pendingName, pendingEmail, pendingPassword);
+  showPageMessage(result.message || "SkinScope sent a verification code to your email.", "success");
   openVerificationModal(pendingEmail);
 }
 
