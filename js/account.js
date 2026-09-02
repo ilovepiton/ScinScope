@@ -1,6 +1,6 @@
 const supabaseClient =
   window.supabase && typeof SUPABASE_URL !== "undefined" && typeof SUPABASE_ANON_KEY !== "undefined"
-    ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
 let pendingEmail = "";
@@ -237,7 +237,7 @@ function getCustomVerificationError(error) {
   const message = String(error && error.message ? error.message : error || "");
 
   if (message.toLowerCase().includes("not connected")) {
-    return "SkinScope email verification is not connected yet. Your account was not created or logged in.";
+    return "Use the Supabase email confirmation link, then log in.";
   }
 
   return message || "SkinScope verification failed. Please try again.";
@@ -265,6 +265,8 @@ function isUserVerifiedBySkinScope(user) {
     user &&
     (
       isEmailVerifiedBySkinScope(user.email) ||
+      Boolean(user.email_confirmed_at) ||
+      Boolean(user.confirmed_at) ||
       user.user_metadata?.skinscope_verified === true ||
       user.user_metadata?.skinscope_verified === "true"
     )
@@ -487,7 +489,7 @@ function getFriendlyAuthError(errorMessage) {
   }
 
   if (message.includes("email not confirmed") || message.includes("not confirmed")) {
-    return "Please confirm your email first. Enter the code from your email.";
+    return "Please confirm your email first, then log in.";
   }
 
   if (message.includes("invalid login credentials")) {
@@ -831,21 +833,51 @@ async function registerUser(event) {
   setButtonProcessing("register-submit-button", true, "Create Account", "Creating...");
 
   try {
-    pendingVerificationMode = "custom";
-
-    if (!hasCustomVerificationEndpoint()) {
-      showPageMessage(getCustomVerificationError(new Error("SkinScope verification server is not connected yet.")));
+    if (hasCustomVerificationEndpoint()) {
+      pendingVerificationMode = "custom";
+      await sendCustomVerificationCode(email, name);
+      showPageMessage("SkinScope sent a verification code to your email.", "success");
+      openVerificationModal(email);
       return;
     }
 
-    await sendCustomVerificationCode(email, name);
-    showPageMessage("SkinScope sent a verification code to your email.", "success");
-    openVerificationModal(email);
+    pendingVerificationMode = "supabase";
+    await createAccountWithSupabaseAuth();
   } catch (error) {
-    showPageMessage(getCustomVerificationError(error));
+    showPageMessage(getFriendlyAuthError(error.message || error));
   } finally {
     setButtonProcessing("register-submit-button", false, "Create Account", "Creating...");
   }
+}
+
+async function createAccountWithSupabaseAuth() {
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: pendingEmail,
+    password: pendingPassword,
+    options: {
+      emailRedirectTo: getAccountRedirectUrl(),
+      data: {
+        name: pendingName
+      }
+    }
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (data.session && data.session.user) {
+    await showLoggedIn(data.session.user);
+    showPageMessage("Account created. You are logged in.", "success");
+    return;
+  }
+
+  if (data.user) {
+    showPageMessage("Account created. Check your email to confirm it, then log in.", "success");
+    return;
+  }
+
+  showPageMessage("Account request sent. Check your email, then log in.", "success");
 }
 
 async function createAccountAfterCustomVerification() {
@@ -951,12 +983,12 @@ async function loginUser(event) {
         message.includes("not confirmed") ||
         message.includes("confirm")
       ) {
-        pendingVerificationMode = "custom";
-
         if (!hasCustomVerificationEndpoint()) {
-          showPageMessage("This account is not verified by SkinScope yet, and SkinScope email verification is not connected.");
+          showPageMessage("Check your email and confirm your account first, then log in.", "info");
           return;
         }
+
+        pendingVerificationMode = "custom";
 
         pendingName = email.split("@")[0];
         await sendCustomVerificationCode(email, pendingName);

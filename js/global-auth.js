@@ -26,6 +26,8 @@ function isGlobalUserVerifiedBySkinScope(user) {
     user &&
     (
       getGlobalVerifiedEmails().includes(normalizeGlobalEmail(user.email)) ||
+      Boolean(user.email_confirmed_at) ||
+      Boolean(user.confirmed_at) ||
       user.user_metadata?.skinscope_verified === true ||
       user.user_metadata?.skinscope_verified === "true"
     )
