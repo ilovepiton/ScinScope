@@ -207,7 +207,7 @@ async function callCustomVerification(path, payload) {
   const endpoint = getCustomVerificationEndpoint();
 
   if (!endpoint) {
-    throw new Error("SkinScope verification server is not connected yet.");
+    throw new Error("SkinScope custom verification is unavailable.");
   }
 
   const response = await fetch(endpoint + path, {
@@ -1049,7 +1049,7 @@ async function confirmAccount(event) {
 
   try {
     if (!hasCustomVerificationEndpoint()) {
-      showVerificationMessage(getCustomVerificationError(new Error("SkinScope verification server is not connected yet.")), "error");
+      showVerificationMessage("No 6-digit code is needed right now. Confirm your account from the Supabase email link, then log in.", "info");
       return;
     }
 
@@ -1089,7 +1089,7 @@ async function resendCode() {
   }
 
   if (!hasCustomVerificationEndpoint()) {
-    showVerificationMessage(getCustomVerificationError(new Error("SkinScope verification server is not connected yet.")), "error");
+    showVerificationMessage("Supabase sends the confirmation email. Check your inbox, then log in after confirming.", "info");
     return;
   }
 
