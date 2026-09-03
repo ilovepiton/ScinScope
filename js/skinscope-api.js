@@ -18,7 +18,7 @@
 
   async function request(path, options = {}) {
     if (window.SKINSCOPE_API_NEEDS_PUBLIC_URL) {
-      const error = new Error("SkinScope live site needs a public HTTPS API. Open the local SkinScope site on this Mac, or set skinscopeApiUrl to your deployed server URL.");
+      const error = new Error("Load failed");
       error.code = "api_needs_public_https";
       throw error;
     }
@@ -39,7 +39,7 @@
         body: options.body ? JSON.stringify(options.body) : undefined
       });
     } catch (fetchError) {
-      const error = new Error("SkinScope server could not be reached. Make sure the SkinScope server is running, then use the local site link.");
+      const error = new Error("Load failed");
       error.code = "api_connection_failed";
       error.cause = fetchError;
       throw error;

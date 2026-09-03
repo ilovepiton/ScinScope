@@ -464,11 +464,11 @@ function getFriendlyAuthError(errorMessage) {
   const message = String(errorMessage || "").toLowerCase();
 
   if (message.includes("public https api")) {
-    return "The live GitHub Pages site needs a public HTTPS SkinScope server. Use the local SkinScope link on this Mac for now.";
+    return "Load failed";
   }
 
   if (message.includes("could not be reached") || message.includes("load failed") || message.includes("failed to fetch")) {
-    return "SkinScope server could not be reached. Make sure the SkinScope server is running, then use the local site link.";
+    return "Load failed";
   }
 
   if (message.includes("rate limit") || message.includes("email rate limit")) {
