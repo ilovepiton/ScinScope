@@ -3,7 +3,8 @@
 <head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f7fbff">
  <meta name="description" content="SkinScope — a friendly place to understand your skin, keep a private photo journal and build your routine."><title>SkinScope</title>
- <link rel="icon" href="./app/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./app/journey.css">
+ <link rel="icon" href="./app/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./app/journey.css"><link rel="stylesheet" href="./app/reference.css?v=soap-2">
+ <link rel="preload" href="./app/reference-icons.png" as="image"><link rel="preload" href="./app/soap-bottle.png" as="image">
 </head>
 <body>
  <a class="skip-link" href="#main">Skip to content</a>
@@ -14,12 +15,12 @@
  <dialog id="messageDialog"><button class="dialog-close" aria-label="Close" data-action="close-dialog"></button><div id="dialogBody"></div></dialog>
  <div id="toast" role="status" aria-live="polite"></div>
  <section id="welcome" class="welcome" aria-label="Welcome to SkinScope" hidden>
-  <div class="welcome-brand">SkinScope</div><div class="water-scene"><div class="water-light"></div><div class="water-ring ring-one"></div><div class="water-ring ring-two"></div><div class="water-ring ring-three"></div>
+  <div class="welcome-brand">SkinScope</div><button id="welcomeSound" class="welcome-sound" type="button" aria-label="Mute welcome sound" aria-pressed="true" title="Mute welcome sound"></button><div class="water-scene"><div class="water-light"></div><div class="water-ring ring-one"></div><div class="water-ring ring-two"></div><div class="water-ring ring-three"></div>
    <button id="bottleButton" class="bottle-button" aria-label="Tap the bottle to enter SkinScope">
-    <img class="intro-bottle" src="./app/welcome-bottle.png" alt="" width="1024" height="1024" fetchpriority="high">
-    <span class="milk-splash"></span><span class="milk-drop drop-one"></span><span class="milk-drop drop-two"></span><span class="milk-drop drop-three"></span>
+    <span class="bottle-shadow"></span><img class="bottle-layer bottle-body" src="./app/soap-bottle.png" alt="" width="1280" height="1280" fetchpriority="high"><img class="bottle-layer pump-head" src="./app/soap-bottle.png" alt="" width="1280" height="1280">
+    <svg class="soap-flow" viewBox="0 0 400 400" aria-hidden="true"><defs><filter id="creamShadow" x="-40%" y="-20%" width="200%" height="170%"><feDropShadow dx="2" dy="3" stdDeviation="1.5" flood-color="#688ca5" flood-opacity=".2"/></filter></defs><g class="soap-stream" fill="none" stroke-linecap="round" filter="url(#creamShadow)"><path class="cream-body" pathLength="1" d="M282 62C312 69 329 104 328 145C327 203 312 252 317 300C320 326 335 343 329 357"/><path class="cream-shine" pathLength="1" d="M281 62C310 69 326 104 325 145C324 203 309 252 314 300C317 326 332 343 326 357"/></g><g class="soap-dollop" filter="url(#creamShadow)"><ellipse cx="328" cy="371" rx="24" ry="7" fill="#e4e2d7" opacity=".5"/><path d="M309 365C309 355 342 350 348 362C351 373 301 375 305 365C307 359 339 358 339 365C337 370 312 369 315 363C318 357 337 357 337 351C337 346 328 342 329 334" fill="none" stroke="#fffef2" stroke-width="10" stroke-linecap="round"/><path d="M310 361C321 357 336 357 342 360M315 364C323 362 330 362 334 363" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></g></svg>
    </button><div class="water-front"></div></div>
-  <div class="welcome-copy"><h1>A fresh start.</h1><p>Tap the bottle to begin.</p></div><button id="skipWelcome" class="skip-welcome">Skip intro</button><div class="white-wash"></div>
+  <div class="welcome-copy"><h1>A fresh start.</h1><p>Press the pump. Make a little time for you.</p></div><button id="skipWelcome" class="skip-welcome">Skip intro</button><div class="white-wash"></div><audio id="welcomeAudio" preload="auto" src="./app/soap-pump.mp3"></audio>
  </section>
- <script src="./js/skinscope-api-config.js"></script><script src="./js/skinscope-api.js"></script><script type="module" src="./app/journey.js"></script>
+ <script src="./js/skinscope-api-config.js"></script><script src="./js/skinscope-api.js"></script><script type="module" src="./app/journey.js?v=soap-2"></script>
 </body></html>
