@@ -1,4 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
+import { createJourneyRouter } from "./journey.js";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -9,6 +10,17 @@ const DATA_DIR = join(__dirname, "data");
 const DB_PATH = process.env.SKINSCOPE_DB_PATH || join(DATA_DIR, "skinscope.sqlite");
 const OUTBOX_PATH = process.env.SKINSCOPE_OUTBOX_PATH || join(DATA_DIR, "email-outbox.json");
 const PORT = Number(process.env.PORT || process.env.SKINSCOPE_PORT || 8787);
+const ALLOWED_ORIGINS = (process.env.SKINSCOPE_ALLOWED_ORIGINS || "http://127.0.0.1:8766,http://localhost:8766,https://ilovepiton.github.io")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
+const DEV_OUTBOX_ENABLED = process.env.SKINSCOPE_DEV_OUTBOX !== "0";
+const SMTP_HOST = process.env.SMTP_HOST || "";
+const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
+const SMTP_SECURE = process.env.SMTP_SECURE === "1";
+const SMTP_USER = process.env.SMTP_USER || "";
+const SMTP_PASS = process.env.SMTP_PASS || "";
+const SMTP_FROM = process.env.SMTP_FROM || "SkinScope <no-reply@skinscope.local>";
 const SESSION_DAYS = 30;
 const CODE_MINUTES = 15;
 
@@ -75,12 +87,20 @@ function addMinutes(minutes) {
   return new Date(Date.now() + minutes * 60 * 1000).toISOString();
 }
 
-function jsonResponse(res, status, payload) {
+function getCorsOrigin(req) {
+  const origin = req.headers.origin || "";
+  if (!origin) return ALLOWED_ORIGINS[0] || "*";
+  if (ALLOWED_ORIGINS.includes("*") || ALLOWED_ORIGINS.includes(origin)) return origin;
+  return ALLOWED_ORIGINS[0] || origin;
+}
+
+function jsonResponse(req, res, status, payload) {
   const body = JSON.stringify(payload);
   res.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Content-Length": Buffer.byteLength(body),
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": getCorsOrigin(req),
+    "Vary": "Origin",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
   });
@@ -172,7 +192,45 @@ function appendOutbox(message) {
   writeFileSync(OUTBOX_PATH, JSON.stringify(outbox.slice(0, 50), null, 2));
 }
 
-function saveVerificationCode(email, name) {
+async function sendVerificationEmail(message) {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    appendOutbox(message);
+    console.log(`[SkinScope email] ${message.to} code: ${message.code}`);
+    return { sent: false, outbox: true };
+  }
+
+  try {
+    const nodemailer = await import("nodemailer");
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_SECURE,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS
+      }
+    });
+
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: message.to,
+      subject: message.subject,
+      text: message.text
+    });
+
+    console.log(`[SkinScope email] sent verification code to ${message.to}`);
+    return { sent: true, outbox: false };
+  } catch (error) {
+    appendOutbox({
+      ...message,
+      delivery_error: error.message || "SMTP delivery failed"
+    });
+    console.error("[SkinScope email] SMTP failed; saved to outbox:", error.message || error);
+    return { sent: false, outbox: true, error: error.message || "SMTP delivery failed" };
+  }
+}
+
+async function saveVerificationCode(email, name) {
   const code = makeCode();
   const message = {
     to: email,
@@ -192,8 +250,7 @@ function saveVerificationCode(email, name) {
       created_at = excluded.created_at
   `).run(email, code, addMinutes(CODE_MINUTES), nowIso());
 
-  appendOutbox(message);
-  console.log(`[SkinScope email] ${email} code: ${code}`);
+  return sendVerificationEmail(message);
 }
 
 function createSession(userId) {
@@ -222,7 +279,7 @@ function getAuthUser(req) {
 function requireUser(req, res) {
   const user = getAuthUser(req);
   if (!user) {
-    jsonResponse(res, 401, { ok: false, message: "Please log in first." });
+    jsonResponse(req, res, 401, { ok: false, message: "Please log in first." });
     return null;
   }
   return user;
@@ -234,13 +291,13 @@ async function handleRegister(req, res) {
   const email = normalizeEmail(body.email);
   const password = String(body.password || "");
 
-  if (name.length < 2) return jsonResponse(res, 400, { ok: false, message: "Name is too short." });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return jsonResponse(res, 400, { ok: false, message: "Please enter a valid email." });
-  if (password.length < 8) return jsonResponse(res, 400, { ok: false, message: "Password must be at least 8 characters." });
+  if (name.length < 2) return jsonResponse(req, res, 400, { ok: false, message: "Name is too short." });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return jsonResponse(req, res, 400, { ok: false, message: "Please enter a valid email." });
+  if (password.length < 8) return jsonResponse(req, res, 400, { ok: false, message: "Password must be at least 8 characters." });
 
   const existing = db.prepare("SELECT id, verified FROM users WHERE email = ?").get(email);
   if (existing && existing.verified) {
-    return jsonResponse(res, 409, { ok: false, message: "This email already has an account. Please log in." });
+    return jsonResponse(req, res, 409, { ok: false, message: "This email already has an account. Please log in." });
   }
 
   const { salt, hash } = hashPassword(password);
@@ -255,8 +312,13 @@ async function handleRegister(req, res) {
       password_salt = excluded.password_salt
   `).run(id, email, name, hash, salt, nowIso());
 
-  saveVerificationCode(email, name);
-  jsonResponse(res, 200, { ok: true, message: "SkinScope sent a verification code.", email });
+  const delivery = await saveVerificationCode(email, name);
+  jsonResponse(req, res, 200, {
+    ok: true,
+    message: delivery.sent ? "SkinScope sent a verification code." : "SkinScope saved your verification code in the local outbox.",
+    email,
+    delivery
+  });
 }
 
 async function handleVerify(req, res) {
@@ -266,16 +328,16 @@ async function handleVerify(req, res) {
   const codeRow = db.prepare("SELECT * FROM email_codes WHERE email = ?").get(email);
 
   if (!codeRow || codeRow.expires_at <= nowIso()) {
-    return jsonResponse(res, 400, { ok: false, message: "This code is expired. Request a new code." });
+    return jsonResponse(req, res, 400, { ok: false, message: "This code is expired. Request a new code." });
   }
 
   if (codeRow.attempts >= 5) {
-    return jsonResponse(res, 429, { ok: false, message: "Too many code attempts. Request a new code." });
+    return jsonResponse(req, res, 429, { ok: false, message: "Too many code attempts. Request a new code." });
   }
 
   if (codeRow.code !== code) {
     db.prepare("UPDATE email_codes SET attempts = attempts + 1 WHERE email = ?").run(email);
-    return jsonResponse(res, 400, { ok: false, message: "This code is wrong. Check the latest email." });
+    return jsonResponse(req, res, 400, { ok: false, message: "This code is wrong. Check the latest email." });
   }
 
   db.prepare("UPDATE users SET verified = 1 WHERE email = ?").run(email);
@@ -290,7 +352,7 @@ async function handleVerify(req, res) {
     ON CONFLICT(user_id) DO NOTHING
   `).run(user.id, addDays(7));
 
-  jsonResponse(res, 200, { ok: true, token, user: publicUser(user), profile: publicProfile(user) });
+  jsonResponse(req, res, 200, { ok: true, token, user: publicUser(user), profile: publicProfile(user) });
 }
 
 async function handleLogin(req, res) {
@@ -300,22 +362,22 @@ async function handleLogin(req, res) {
   const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
 
   if (!user || !verifyPassword(password, user.password_salt, user.password_hash)) {
-    return jsonResponse(res, 401, { ok: false, message: "Email or password is incorrect." });
+    return jsonResponse(req, res, 401, { ok: false, message: "Email or password is incorrect." });
   }
 
   if (!user.verified) {
-    saveVerificationCode(email, user.name);
-    return jsonResponse(res, 403, { ok: false, code: "email_not_verified", message: "Enter the SkinScope code from your email to finish login." });
+    await saveVerificationCode(email, user.name);
+    return jsonResponse(req, res, 403, { ok: false, code: "email_not_verified", message: "Enter the SkinScope code from your email to finish login." });
   }
 
-  jsonResponse(res, 200, { ok: true, token: createSession(user.id), user: publicUser(user), profile: publicProfile(user) });
+  jsonResponse(req, res, 200, { ok: true, token: createSession(user.id), user: publicUser(user), profile: publicProfile(user) });
 }
 
 function handleMe(req, res) {
   const user = requireUser(req, res);
   if (!user) return;
 
-  jsonResponse(res, 200, { ok: true, user: publicUser(user), profile: publicProfile(user) });
+  jsonResponse(req, res, 200, { ok: true, user: publicUser(user), profile: publicProfile(user) });
 }
 
 function handleSubscription(req, res) {
@@ -330,7 +392,7 @@ function handleSubscription(req, res) {
     subscription = { plan: "trial", status: "trialing", trial_ends_at: trialEndsAt };
   }
 
-  jsonResponse(res, 200, { ok: true, subscription });
+  jsonResponse(req, res, 200, { ok: true, subscription });
 }
 
 async function handleAvatar(req, res) {
@@ -340,16 +402,16 @@ async function handleAvatar(req, res) {
   const body = await readJson(req);
   const avatar = String(body.avatar || "");
   if (avatar && !avatar.startsWith("data:image/")) {
-    return jsonResponse(res, 400, { ok: false, message: "Please upload an image file." });
+    return jsonResponse(req, res, 400, { ok: false, message: "Please upload an image file." });
   }
 
   if (avatar.length > 6_500_000) {
-    return jsonResponse(res, 413, { ok: false, message: "Profile picture is too large." });
+    return jsonResponse(req, res, 413, { ok: false, message: "Profile picture is too large." });
   }
 
   db.prepare("UPDATE users SET avatar_data_url = ? WHERE id = ?").run(avatar, user.id);
   const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
-  jsonResponse(res, 200, { ok: true, profile: publicProfile(updated) });
+  jsonResponse(req, res, 200, { ok: true, profile: publicProfile(updated) });
 }
 
 async function handleResend(req, res) {
@@ -357,11 +419,15 @@ async function handleResend(req, res) {
   const email = normalizeEmail(body.email);
   const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
 
-  if (!user) return jsonResponse(res, 404, { ok: false, message: "Create an account first." });
-  if (user.verified) return jsonResponse(res, 200, { ok: true, message: "This account is already verified." });
+  if (!user) return jsonResponse(req, res, 404, { ok: false, message: "Create an account first." });
+  if (user.verified) return jsonResponse(req, res, 200, { ok: true, message: "This account is already verified." });
 
-  saveVerificationCode(email, user.name);
-  jsonResponse(res, 200, { ok: true, message: "A new SkinScope code was sent." });
+  const delivery = await saveVerificationCode(email, user.name);
+  jsonResponse(req, res, 200, {
+    ok: true,
+    message: delivery.sent ? "A new SkinScope code was sent." : "A new SkinScope code was saved in the local outbox.",
+    delivery
+  });
 }
 
 async function handleTrial(req, res) {
@@ -382,17 +448,21 @@ async function handleTrial(req, res) {
   db.prepare("INSERT INTO referrals (id, user_id, email, referrer_code, status, trial_ends_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
     .run(randomBytes(16).toString("hex"), user.id, user.email, referrerCode, status, trialEndsAt, nowIso());
 
-  jsonResponse(res, 200, { ok: true });
+  jsonResponse(req, res, 200, { ok: true });
 }
 
 async function handleLogout(req, res) {
   const header = req.headers.authorization || "";
   const match = header.match(/^Bearer\s+(.+)$/i);
   if (match) db.prepare("DELETE FROM sessions WHERE token_hash = ?").run(hashToken(match[1]));
-  jsonResponse(res, 200, { ok: true });
+  jsonResponse(req, res, 200, { ok: true });
 }
 
 function handleOutbox(req, res) {
+  if (!DEV_OUTBOX_ENABLED) {
+    return jsonResponse(req, res, 404, { ok: false, message: "Dev outbox is disabled." });
+  }
+
   let outbox = [];
   try {
     outbox = JSON.parse(readFileSync(OUTBOX_PATH, "utf8"));
@@ -400,10 +470,24 @@ function handleOutbox(req, res) {
     outbox = [];
   }
 
-  jsonResponse(res, 200, { ok: true, outbox });
+  jsonResponse(req, res, 200, { ok: true, outbox });
 }
 
+function handleHealth(req, res) {
+  const users = db.prepare("SELECT count(*) AS count FROM users").get().count;
+  jsonResponse(req, res, 200, {
+    ok: true,
+    service: "skinscope-server",
+    database: "sqlite",
+    users,
+    time: nowIso()
+  });
+}
+
+const handleJourney = createJourneyRouter({ db, getAuthUser, jsonResponse, readJson });
+
 const routes = {
+  "GET /api/health": handleHealth,
   "POST /api/register": handleRegister,
   "POST /api/login": handleLogin,
   "POST /api/verify": handleVerify,
@@ -419,21 +503,22 @@ const routes = {
 const server = await import("node:http").then(({ createServer }) =>
   createServer(async (req, res) => {
     if (req.method === "OPTIONS") {
-      return jsonResponse(res, 204, {});
+      return jsonResponse(req, res, 204, {});
     }
 
     const url = new URL(req.url, `http://${req.headers.host}`);
+    if (url.pathname.startsWith("/api/journey/")) return handleJourney(req, res, url);
     const route = routes[`${req.method} ${url.pathname}`];
 
     if (!route) {
-      return jsonResponse(res, 404, { ok: false, message: "SkinScope API route not found." });
+      return jsonResponse(req, res, 404, { ok: false, message: "SkinScope API route not found." });
     }
 
     try {
       await route(req, res);
     } catch (error) {
       console.error(error);
-      jsonResponse(res, 500, { ok: false, message: error.message || "SkinScope server error." });
+      jsonResponse(req, res, 500, { ok: false, message: error.message || "SkinScope server error." });
     }
   })
 );
