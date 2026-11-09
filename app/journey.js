@@ -21,10 +21,11 @@ function dialog(html){$('#dialogBody').innerHTML=html;$('#messageDialog').showMo
 function closeDialog(){$('#messageDialog').close();}
 function renderHeader(){
  const items=[['flame',streak(state.activity),'Day streak',''],['crown',rank()??'—','Current rank','rank'],['phone',photos.length,'Saved photos','photos']];
- $('#headerMetrics').innerHTML=items.map(([type,value,label,cls])=>`<div class="metric ${cls}" title="${label}" aria-label="${label}: ${value}">${art(type)}<span>${value}</span></div>`).join('');
+ $('#headerMetrics').innerHTML=items.map(([type,value,label,cls])=>cls==='rank'?`<button class="metric rank" data-go="leaderboard" title="Leaderboard" aria-label="Open leaderboard, current rank: ${value}">${art(type)}<span>${value}</span></button>`:`<div class="metric ${cls}" title="${label}" aria-label="${label}: ${value}">${art(type)}<span>${value}</span></div>`).join('');
  const section=current()[0]||'home';
  const nav=navItems.map(([id,label])=>`<a class="nav-link ${section===id?'active':''}" href="#/${id}" ${section===id?'aria-current="page"':''}>${icon(id)}<span>${label}</span></a>`).join('');
- $('#bottomNav').innerHTML=nav;$('#desktopLinks').innerHTML=nav;
+ $('#desktopLinks').innerHTML=nav;
+ $('#bottomNav').innerHTML=navItems.filter(([id])=>id!=='leaderboard').map(([id,label])=>{const ranking=id==='progress'&&section==='leaderboard',active=section===id||ranking;return `<a class="nav-link ${active?'active':''}" href="#/${ranking?'leaderboard':id}" ${active?'aria-current="page"':''}>${icon(id)}<span>${ranking?'Leaderboard':label}</span></a>`;}).join('');
 }
 function renderContext(){
  $('#contextPanel').innerHTML=`<section class="context-block"><span class="eyebrow">One step at a time</span><div class="context-art">${art('goal')}</div><h2>A little care, every day.</h2><p>${completed().length?`${completed().length} check-ins complete. Your next small step is waiting.`:'Your journey starts with a simple skin check-in.'}</p>${bar(completed().length)}<p>${completed().length} of 10 tests complete</p></section><section class="context-block"><h2>Your photo journal</h2><div class="row">${icon('shield')}<strong class="small">Private by default</strong></div><p>${photos.length} photo${photos.length===1?'':'s'} saved on this device.</p>${button('Add a photo','open-photo','secondary full')}</section><section class="context-block"><h2>${e(state.profile.name==='Guest'?'Make yourself at home':state.profile.name)}</h2><p>${session?'Signed in to your SkinScope account.':'No account needed to get started.'}</p><a class="small-link" href="${session?'#/profile':'./pages/account.html'}">${session?'Your profile':'Sign in to your account'} ${icon('right')}</a></section>`;

@@ -110,7 +110,7 @@
  .course .course-state{display:none}
  .course-crown{width:35px;height:34px;right:-5px;bottom:-5px}
  .course-check{width:22px;height:22px;border-width:2px;right:-3px;top:-2px}
- .bottom-nav{background:#fbfdff;min-height:76px;padding-top:6px;border-color:#e3edf6;backdrop-filter:none}
+ .bottom-nav{grid-template-columns:repeat(4,minmax(0,1fr));background:#fbfdff;min-height:76px;padding-top:6px;border-color:#e3edf6;backdrop-filter:none}
  .bottom-nav .nav-link{font-size:10px;color:#6d88aa;gap:6px;border-radius:12px;font-weight:400;padding-top:8px;padding-bottom:7px}
  .bottom-nav .nav-link .ui-icon{width:25px;height:25px;stroke-width:1.8}
  .bottom-nav .nav-link.active{color:#176bff;background:#eaf5ff}

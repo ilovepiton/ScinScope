@@ -9,7 +9,8 @@ without signing in uses a separate guest journal, not a fabricated session.
 ## Interface
 
 - Five routes: Home, Photo, Progress, Leaderboard and Profile.
-- Fixed five-item mobile navigation, safe-area spacing, desktop sidebar and
+- Fixed four-item mobile navigation matching the supplied image, safe-area
+  spacing, five-route desktop sidebar and
   contextual right column. All navigation entries have real destinations.
 - Three header metrics only: real check-in streak, opt-in rank or an empty dash,
   and locally saved photo count. No fabricated users, scores or completions.
@@ -113,6 +114,10 @@ The closer mockup pass also uses list-shaped starting states in Progress,
 an empty (not fabricated) Skin Score chart grid, compact profile editing with
 collapsible privacy preferences, and simple leaderboard/friends empty states.
 The original login remains reachable; guest access never creates a session.
+The picture, as reiterated by the user, takes precedence over the older
+attached document's five-item mobile requirement: Home, Photo, Progress and
+Profile remain on the bottom bar. The header crown opens Leaderboard; its
+active screen uses the third navigation slot, as in the reference image.
 
 `app/soap-pump.mp3` is a real CC0 recording, not generated audio. Attribution,
 source links and image-generation prompt notes are in `ASSET_CREDITS.md`.
