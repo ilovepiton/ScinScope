@@ -1,4 +1,4 @@
-import {icon} from './icons.js?v=soap-2';
+import {icon} from './icons.js?v=mockup-3';
 
 export function createWelcome({onEnter}) {
  const welcome=document.querySelector('#welcome');

@@ -14,13 +14,13 @@ const paths={
  bin:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',download:'<path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/>',
  phone:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/>',
  group:'<circle cx="12" cy="7" r="4"/><path d="M5 22v-2a7 7 0 0 1 14 0v2M3 8a3 3 0 0 0 0 6m18-6a3 3 0 0 1 0 6M1 21v-2a5 5 0 0 1 3-4m19 6v-2a5 5 0 0 0-3-4"/>'
- ,volume:'<path d="m3 9 5 0 5-5v16l-5-5H3Z"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>',muted:'<path d="m3 9 5 0 5-5v16l-5-5H3Zm14 0 5 6m0-6-5 6"/>'
+ ,level:'<path d="m2 6 5 3 5-7 5 7 5-3-2 15H4Z"/>',volume:'<path d="m3 9 5 0 5-5v16l-5-5H3Z"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>',muted:'<path d="m3 9 5 0 5-5v16l-5-5H3Zm14 0 5 6m0-6-5 6"/>'
 };
 export const icon=(name,cls='')=>`<svg class="ui-icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.info}</svg>`;
 let n=0;
 export function art(type,cls=''){
  const tiles={skin:0,normal:0,concern:1,breakouts:2,feel:3,dry:3,oily:3,pores:4,tone:5,combination:5,sun:6,product:7,sensitive:8,goal:9,crown:10,flame:11,phone:12,camera:13,gallery:14,profile:15};
- if(type in tiles){const cell=tiles[type],x=(cell%4)*100/3,y=Math.floor(cell/4)*100/3;return `<span class="illustration illustrated-tile ${cls}" style="background-position:${x}% ${y}%" aria-hidden="true"></span>`;}
+ if(type in tiles&&!['flame','crown','phone'].includes(type)){const cell=tiles[type],x=(cell%4)*100/3,y=Math.floor(cell/4)*100/3,transparent=['camera','gallery','profile'].includes(type);return `<span class="illustration illustrated-tile ${transparent?'illustrated-transparent':cell<10?'illustrated-disc':'illustrated-glyph'} ${cls}" style="background-position:${x}% ${y}%" aria-hidden="true"></span>`;}
  const id='art'+n++,defs=`<defs><radialGradient id="${id}p" cx="35%" cy="20%"><stop stop-color="#ffe4d9"/><stop offset="1" stop-color="#fca8a3"/></radialGradient><radialGradient id="${id}b" cx="30%" cy="20%"><stop stop-color="#b7efff"/><stop offset="1" stop-color="#35b7f5"/></radialGradient><linearGradient id="${id}g" x2=".8" y2="1"><stop stop-color="#ffdc58"/><stop offset="1" stop-color="#ffb900"/></linearGradient><linearGradient id="${id}v" x2=".8" y2="1"><stop stop-color="#bfadff"/><stop offset="1" stop-color="#7261e8"/></linearGradient></defs>`;
  let a='';
  if(type==='concern')a=`<circle cx="60" cy="60" r="48" fill="#ffe7e5"/><circle cx="60" cy="62" r="32" fill="url(#${id}p)"/><ellipse cx="53" cy="55" rx="7" ry="10" fill="#e86e7f" transform="rotate(24 53 55)"/><ellipse cx="73" cy="70" rx="6" ry="8" fill="#db657b" transform="rotate(24 73 70)"/><circle cx="73" cy="43" r="4" fill="#f28e99"/><circle cx="42" cy="76" r="4" fill="#f28e99"/><circle cx="63" cy="82" r="3" fill="#f28e99"/><path d="M37 49q7-13 20-16" fill="none" stroke="#ffd9d4" stroke-width="5" stroke-linecap="round"/>`;

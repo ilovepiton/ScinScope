@@ -91,18 +91,28 @@ Built-in image generation was used, not a remote image dependency:
   blue-gray collar and transparent background. Two aligned CSS masks separate
   the moving pump head from the stationary body.
 - `app/reference-icons.png`: 4 by 4 transparent atlas of softly shaded
-  illustrations following the supplied mobile reference. Course art, header
-  metrics and upload tiles use these illustrations, not Unicode emoji.
+  earlier 3D illustrations, retained but no longer used by the current UI.
+- `app/mockup-icons.png`: 4 by 4 atlas following the reference's pink face,
+  follicle, droplet, nose, skin tones and flat blue/purple tool art. Circular
+  masks and multiply compositing keep cell backgrounds outside the visible art.
+- `app/analysis-photos.png`: two equal photographic panels: pink skin macro and
+  a white/red plus taller blue skincare tube pair, matching the reference's
+  Photo options composition. These are illustrations, never user results.
 - `app/skin-texture.jpg`: illustrative macro cheek-skin texture, subtle pores,
   pale peach tone, diffuse light, no identifiable face or diagnostic condition.
 - `app/welcome-bottle.png`: retained earlier illustration, no longer used by
   the current intro.
 
 The texture was converted to JPEG for delivery; the bottle and atlas preserve
-alpha. Navigation and tool controls retain the project-local SVG icon family.
+alpha where provided. Navigation and tool controls retain the project-local SVG icon family.
 `reference.css` refines proportions to match the ten-screen reference, including
 the compact mobile header, circular courses and upload panel. Desktop keeps a
 three-column course grid and the existing sidebar.
+
+The closer mockup pass also uses list-shaped starting states in Progress,
+an empty (not fabricated) Skin Score chart grid, compact profile editing with
+collapsible privacy preferences, and simple leaderboard/friends empty states.
+The original login remains reachable; guest access never creates a session.
 
 `app/soap-pump.mp3` is a real CC0 recording, not generated audio. Attribution,
 source links and image-generation prompt notes are in `ASSET_CREDITS.md`.

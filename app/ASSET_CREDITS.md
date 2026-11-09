@@ -3,6 +3,25 @@
 The UI follows the user's ten-phone SkinScope mockup. The sixteen illustrated
 tiles are custom raster artwork, not Unicode emoji or a system emoji font.
 
+## Closer Mockup Pass
+
+- `mockup-icons.png` replaces the chunky 3D atlas with the reference's soft 2D
+  shading, pink face and hair, flat yellow crown, orange flame, outlined phone,
+  blue camera and purple gallery. Prompt used the original ten-phone mockup as
+  the style source and requested fixed 4 by 4 cells, no text, no progress rings,
+  no clay rendering. Disc clipping and glyph compositing are CSS-only; the
+  generated source is preserved. The earlier atlas remains for history.
+  Runtime header metrics use the existing clean SVG flame/crown/phone; camera,
+  gallery and anonymous avatar retain the earlier transparent artwork. Crown
+  level badges use a white-outlined gold vector shape and real level text.
+- `analysis-photos.png` is a generated 2:1 photographic atlas. Left is a
+  pink-peach skin macro with fine pores/furrows, no identifiable face or lesion;
+  right is the reference's short white/red tube beside a taller blue tube on
+  an ice-blue background. No real product claims or invented user results.
+
+Source generations are retained in the Codex generated-images directory. A
+background-removal candidate with visible artifacts was rejected, not shipped.
+
 ## Generated Images
 
 Generated with the built-in image tool and stored in the project:
