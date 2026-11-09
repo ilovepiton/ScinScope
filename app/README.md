@@ -20,7 +20,9 @@ without signing in uses a separate guest journal, not a fabricated session.
 - Progress Overview / Tests / Photos tabs and profile subviews for edit,
   statistics, photos, friends, groups and settings.
 - Keyboard focus states, labels, skip link, reduced motion, press feedback,
-  bottle welcome animation, white transition, Skip and Replay welcome.
+  bottle welcome animation, white transition, Skip and Replay welcome. Only
+  the pump head moves; opaque cream follows the press. Recorded pump audio is
+  gesture-triggered, optional, and never plays on page load or Skip.
 
 ## Storage And Privacy
 
@@ -76,17 +78,31 @@ Routes under `/api/journey`:
 
 Run `node --test tests/journey-server.test.mjs` for isolated in-memory privacy,
 ownership, request direction, ranking and group access tests. These tests never
-touch the real database or email outbox. Use a static server from the parent
+touch the real database or email outbox. Run `node --test tests/welcome.test.mjs`
+for intro timing, mute, reduced-motion and audio-failure checks.
+Use a static server from the parent
 directory so existing absolute `/ScinScope/` legacy links continue working.
 
 ## Visual Assets
 
 Built-in image generation was used, not a remote image dependency:
 
-- `app/welcome-bottle.png`: transparent, friendly white 3D pump bottle with a
-  blue pump, water drop and SkinScope label, full silhouette, soft studio light.
+- `app/soap-bottle.png`: realistic satin-white skincare dispenser with a
+  blue-gray collar and transparent background. Two aligned CSS masks separate
+  the moving pump head from the stationary body.
+- `app/reference-icons.png`: 4 by 4 transparent atlas of softly shaded
+  illustrations following the supplied mobile reference. Course art, header
+  metrics and upload tiles use these illustrations, not Unicode emoji.
 - `app/skin-texture.jpg`: illustrative macro cheek-skin texture, subtle pores,
   pale peach tone, diffuse light, no identifiable face or diagnostic condition.
+- `app/welcome-bottle.png`: retained earlier illustration, no longer used by
+  the current intro.
 
-The texture was converted to JPEG for delivery; the bottle preserves alpha.
-`icons.js` extends the existing project-local vector illustration family.
+The texture was converted to JPEG for delivery; the bottle and atlas preserve
+alpha. Navigation and tool controls retain the project-local SVG icon family.
+`reference.css` refines proportions to match the ten-screen reference, including
+the compact mobile header, circular courses and upload panel. Desktop keeps a
+three-column course grid and the existing sidebar.
+
+`app/soap-pump.mp3` is a real CC0 recording, not generated audio. Attribution,
+source links and image-generation prompt notes are in `ASSET_CREDITS.md`.
