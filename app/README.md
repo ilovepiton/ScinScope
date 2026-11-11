@@ -86,38 +86,49 @@ directory so existing absolute `/ScinScope/` legacy links continue working.
 
 ## Visual Assets
 
-Built-in image generation was used, not a remote image dependency:
+The November 11 pass uses the first supplied image for mobile, and ONLY the
+computer portion of the second supplied image for desktop. The screenshots
+are not rendered as a fake app: the text, inputs, buttons and navigation are
+real HTML controls. Artwork and common icon shapes are literal cropped source
+pixels in `reference/`, not another generated approximation or emoji atlas.
 
-- `app/soap-bottle.png`: realistic satin-white skincare dispenser with a
-  blue-gray collar and transparent background. Two aligned CSS masks separate
-  the moving pump head from the stationary body.
-- `app/reference-icons.png`: 4 by 4 transparent atlas of softly shaded
-  earlier 3D illustrations, retained but no longer used by the current UI.
-- `app/mockup-icons.png`: 4 by 4 atlas following the reference's pink face,
-  follicle, droplet, nose, skin tones and flat blue/purple tool art. Circular
-  masks and multiply compositing keep cell backgrounds outside the visible art.
-- `app/analysis-photos.png`: two equal photographic panels: pink skin macro and
-  a white/red plus taller blue skincare tube pair, matching the reference's
-  Photo options composition. These are illustrations, never user results.
-- `app/skin-texture.jpg`: illustrative macro cheek-skin texture, subtle pores,
-  pale peach tone, diffuse light, no identifiable face or diagnostic condition.
-- `app/welcome-bottle.png`: retained earlier illustration, no longer used by
-  the current intro.
+`interface.css` is now the active UI refinement stylesheet. Desktop has a
+190px sidebar, four course columns, a white metrics capsule and four right
+panels: Your Progress, Daily Goal, Leaderboard and Your Stats. On narrow tablets
+the side panels hide and the grid adapts. Mobile has the first image's two
+course columns and four bottom items, not the second image's mobile design.
+The header crown opens Leaderboard; the desktop sidebar has five routes.
 
-The texture was converted to JPEG for delivery; the bottle and atlas preserve
-alpha where provided. Navigation and tool controls retain the project-local SVG icon family.
-`reference.css` refines proportions to match the ten-screen reference, including
-the compact mobile header, circular courses and upload panel. Desktop keeps a
-three-column course grid and the existing sidebar.
+`reference-art.js` chooses the correct mobile/desktop originals. The rings,
+crowns, locks, camera/gallery art, product/skin option images, navigation glyphs
+and decorative desktop podium come from the user references. Common masks use
+module-absolute URLs. Unpictured controls reuse the existing local SVG family.
+The podium is decorative art, not invented accounts or real ranking results.
+No reference photos of actual people or complete screenshots are published.
 
-The closer mockup pass also uses list-shaped starting states in Progress,
-an empty (not fabricated) Skin Score chart grid, compact profile editing with
-collapsible privacy preferences, and simple leaderboard/friends empty states.
+`scripts/extract-reference-assets.mjs` records deterministic crop coordinates
+and outputs `reference/manifest.json`. Rebuilding requires Sharp and the two
+original reference PNGs, passed as arguments; `SHARP_PATH` can select an existing
+Sharp installation. No image generation is used for these UI assets. Original
+resolution limits apply; replace them with original high-resolution exports
+if the user supplies those. Older generated atlases are retained but inactive.
+
+`Roboto.ttf` is self-hosted with `ROBOTO-OFL.txt`. The app does not fetch fonts
+or UI images from external servers at runtime.
+
+`welcome.css` and `welcome-pump-v4.png` replace the old gray bottle intro.
+The generated white/cobalt dispenser uses aligned head/body masks. A real tap
+depresses the head, releases an opaque cream/foam ribbon and triggers a white
+wipe. The primary button and bottle both enter; Skip also interrupts an active
+animation and cancels its timers. Mute persists; there is no autoplay audio.
+The upgraded intro is shown once with `welcomeVersion=4`, without clearing
+any journal/profile data. Reduced-motion users bypass the physical animation.
+
+Sensitivities and Goal unlock after the first eight check-ins; already completed
+tests are never relocked. Daily Goal counts real test activity on the user's
+local day. Empty health metrics stay empty, not copied from the mockup. See
+`tests/course-state.test.mjs` and `tests/reference-art.test.mjs` for focused tests.
+
 The original login remains reachable; guest access never creates a session.
-The picture, as reiterated by the user, takes precedence over the older
-attached document's five-item mobile requirement: Home, Photo, Progress and
-Profile remain on the bottom bar. The header crown opens Leaderboard; its
-active screen uses the third navigation slot, as in the reference image.
-
-`app/soap-pump.mp3` is a real CC0 recording, not generated audio. Attribution,
-source links and image-generation prompt notes are in `ASSET_CREDITS.md`.
+`soap-pump.mp3` remains the CC0 recorded dispenser. Source details and generation
+provenance are in `ASSET_CREDITS.md`.

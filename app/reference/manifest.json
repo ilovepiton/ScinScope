@@ -1,0 +1,808 @@
+[
+  {
+    "name": "mobile-skin",
+    "source": "mobile reference",
+    "box": [
+      66,
+      132,
+      80,
+      77
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "mobile-concern",
+    "source": "mobile reference",
+    "box": [
+      197,
+      132,
+      80,
+      77
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "mobile-breakouts",
+    "source": "mobile reference",
+    "box": [
+      66,
+      236,
+      80,
+      77
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "mobile-feel",
+    "source": "mobile reference",
+    "box": [
+      197,
+      236,
+      80,
+      77
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "mobile-pores",
+    "source": "mobile reference",
+    "box": [
+      66,
+      340,
+      80,
+      77
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "mobile-tone",
+    "source": "mobile reference",
+    "box": [
+      197,
+      340,
+      80,
+      77
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-skin",
+    "source": "desktop reference",
+    "box": [
+      689,
+      178,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-concern",
+    "source": "desktop reference",
+    "box": [
+      840,
+      178,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-breakouts",
+    "source": "desktop reference",
+    "box": [
+      990,
+      178,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-feel",
+    "source": "desktop reference",
+    "box": [
+      1141,
+      178,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-pores",
+    "source": "desktop reference",
+    "box": [
+      689,
+      407,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-tone",
+    "source": "desktop reference",
+    "box": [
+      840,
+      407,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-sun",
+    "source": "desktop reference",
+    "box": [
+      990,
+      407,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-product",
+    "source": "desktop reference",
+    "box": [
+      1141,
+      407,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-sensitive",
+    "source": "desktop reference",
+    "box": [
+      689,
+      636,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "course-goal",
+    "source": "desktop reference",
+    "box": [
+      840,
+      636,
+      119,
+      119
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "skin",
+    "source": "desktop reference",
+    "box": [
+      715,
+      203,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "concern",
+    "source": "desktop reference",
+    "box": [
+      865,
+      203,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "breakouts",
+    "source": "desktop reference",
+    "box": [
+      1017,
+      203,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "feel",
+    "source": "desktop reference",
+    "box": [
+      1167,
+      203,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "pores",
+    "source": "desktop reference",
+    "box": [
+      715,
+      433,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "tone",
+    "source": "desktop reference",
+    "box": [
+      865,
+      433,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "sun",
+    "source": "desktop reference",
+    "box": [
+      1017,
+      433,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "product",
+    "source": "desktop reference",
+    "box": [
+      1167,
+      433,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "sensitive",
+    "source": "desktop reference",
+    "box": [
+      715,
+      664,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "goal",
+    "source": "desktop reference",
+    "box": [
+      865,
+      664,
+      64,
+      64
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "small-skin",
+    "source": "mobile reference",
+    "box": [
+      82,
+      149,
+      48,
+      48
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "small-concern",
+    "source": "mobile reference",
+    "box": [
+      212,
+      149,
+      48,
+      48
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "small-breakouts",
+    "source": "mobile reference",
+    "box": [
+      82,
+      253,
+      48,
+      48
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "small-feel",
+    "source": "mobile reference",
+    "box": [
+      212,
+      253,
+      48,
+      48
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "small-pores",
+    "source": "mobile reference",
+    "box": [
+      82,
+      356,
+      48,
+      48
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "small-tone",
+    "source": "mobile reference",
+    "box": [
+      212,
+      356,
+      48,
+      48
+    ],
+    "round": true,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "flame",
+    "source": "desktop reference",
+    "box": [
+      1214,
+      74,
+      33,
+      39
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "crown",
+    "source": "desktop reference",
+    "box": [
+      1310,
+      74,
+      40,
+      39
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "phone",
+    "source": "desktop reference",
+    "box": [
+      1412,
+      73,
+      29,
+      40
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "trophy",
+    "source": "desktop reference",
+    "box": [
+      1283,
+      473,
+      46,
+      43
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "target",
+    "source": "desktop reference",
+    "box": [
+      1281,
+      325,
+      52,
+      51
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "podium",
+    "source": "desktop reference",
+    "box": [
+      1276,
+      518,
+      225,
+      155
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "camera",
+    "source": "mobile reference",
+    "box": [
+      393,
+      347,
+      44,
+      44
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "gallery",
+    "source": "mobile reference",
+    "box": [
+      520,
+      348,
+      44,
+      43
+    ],
+    "round": false,
+    "mask": false,
+    "background": true
+  },
+  {
+    "name": "photo-skin",
+    "source": "mobile reference",
+    "box": [
+      660,
+      165,
+      114,
+      104
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "photo-product",
+    "source": "mobile reference",
+    "box": [
+      788,
+      165,
+      111,
+      104
+    ],
+    "round": false,
+    "mask": false,
+    "background": false
+  },
+  {
+    "name": "icon-home",
+    "source": "mobile reference",
+    "box": [
+      368,
+      469,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-home-active",
+    "source": "mobile reference",
+    "box": [
+      54,
+      469,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-photo",
+    "source": "mobile reference",
+    "box": [
+      123,
+      469,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-photo-active",
+    "source": "mobile reference",
+    "box": [
+      433,
+      469,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-camera-outline",
+    "source": "mobile reference",
+    "box": [
+      455,
+      173,
+      45,
+      40
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-progress",
+    "source": "mobile reference",
+    "box": [
+      192,
+      469,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-progress-active",
+    "source": "mobile reference",
+    "box": [
+      1092,
+      474,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-profile",
+    "source": "mobile reference",
+    "box": [
+      263,
+      469,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-profile-active",
+    "source": "mobile reference",
+    "box": [
+      263,
+      965,
+      25,
+      25
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-edit",
+    "source": "mobile reference",
+    "box": [
+      193,
+      697,
+      24,
+      24
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-stats",
+    "source": "mobile reference",
+    "box": [
+      54,
+      831,
+      24,
+      24
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-photos",
+    "source": "mobile reference",
+    "box": [
+      54,
+      864,
+      24,
+      24
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-friends",
+    "source": "mobile reference",
+    "box": [
+      54,
+      897,
+      24,
+      24
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-settings",
+    "source": "mobile reference",
+    "box": [
+      54,
+      930,
+      24,
+      24
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "icon-pin",
+    "source": "mobile reference",
+    "box": [
+      365,
+      759,
+      25,
+      29
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "desktop-icon-home",
+    "source": "desktop reference",
+    "box": [
+      497,
+      146,
+      32,
+      32
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "desktop-icon-photo",
+    "source": "desktop reference",
+    "box": [
+      497,
+      201,
+      32,
+      32
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "desktop-icon-progress",
+    "source": "desktop reference",
+    "box": [
+      497,
+      256,
+      32,
+      32
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "desktop-icon-leaderboard",
+    "source": "desktop reference",
+    "box": [
+      497,
+      311,
+      32,
+      33
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  },
+  {
+    "name": "desktop-icon-profile",
+    "source": "desktop reference",
+    "box": [
+      497,
+      365,
+      32,
+      33
+    ],
+    "round": false,
+    "mask": true,
+    "background": false
+  }
+]

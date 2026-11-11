@@ -1,5 +1,30 @@
 # Reference Refinement Assets
 
+## November 11: Literal User Reference Assets
+
+The current interface uses `reference/*.png`, deterministically extracted from
+the two latest user-provided references. Mobile uses the ten-phone image.
+Desktop uses only the computer region of the computer/phone image. These assets
+were copied at the user's explicit request to reproduce the original elements,
+not generated or redesigned. Crop coordinates, geometric clipping and outside
+background removal are recorded by `scripts/extract-reference-assets.mjs` and
+`reference/manifest.json`. No full screenshot or actual person's avatar is
+included. The desktop podium contains only the reference's decorative cartoon
+figures and is never used as real leaderboard data.
+
+Roboto is from the official Google Fonts repository:
+https://github.com/google/fonts/tree/main/ofl/roboto
+The accompanying SIL Open Font License is retained as `ROBOTO-OFL.txt`.
+
+The only new generated bitmap is `welcome-pump-v4.png`: premium white glossy
+soap dispenser, cobalt-blue pump, silver collar and clear SkinScope label,
+front-facing on transparent alpha. Prompt explicitly excluded rooms, interiors,
+pedestals, extra objects, water, smoke and splash. Head and collar are separated
+with CSS; the cream ribbon and foam response are animated UI elements. The
+original generation is retained in the Codex generated-images directory.
+
+The earlier asset notes below describe retained, inactive iterations.
+
 The UI follows the user's ten-phone SkinScope mockup. The sixteen illustrated
 tiles are custom raster artwork, not Unicode emoji or a system emoji font.
 

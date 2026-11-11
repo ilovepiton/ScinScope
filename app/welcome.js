@@ -1,4 +1,4 @@
-import {icon} from './icons.js?v=mockup-3';
+import {icon} from './reference-art.js?v=ref-20261111';
 
 export function createWelcome({onEnter}) {
  const welcome=document.querySelector('#welcome');
@@ -6,6 +6,7 @@ export function createWelcome({onEnter}) {
  const soundButton=document.querySelector('#welcomeSound');
  const surfaces=['.app-shell','.desktop-nav','#bottomNav'].map(s=>document.querySelector(s));
  let entering=false;
+ let timers=[];
  let sound=true;
  try {sound=localStorage.getItem('skinscope.welcomeSound')!=='off';} catch {}
 
@@ -16,6 +17,7 @@ export function createWelcome({onEnter}) {
   soundButton.title=sound?'Mute welcome sound':'Enable welcome sound';
  }
  function finish() {
+  timers.forEach(clearTimeout);timers=[];
   welcome.hidden=true;
   welcome.classList.remove('dispensing','leaving');
   document.body.classList.remove('intro-open');
@@ -36,16 +38,16 @@ export function createWelcome({onEnter}) {
   welcome.focus();
  }
  function enter(skip=false) {
+  if(skip){finish();return;}
   if(entering)return;
   entering=true;
-  if(skip){finish();return;}
   // Start only inside the tap gesture, so mobile browsers can allow playback.
   if(sound){audio.volume=.34;audio.currentTime=0;audio.play().catch(()=>{});}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduced){setTimeout(finish,450);return;}
+  if(reduced){timers.push(setTimeout(finish,450));return;}
   welcome.classList.add('dispensing');
-  setTimeout(()=>welcome.classList.add('leaving'),1450);
-  setTimeout(finish,2250);
+  timers.push(setTimeout(()=>welcome.classList.add('leaving'),1450));
+  timers.push(setTimeout(finish,2250));
  }
  soundButton.addEventListener('click',()=>{
   sound=!sound;
@@ -54,6 +56,7 @@ export function createWelcome({onEnter}) {
   updateSound();
  });
  document.querySelector('#bottleButton').addEventListener('click',()=>enter());
+ document.querySelector('#enterWelcome')?.addEventListener('click',()=>enter());
  document.querySelector('#skipWelcome').addEventListener('click',()=>enter(true));
  document.querySelector('#replayIntro').addEventListener('click',show);
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!welcome.hidden)enter(true);});
