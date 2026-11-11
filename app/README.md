@@ -9,7 +9,7 @@ without signing in uses a separate guest journal, not a fabricated session.
 ## Interface
 
 - Five routes: Home, Photo, Progress, Leaderboard and Profile.
-- Fixed four-item mobile navigation matching the supplied image, safe-area
+- Fixed five-item mobile navigation with an explicit Leaderboard tab, safe-area
   spacing, five-route desktop sidebar and
   contextual right column. All navigation entries have real destinations.
 - Three header metrics only: real check-in streak, opt-in rank or an empty dash,
@@ -97,8 +97,9 @@ The reference layout, subjects, palette and mobile crown levels are retained.
 190px sidebar, four course columns, a white metrics capsule and four right
 panels: Your Progress, Daily Goal, Leaderboard and Your Stats. On narrow tablets
 the side panels hide and the grid adapts. Mobile has the first image's two
-course columns and four bottom items, not the second image's mobile design.
-The header crown opens Leaderboard; the desktop sidebar has five routes.
+course columns. The follow-up adds a fifth bottom item for direct Leaderboard
+access, without replacing Progress. The header crown also opens Leaderboard;
+the desktop sidebar has the same five routes.
 
 `reference-art.js` exposes the existing local SVG icon family and new scalable
 reference-style art. Rings, crowns, locks, camera/gallery art, header metrics

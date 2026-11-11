@@ -30,7 +30,7 @@ function renderHeader(){
  $('.header-context').innerHTML=`<h1>SkinScope</h1><p>${section==='home'?'Choose a test to get your personal skin analysis':section==='photo'?'Your private skin and product photo journal':section==='progress'?'Your check-ins and photos over time':section==='leaderboard'?'A little friendly motivation':'Your own pace. Your own journey.'}</p>`;
  const nav=navItems.map(([id,label])=>`<a class="nav-link ${section===id?'active':''}" href="#/${id}" ${section===id?'aria-current="page"':''}>${icon(id)}<span>${label}</span></a>`).join('');
  $('#desktopLinks').innerHTML=nav;
- $('#bottomNav').innerHTML=navItems.filter(([id])=>id!=='leaderboard').map(([id,label])=>{const ranking=id==='progress'&&section==='leaderboard',active=section===id||ranking;return `<a class="nav-link ${active?'active':''}" href="#/${ranking?'leaderboard':id}" ${active?'aria-current="page"':''}>${icon(id)}<span>${ranking?'Leaderboard':label}</span></a>`;}).join('');
+ $('#bottomNav').innerHTML=nav;
 }
 function renderContext(){
  const done=completed().length,goal=dailyGoalCount(state.activity),next=modules.find(m=>!state.tests[m.id]?.completedAt&&!isCourseLocked(m.id,state.tests))||modules[0];
