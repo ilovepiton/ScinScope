@@ -3,9 +3,9 @@
 body{background:linear-gradient(115deg,#f7fbff,#f0f8ff)}
 button,input,textarea,select{font-family:inherit}
 h1,h2,h3{font-weight:700;letter-spacing:0}
-.ui-icon.reference-icon{display:inline-block;background:currentColor;mask:var(--glyph) center/contain no-repeat;stroke:none;flex-shrink:0}
-.ref-home{--glyph:url('./reference/icon-home.png')}.ref-photo{--glyph:url('./reference/icon-photo.png')}.ref-progress{--glyph:url('./reference/icon-progress.png')}.ref-profile{--glyph:url('./reference/icon-profile.png')}.ref-leaderboard{--glyph:url('./reference/desktop-icon-leaderboard.png')}
-.nav-link.active .ref-home{--glyph:url('./reference/icon-home-active.png')}.nav-link.active .ref-photo{--glyph:url('./reference/icon-photo-active.png')}.nav-link.active .ref-progress{--glyph:url('./reference/icon-progress-active.png')}.nav-link.active .ref-profile{--glyph:url('./reference/icon-profile-active.png')}
+.ui-icon.reference-icon{display:block;background:none;mask:none;fill:none;stroke:currentColor;stroke-width:1.9;flex-shrink:0}
+.nav-link.active .ui-icon.reference-icon{fill:none;stroke:currentColor}
+.bottom-nav .nav-link.active .ref-home,.bottom-nav .nav-link.active .ref-profile,.bottom-nav .nav-link.active .ref-progress{fill:currentColor}
 .reference-art{display:block;flex-shrink:0}.reference-art img{width:100%;height:100%;object-fit:contain}
 .avatar-symbol{display:grid;place-items:center;background:#eaf5ff;color:#87b0df}.avatar-symbol .ui-icon{width:60%;height:60%;stroke-width:1.3}
 .primary{min-height:49px;border:0;border-radius:25px;background:linear-gradient(#247bff,#0860ff);box-shadow:0 2px 5px #166eff14;font-weight:500;padding:12px 23px}
@@ -17,7 +17,6 @@ button:active:not(:disabled){transform:translateY(1px)}
 .sidebar-brand{font-size:26px;font-weight:750;gap:0;margin:0 13px 25px;white-space:nowrap}.brand-bubble,.sidebar-bottom{display:none}
 .desktop-nav nav{gap:0}.desktop-nav .nav-link{height:55px;padding:12px 16px;gap:17px;font-size:17px;font-weight:400;border:0;border-radius:14px;color:#5f789b}
 .desktop-nav .nav-link.active{background:#e3efff;color:#086bff}.desktop-nav .ui-icon{width:29px;height:29px}
-.desktop-nav .ref-home{--glyph:url('./reference/desktop-icon-home.png')!important}.desktop-nav .ref-photo{--glyph:url('./reference/desktop-icon-photo.png')!important}.desktop-nav .ref-progress{--glyph:url('./reference/desktop-icon-progress.png')!important}.desktop-nav .ref-profile{--glyph:url('./reference/desktop-icon-profile.png')!important}
 .app-shell{margin-left:190px}.app-header{height:114px;background:none;border:0;padding:17px 24px 15px 26px;align-items:flex-start;gap:16px}
 .header-context{min-width:0}.header-context h1{font-size:34px;line-height:1.22;color:#0d173a}.header-context p{font-size:18px;line-height:1.4;font-weight:400;margin-top:6px;color:#617a9e}
 .header-metrics{gap:27px;min-width:320px;height:56px;padding:8px 24px;background:#ffffffd9;border-radius:30px;margin-top:-6px;justify-content:space-between}
@@ -29,6 +28,8 @@ button:active:not(:disabled){transform:translateY(1px)}
 .course:hover{background:#fff;border-color:#cfe3fb}.course:focus-visible{outline:3px solid #8cbcff;outline-offset:2px}
 .course-ring{display:block;width:114px;height:114px;padding:0;background:none!important;box-shadow:none;position:relative;flex-shrink:0}
 .reference-course,.reference-course img{display:block;width:100%;height:100%;object-fit:contain}
+.course-level-mobile{display:none}
+@media(max-width:720px){.course-level-mobile{display:block}.course-level-desktop{display:none}}
 .course .course-name{font-size:16px;line-height:21px;font-weight:700;margin-top:3px;white-space:nowrap;color:#101a3c}
 .course .course-state{font-size:14px;line-height:20px;font-weight:400;font-variation-settings:'wdth' 90;width:calc(100% + 10px);max-width:165px;margin-top:10px;color:#617a9e;text-align:center}
 .course-check{right:0;top:2px;width:23px;height:23px;border:2px solid white;background:#2ac18d}
@@ -44,7 +45,7 @@ button:active:not(:disabled){transform:translateY(1px)}
 .bar{background:#d9eafa;box-shadow:none}.bar span{background:linear-gradient(90deg,#1686ff,#21a6ff);box-shadow:none}
 .page-heading h1{font-size:24px}.heading-back{width:32px;height:32px;display:grid;place-items:center;color:#7189a9}.page-heading.has-back{justify-content:flex-start}.page-heading.has-back .heading-back{margin-right:10px}
 .tabs{background:#e6f1ff;padding:3px;border-radius:25px}.tab{font-weight:400}.tab.active{background:linear-gradient(#247bff,#0860ff);box-shadow:none}
-.analysis-photo{display:block;width:100%;height:100%;background:url('./reference/photo-skin.png') center/cover}.analysis-photo.product-photo{background-image:url('./reference/photo-product.png')}
+.analysis-photo{display:block;width:100%;height:100%;background:url('./analysis-photos.png') left center/200% 100% no-repeat}.analysis-photo.product-photo{background-position:right center}
 .upload-zone{border:1px solid #dfecf9;background:#f4f9ff}.upload-zone>.ui-icon{width:53px;height:53px;color:#7189aa;margin-bottom:21px;stroke-width:1.8}.upload-choices .reference-art{width:55px;height:55px}
 .analysis-choice{border-width:1px;border-radius:15px;padding:5px 5px 16px;box-shadow:none}.analysis-choice.selected{border-color:#448bff;background:#f4f3ff}.analysis-art{margin-bottom:13px;border-radius:11px}.info-strip{background:#e8f3ff;color:#617a9e}
 .avatar-placeholder{overflow:hidden;background:#eaf5ff}.profile-hero:before{background:#e9f7ff}.profile-stats{background:#fbfdff;border-color:#e4eff8}.profile-stat .reference-art{width:28px;height:28px}
@@ -82,3 +83,13 @@ button:active:not(:disabled){transform:translateY(1px)}
 }
 @media(max-width:360px){.app-header{padding-left:12px;padding-right:12px;height:80px}.content-layout{padding-left:14px;padding-right:14px}.course-ring{width:99px;height:99px}.course .course-name{font-size:13px}.course-grid{column-gap:13px;row-gap:12px}.bottom-nav .nav-link{font-size:9px}.analysis-art{height:130px}.analysis-choice p{font-size:12px}.analysis-choice h2{font-size:16px}.page-heading h1{font-size:18px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.camera-dialog{width:min(460px,calc(100% - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:19px;border:1px solid #dcebf9;border-radius:16px;background:#f7fbff;color:#101a3c;overflow:auto;box-shadow:0 20px 80px #12294930}
+.camera-dialog::backdrop{background:#20364f70;backdrop-filter:blur(5px)}
+.camera-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.camera-heading h2{font-size:21px}.camera-heading .icon-button{width:36px;height:36px}
+.camera-stage{position:relative;aspect-ratio:3/4;max-height:55dvh;background:#e4eff9;border-radius:12px;overflow:hidden}.camera-stage video{display:block;width:100%;height:100%;object-fit:contain;background:#142132}.camera-stage video[data-facing="user"]{transform:scaleX(-1)}
+.camera-guide{position:absolute;inset:13% 18%;border:1px solid #ffffff70;border-radius:48%;pointer-events:none}.camera-loading{position:absolute;inset:0;background:#eaf3fc;display:grid;place-items:center}.camera-loading span{width:34px;height:34px;border:3px solid #ccdef2;border-top-color:#2478ff;border-radius:50%;animation:camera-spin .8s linear infinite}
+.camera-dialog[data-state="ready"] .camera-loading{display:none}.camera-dialog[data-state="error"] .camera-loading span{animation:none;border-color:#ccdef2}.camera-dialog:not([data-state="ready"]) .camera-guide{display:none}
+.camera-status{font-size:13px;line-height:1.5;color:#617a9e;margin:13px 0;text-align:center;min-height:20px;overflow-wrap:anywhere}.camera-dialog[data-state="error"] .camera-status{color:#9d434d}
+.camera-controls{display:grid;grid-template-columns:44px 70px 44px;align-items:center;justify-content:center;gap:28px;padding:4px 0 10px}.camera-controls .icon-button{width:44px;height:44px}.camera-shutter{width:70px;height:70px;border-radius:50%;border:3px solid #146dff;background:#fff;padding:5px;display:grid;place-items:center}.camera-shutter span{width:100%;height:100%;border-radius:50%;background:#146dff}.camera-shutter:active:not(:disabled){transform:scale(.96)}.camera-dialog #retryCamera{margin-top:12px}
+@keyframes camera-spin{to{transform:rotate(360deg)}}
+@media(max-height:650px){.camera-stage{aspect-ratio:4/3;max-height:41dvh}.camera-dialog{padding:14px}.camera-heading{margin-bottom:8px}.camera-status{margin:8px 0}}

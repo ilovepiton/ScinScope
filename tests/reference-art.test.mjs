@@ -1,19 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {access} from 'node:fs/promises';
 import {icon,art,courseFigure} from '../app/reference-art.js';
 
-test('inline icon masks use module-absolute URLs, not stylesheet-relative paths',()=>{
- assert.ok(icon('capture').includes(new URL('../app/reference/icon-camera-outline.png',import.meta.url).href));
- assert.ok(icon('edit').includes(new URL('../app/reference/icon-edit.png',import.meta.url).href));
+test('navigation and camera tools use vector paths instead of small bitmap masks',()=>{
+ for(const name of ['home','photo','progress','leaderboard','profile','capture','edit','location','person','stats']){
+  assert.match(icon(name),/^<svg/);assert.doesNotMatch(icon(name),/\.png|mask|<image/);
+  assert.match(icon(name),/viewBox="0 0 24 24"/);
+ }
 });
-test('original mobile and desktop course art are selected separately',()=>{
- assert.match(courseFigure('skin'),/mobile-skin\.png/);assert.match(courseFigure('skin'),/course-skin\.png/);
- assert.doesNotMatch(courseFigure('goal',{unlocked:true}),/course-goal\.png/);
- assert.match(art('normal'),/small-skin\.png/);
+test('course illustrations, rings and badges are vector at every screen density',()=>{
+ for(const name of ['skin','concern','breakouts','feel','pores','tone','sun','product','sensitive','goal']){
+  assert.match(courseFigure(name),/^<svg/);assert.doesNotMatch(courseFigure(name),/\.png|<image|<img/);
+  assert.match(art(name),/^<svg/);assert.doesNotMatch(art(name),/\.png|<image|<img/);
+ }
+ assert.match(courseFigure('feel'),/course-level-mobile">2/);
+ assert.match(courseFigure('feel'),/course-level-desktop">1/);
+ assert.doesNotMatch(courseFigure('goal',{unlocked:true}),/translate\(92 91\)/);
+ assert.match(art('normal'),/radialGradient/);
 });
-test('all literal course illustrations and navigation masks exist',async()=>{
- const names=['skin','concern','breakouts','feel','pores','tone','sun','product','sensitive','goal'];
- for(const name of names)await access(new URL(`../app/reference/course-${name}.png`,import.meta.url));
- for(const name of ['home','photo','progress','profile'])await access(new URL(`../app/reference/icon-${name}.png`,import.meta.url));
+test('gradient IDs stay unique when multiple instances are on a page',()=>{
+ const markup=art('skin')+courseFigure('skin')+art('podium')+art('feel');
+ const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);
+ assert.equal(new Set(ids).size,ids.length);
+ for(const [,id] of markup.matchAll(/url\(#([^)]+)\)/g))assert.ok(ids.includes(id));
 });

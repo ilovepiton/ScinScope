@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Camera Pipeline Check</title>
+<style>body{font:16px Arial;background:#f4faff;color:#14213d;max-width:700px;margin:30px auto;padding:16px}button{padding:14px;background:#146dff;color:white;border:0;border-radius:8px}video,img{display:block;width:320px;max-width:100%;margin:16px 0;border-radius:12px}canvas{display:none}</style>
+<h1>Camera Pipeline Check</h1><p>Synthetic frames only. No hardware camera or microphone.</p><button id="start">Start test stream</button><button id="capture" disabled>Capture test frame</button><p id="status" role="status">Idle</p><video id="video" muted autoplay playsinline></video><img id="result" alt="Captured synthetic frame"><canvas id="source" width="640" height="480"></canvas>
+<script type="module">
+import {createCamera} from '../app/camera.js';
+const source=document.querySelector('#source'),context=source.getContext('2d'),video=document.querySelector('video'),status=document.querySelector('#status');
+let frame=0,animation;
+function draw(){context.fillStyle='#dff1ff';context.fillRect(0,0,640,480);context.fillStyle='#146dff';context.fillRect(30,40,580,340);context.fillStyle='white';context.font='36px Arial';context.fillText('SkinScope camera test',90,180);context.fillText(String(++frame),300,260);animation=requestAnimationFrame(draw);}
+let stream;
+const camera=createCamera({secureContext:true,mediaDevices:{getUserMedia:async()=>{stream=source.captureStream(12);return stream;}}});
+document.querySelector('#start').onclick=async()=>{try{draw();await camera.start(video);status.textContent=`Ready: ${video.videoWidth} x ${video.videoHeight}`;document.querySelector('#capture').disabled=false;}catch(error){status.textContent=error.message;}};
+document.querySelector('#capture').onclick=async()=>{try{const blob=await camera.capture();document.querySelector('#result').src=URL.createObjectURL(blob);camera.stop();cancelAnimationFrame(animation);status.textContent=`Captured ${blob.type}, ${blob.size} bytes. Preview detached: ${video.srcObject===null}. Tracks ended: ${stream.getTracks().every(track=>track.readyState==='ended')}.`;}catch(error){status.textContent=error.message;}};
+window.addEventListener('pagehide',()=>{camera.stop();cancelAnimationFrame(animation);});
+</script></html>

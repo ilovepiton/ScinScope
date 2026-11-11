@@ -2,7 +2,7 @@ const paths={
  home:'<path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>',
  photo:'<path d="M4 6h4l2-3h4l2 3h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/>',
  progress:'<rect x="3" y="13" width="4" height="9" rx="1.5"/><rect x="10" y="8" width="4" height="14" rx="1.5"/><rect x="17" y="2" width="4" height="20" rx="1.5"/>',
- leaderboard:'<path d="m3 7 4 4 5-7 5 7 4-4-2 12H5Z"/><path d="M6 22h12"/>',
+ leaderboard:'<path d="M7 3h10v6a5 5 0 0 1-10 0Zm5 11v6m-4 2h8M7 5H3v3a5 5 0 0 0 5 5m9-8h4v3a5 5 0 0 1-5 5"/>',
  profile:'<circle cx="12" cy="7" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2Z"/>',
  back:'<path d="m15 4-8 8 8 8"/>',close:'<path d="m5 5 14 14M5 19 19 5"/>',right:'<path d="m9 5 7 7-7 7"/>',check:'<path d="m4 12 5 5L20 6"/>',
  search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>',plus:'<path d="M12 4v16M4 12h16"/>',edit:'<path d="m4 16 12-12 4 4L8 20l-5 1Z"/>',
@@ -13,6 +13,8 @@ const paths={
  shield:'<path d="m12 2 9 4v7c0 5-9 9-9 9s-9-4-9-9V6Z"/><path d="m7 12 3 3 7-7"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>',
  bin:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',download:'<path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/>',
  phone:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/>',
+ location:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+ swap:'<path d="M20 7H4m0 0 4-4M4 7l4 4m-4 6h16m0 0-4-4m4 4-4 4"/>',
  group:'<circle cx="12" cy="7" r="4"/><path d="M5 22v-2a7 7 0 0 1 14 0v2M3 8a3 3 0 0 0 0 6m18-6a3 3 0 0 1 0 6M1 21v-2a5 5 0 0 1 3-4m19 6v-2a5 5 0 0 0-3-4"/>'
  ,level:'<path d="m2 6 5 3 5-7 5 7 5-3-2 15H4Z"/>',volume:'<path d="m3 9 5 0 5-5v16l-5-5H3Z"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>',muted:'<path d="m3 9 5 0 5-5v16l-5-5H3Zm14 0 5 6m0-6-5 6"/>'
 };

@@ -3,7 +3,7 @@
 <head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f7fbff">
  <meta name="description" content="SkinScope — a friendly place to understand your skin, keep a private photo journal and build your routine."><title>SkinScope</title>
- <link rel="icon" href="./app/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./app/journey.css"><link rel="stylesheet" href="./app/interface.css?v=ref-20261111"><link rel="stylesheet" href="./app/welcome.css?v=ref-20261111">
+ <link rel="icon" href="./app/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./app/journey.css"><link rel="stylesheet" href="./app/interface.css?v=sharp-camera-20261111"><link rel="stylesheet" href="./app/welcome.css?v=ref-20261111">
  <link rel="preload" href="./app/Roboto.ttf" as="font" type="font/ttf" crossorigin><link rel="preload" href="./app/welcome-pump-v4.png" as="image">
 </head>
 <body>
@@ -13,14 +13,21 @@
  <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation"></nav>
  <input id="photoFile" type="file" accept="image/*" hidden><input id="cameraFile" type="file" accept="image/*" capture="user" hidden><input id="avatarFile" type="file" accept="image/*" hidden>
  <dialog id="messageDialog"><button class="dialog-close" aria-label="Close" data-action="close-dialog"></button><div id="dialogBody"></div></dialog>
+ <dialog id="cameraDialog" class="camera-dialog" aria-labelledby="cameraTitle" data-state="loading">
+  <header class="camera-heading"><h2 id="cameraTitle">Camera</h2><button class="icon-button" data-camera="close" aria-label="Close camera" title="Close camera"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></header>
+  <div class="camera-stage"><video id="cameraVideo" autoplay muted playsinline aria-label="Live camera preview"></video><span class="camera-guide" aria-hidden="true"></span><div class="camera-loading" aria-hidden="true"><span></span></div></div>
+  <p id="cameraStatus" class="camera-status" role="status" aria-live="polite">Starting camera…</p>
+  <div class="camera-controls"><button class="icon-button" id="flipCamera" data-camera="flip" aria-label="Switch camera" title="Switch camera" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7H4m0 0 4-4M4 7l4 4m-4 6h16m0 0-4-4m4 4-4 4"/></svg></button><button class="camera-shutter" id="takePhoto" data-camera="capture" aria-label="Take photo" title="Take photo" disabled><span></span></button><button class="icon-button" data-camera="picker" aria-label="Choose photo from device" title="Choose photo from device"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 18 5-5 4 3 5-7 4 8"/></svg></button></div>
+  <button class="secondary full" id="retryCamera" data-camera="retry" hidden>Try camera again</button>
+ </dialog>
  <div id="toast" role="status" aria-live="polite"></div>
  <section id="welcome" class="welcome" aria-label="Welcome to SkinScope" hidden>
-  <div class="welcome-brand"><img src="./app/reference/feel.png" alt="">SkinScope</div><button id="welcomeSound" class="welcome-sound" type="button" aria-label="Mute welcome sound" aria-pressed="true" title="Mute welcome sound"></button><div class="water-scene"><div class="water-light"></div><div class="water-ring ring-one"></div><div class="water-ring ring-two"></div><div class="water-ring ring-three"></div>
+  <div class="welcome-brand"><img src="./app/favicon.svg" alt="">SkinScope</div><button id="welcomeSound" class="welcome-sound" type="button" aria-label="Mute welcome sound" aria-pressed="true" title="Mute welcome sound"></button><div class="water-scene"><div class="water-light"></div><div class="water-ring ring-one"></div><div class="water-ring ring-two"></div><div class="water-ring ring-three"></div>
    <button id="bottleButton" class="bottle-button" aria-label="Tap the bottle to enter SkinScope">
     <span class="bottle-shadow"></span><img class="bottle-layer bottle-body" src="./app/welcome-pump-v4.png" alt="" width="1280" height="1280" fetchpriority="high"><img class="bottle-layer pump-head" src="./app/welcome-pump-v4.png" alt="" width="1280" height="1280">
     <svg class="soap-flow" viewBox="0 0 400 400" aria-hidden="true"><defs><filter id="creamShadow" x="-35%" y="-35%" width="200%" height="200%"><feDropShadow dx="1" dy="3" stdDeviation="1.2" flood-color="#67849c" flood-opacity=".22"/></filter></defs><g class="soap-stream" fill="none" stroke-linecap="round" filter="url(#creamShadow)"><path class="cream-body" pathLength="1" d="M267 70C295 68 325 75 337 96C351 120 345 143 325 148C307 152 298 143 305 133C313 124 334 132 328 142"/><path class="cream-shine" pathLength="1" d="M267 67C296 66 322 73 334 95C346 116 342 138 325 143"/></g><g class="soap-dollop" fill="#fffdf3" stroke="#dfebef" stroke-width=".6" filter="url(#creamShadow)"><ellipse cx="325" cy="158" rx="28" ry="12"/><circle cx="305" cy="151" r="9"/><circle cx="316" cy="144" r="11"/><circle cx="333" cy="145" r="12"/><circle cx="345" cy="155" r="9"/><circle cx="324" cy="156" r="12" fill="white"/><circle cx="316" cy="138" r="3" fill="white"/></g></svg>
    </button><div class="water-front"></div></div>
   <div class="welcome-copy"><h1>SkinScope</h1><p>A little care, every day.</p></div><button id="enterWelcome" class="primary welcome-enter">Let's begin</button><button id="skipWelcome" class="skip-welcome">Skip intro</button><div class="white-wash"></div><audio id="welcomeAudio" preload="auto" src="./app/soap-pump.mp3"></audio>
  </section>
- <script src="./js/skinscope-api-config.js"></script><script src="./js/skinscope-api.js"></script><script type="module" src="./app/journey.js?v=ref-20261111"></script>
+ <script src="./js/skinscope-api-config.js"></script><script src="./js/skinscope-api.js"></script><script type="module" src="./app/journey.js?v=sharp-camera-20261111"></script>
 </body></html>

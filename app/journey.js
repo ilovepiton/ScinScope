@@ -1,4 +1,5 @@
-import {icon,art,courseFigure} from './reference-art.js?v=ref-20261111';
+import {icon,art,courseFigure} from './reference-art.js?v=sharp-camera-20261111';
+import {createCamera,cameraErrorMessage} from './camera.js?v=sharp-camera-20261111';
 import {createWelcome} from './welcome.js?v=ref-20261111';
 import {coreCompleted,isCourseLocked,dailyGoalCount} from './course-state.js';
 import {modules,navItems} from './data.js';
@@ -7,6 +8,8 @@ import {escapeHTML as e,loadState,saveState,streak,periodScore,dateLabel,photosF
 const $=s=>document.querySelector(s),api=window.SkinScopeApi;
 let owner='guest',state=loadState(owner),photos=[],session=null,photoDraft=null,photoStep='upload',analysisType='skin';
 let testDraft=null,progressTab='overview',rankPeriod='week',social=null,ranking=[],friendsTab='friends',busy=false,toastTimer;
+let cameraRequest=0,cameraBusy=false,cameraHelpTimer;
+const camera=createCamera({onEnded(){showCameraError({name:'NotReadableError'});}});
 const completed=()=>modules.filter(m=>state.tests[m.id]?.completedAt);
 const current=()=>location.hash.slice(2).split('/').filter(Boolean);
 const go=path=>{if(location.hash==='#/'+path)render();else location.hash='/'+path;};
@@ -31,7 +34,7 @@ function renderHeader(){
 }
 function renderContext(){
  const done=completed().length,goal=dailyGoalCount(state.activity),next=modules.find(m=>!state.tests[m.id]?.completedAt&&!isCourseLocked(m.id,state.tests))||modules[0];
- $('#contextPanel').innerHTML=`<section class="context-card context-progress"><h2>Your Progress</h2>${art('skin')}<strong>${done}/10</strong>${bar(done)}</section><button class="context-card context-goal" data-go="home/test/${next.id}">${art('target')}<h2>Daily Goal</h2><p>Finish 1 test today</p><div class="row">${bar(goal,1,'Daily goal')}<span>${goal}/1</span></div></button><button class="context-card context-leaderboard" data-go="leaderboard"><span class="context-title">${art('trophy')}<h2>Leaderboard</h2></span><img class="podium-art" src="./app/reference/podium.png" alt="" draggable="false"></button><section class="context-card context-statistics"><h2>Your Stats</h2>${[['skin','Skin Score',''],['feel','Hydration',''],['sensitive','Sensitivity','orange']].map(([type,label,color])=>`<div class="context-stat ${color}">${art(type)}<span>${label}</span><div class="bar" aria-label="${label}: no analysis yet"><span style="width:0%"></span></div><b aria-label="No analysis yet">—</b></div>`).join('')}</section>`;
+ $('#contextPanel').innerHTML=`<section class="context-card context-progress"><h2>Your Progress</h2>${art('skin')}<strong>${done}/10</strong>${bar(done)}</section><button class="context-card context-goal" data-go="home/test/${next.id}">${art('target')}<h2>Daily Goal</h2><p>Finish 1 test today</p><div class="row">${bar(goal,1,'Daily goal')}<span>${goal}/1</span></div></button><button class="context-card context-leaderboard" data-go="leaderboard"><span class="context-title">${art('trophy')}<h2>Leaderboard</h2></span>${art('podium','podium-art')}</button><section class="context-card context-statistics"><h2>Your Stats</h2>${[['skin','Skin Score',''],['feel','Hydration',''],['sensitive','Sensitivity','orange']].map(([type,label,color])=>`<div class="context-stat ${color}">${art(type)}<span>${label}</span><div class="bar" aria-label="${label}: no analysis yet"><span style="width:0%"></span></div><b aria-label="No analysis yet">—</b></div>`).join('')}</section>`;
 }
 function home(){
  const descriptions=['Find out your<br>skin type','What is your<br>main concern?','How often do<br>you get breakouts?','How does your skin<br>feel right now?','Do you notice<br>visible pores?','What is your<br>skin tone?','Do you spend a lot<br>of time in the sun?','What products<br>do you use regularly?','Do you have<br>any sensitivities?','What is your skin<br>goal?'];
@@ -76,6 +79,7 @@ function friendsView(){
 function friendRow(f,mode){return `<div class="list-row">${avatar(f,'friend-avatar')}<button class="list-text" data-action="public-profile" data-id="${f.id}"><strong>${e(f.name)}</strong><small>${mode==='request'?'Would like to be friends':'Friends'}</small></button><div class="friend-actions">${mode==='request'?`${button(icon('check'),'respond-friend','icon-button',`data-id="${f.id}" data-accept="true" aria-label="Accept ${e(f.name)}"`)}${button(icon('close'),'respond-friend','icon-button',`data-id="${f.id}" data-accept="false" aria-label="Decline ${e(f.name)}"`)}`:button(icon('close'),'remove-friend','icon-button',`data-id="${f.id}" aria-label="Remove ${e(f.name)} from friends"`)}</div></div>`;}
 function settingsView(){return `${heading('Settings','','profile')}<div class="settings-links"><a href="#/profile/edit">Edit profile & privacy ${icon('right')}</a><a href="./pages/account.html">${session?'Manage account':'Sign in / Register'} ${icon('right')}</a><a href="./pages/plan.html">Plans ${icon('right')}</a><a href="./pages/legacy-home.html">Classic SkinScope ${icon('right')}</a></div><div class="section-title"><h2>On this device</h2></div><div class="stack">${button('Replay welcome','replay-welcome','secondary full')}${button(`${icon('download')} Export my journal`,'export-data','secondary full')}${session?button('Sign out','sign-out','secondary full'):''}</div><p class="small muted space-top">Photos stay in this browser. Signing in does not publish your photos. Public ranking and friend sharing are opt-in.</p>`;}
 function render(){
+ if(current()[0]!=='photo')closeCamera();
  const [page='home',sub,id]=current();renderHeader();renderContext();$('#main').dataset.page=page;$('#main').dataset.view=sub||'';$('#main').dataset.step=photoStep;
  let html=page==='home'?(sub==='test'?testView(id):home()):page==='photo'?photoView():page==='progress'?progressView():page==='leaderboard'?leaderboardView():page==='profile'?(sub==='edit'?editProfile():sub==='stats'?statsView():sub==='photos'?`${heading('My photos','','profile')}<div class="row spread space-top">${button(`${icon('plus')} Add photo`,'open-photo','secondary')}${photos.length>=2?button('Compare','compare-photos','small-link'):''}</div><div class="space-top">${photoGrid()}</div>`:sub==='friends'?friendsView():sub==='settings'?settingsView():profileView()):home();
  $('#main').innerHTML=`<div class="view-enter">${html}</div>`;
@@ -89,6 +93,46 @@ async function syncJournal(){await server('/journal','PUT',{profile:{name:state.
 async function loadSocial(){if(!session)return;try{social=await server('/social');const r=await server('/leaderboard?period='+rankPeriod);ranking=r.people||[];}catch{social=null;ranking=[];}}
 async function readPhotos(){try{photos=await photosFor(owner);}catch{photos=[];toast('Photo storage is unavailable in this browser.');}}
 async function selectFile(file){if(!file)return;try{const data=await imageData(file);photoDraft={data,note:''};photoStep='options';go('photo');if(current()[0]==='photo')render();}catch(error){toast(error.message);}}
+function closeCamera(){
+ clearTimeout(cameraHelpTimer);cameraRequest++;cameraBusy=false;camera.stop();
+ if($('#cameraDialog').open)$('#cameraDialog').close();
+}
+function showCameraError(error){
+ clearTimeout(cameraHelpTimer);camera.stop();
+ $('#cameraStatus').textContent=cameraErrorMessage(error);
+ $('#cameraDialog').dataset.state='error';
+ $('#takePhoto').disabled=true;$('#flipCamera').disabled=true;
+ $('#retryCamera').hidden=false;
+}
+async function openCamera(flip=false){
+ if(cameraBusy)return;
+ rememberDraft();const id=++cameraRequest;cameraBusy=true;
+ const cameraDialog=$('#cameraDialog');
+ if(!cameraDialog.open)cameraDialog.showModal();
+ cameraDialog.dataset.state='loading';
+ $('#cameraStatus').textContent='Allow camera access in your browser to start the preview.';
+ clearTimeout(cameraHelpTimer);cameraHelpTimer=setTimeout(()=>{if(id===cameraRequest)$('#cameraStatus').textContent='Still waiting for the camera. Check the browser permission prompt, or use the photo picker.';},12000);
+ $('#retryCamera').hidden=true;$('#takePhoto').disabled=true;$('#flipCamera').disabled=true;
+ try{
+  const started=await (flip?camera.flip($('#cameraVideo')):camera.start($('#cameraVideo')));
+  if(!started||id!==cameraRequest||!cameraDialog.open)return;
+  clearTimeout(cameraHelpTimer);
+  cameraDialog.dataset.state='ready';$('#cameraStatus').textContent='Camera ready';
+  $('#takePhoto').disabled=false;
+  navigator.mediaDevices.enumerateDevices?.().then(devices=>{if(id===cameraRequest)$('#flipCamera').disabled=devices.filter(d=>d.kind==='videoinput').length<2;}).catch(()=>{});
+ }catch(error){if(id===cameraRequest&&cameraDialog.open)showCameraError(error);}
+ finally{if(id===cameraRequest)cameraBusy=false;}
+}
+async function takePhoto(){
+ if(cameraBusy)return;
+ const id=cameraRequest;cameraBusy=true;$('#takePhoto').disabled=true;
+ try{
+  const blob=await camera.capture();
+  if(id!==cameraRequest||!$('#cameraDialog').open)return;
+  closeCamera();await selectFile(new File([blob],'skinscope-camera.jpg',{type:'image/jpeg'}));
+ }catch(error){if(id===cameraRequest)showCameraError(error);}
+ finally{if(id===cameraRequest)cameraBusy=false;}
+}
 function bindDrop(){const zone=$('#dropZone');zone.addEventListener('dragover',event=>{event.preventDefault();zone.classList.add('dragover');});zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));zone.addEventListener('drop',event=>{event.preventDefault();zone.classList.remove('dragover');selectFile(event.dataTransfer.files[0]);});}
 function showAnswers(id){const m=modules.find(x=>x.id===id),saved=state.tests[id];if(!m||!saved)return;dialog(`<h2>${m.name}</h2><p>Completed ${dateLabel(saved.completedAt)}</p><dl class="result-answers">${m.questions.map(([q,answers],i)=>`<dt>${e(q)}</dt><dd>${e(answers[saved.answers[i]]||'Not answered')}</dd>`).join('')}</dl><div class="dialog-actions">${button('Close','close-dialog','secondary')}${button('Retake','retake-test','primary',`data-id="${id}"`)}</div>`);}
 function showPhoto(id){const p=photos.find(x=>x.id===id);if(!p)return;dialog(`<h2>${p.type==='product'?'Product':'My skin'}</h2><p>${dateLabel(p.date)} · Private</p><div class="photo-preview"><img src="${p.data}" alt="Your private journal photo"></div>${p.note?`<p class="space-top">${e(p.note)}</p>`:''}<div class="dialog-actions">${button(`${icon('download')} Save image`,'download-photo','secondary',`data-id="${p.id}"`)}${button(icon('bin'),'delete-photo','danger-button',`data-id="${p.id}" aria-label="Delete photo"`)}</div>`);}
@@ -120,7 +164,7 @@ document.addEventListener('click',async event=>{
   }
   else if(a==='retake-test'){closeDialog();testDraft=null;go('home/test/'+el.dataset.id);}
   else if(a==='view-answers')showAnswers(el.dataset.id);
-  else if(a==='choose-camera'){$('#cameraFile').value='';$('#cameraFile').click();}
+  else if(a==='choose-camera')openCamera();
   else if(a==='choose-gallery'||a==='replace-photo'){rememberDraft();$('#photoFile').value='';$('#photoFile').click();}
   else if(a==='analysis-type'){analysisType=el.dataset.type;render();}
   else if(a==='photo-preview'){photoStep='preview';render();}
@@ -176,6 +220,18 @@ document.addEventListener('submit',async event=>{
 });
 $('#photoFile').addEventListener('change',event=>selectFile(event.target.files[0]));
 $('#cameraFile').addEventListener('change',event=>selectFile(event.target.files[0]));
+$('#cameraDialog').addEventListener('click',event=>{
+ const action=event.target.closest('[data-camera]')?.dataset.camera;
+ if(event.target===$('#cameraDialog')||action==='close')closeCamera();
+ else if(action==='retry')openCamera();
+ else if(action==='flip')openCamera(true);
+ else if(action==='capture')takePhoto();
+ else if(action==='picker'){closeCamera();$('#cameraFile').value='';$('#cameraFile').click();}
+});
+$('#cameraDialog').addEventListener('cancel',event=>{event.preventDefault();closeCamera();});
+$('#cameraDialog').addEventListener('close',()=>{if(!$('#cameraDialog').open){cameraRequest++;cameraBusy=false;camera.stop();}});
+window.addEventListener('pagehide',closeCamera);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)closeCamera();});
 $('#avatarFile').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;try{const form=$('#profileForm');if(form){state.profile.name=form.elements.name.value;state.profile.bio=form.elements.bio.value;}state.profile.avatar=await imageData(file,350);saveState(owner,state);if(session){const blob=await fetch(state.profile.avatar).then(r=>r.blob());await api.updateAvatar(new File([blob],'avatar.jpg',{type:'image/jpeg'}));}render();toast('Profile photo updated.');}catch(error){toast(error.message);}});
 $('#messageDialog').addEventListener('click',event=>{if(event.target===$('#messageDialog'))closeDialog();});
 $('#messageDialog .dialog-close').innerHTML=icon('close');

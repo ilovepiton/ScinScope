@@ -89,8 +89,9 @@ directory so existing absolute `/ScinScope/` legacy links continue working.
 The November 11 pass uses the first supplied image for mobile, and ONLY the
 computer portion of the second supplied image for desktop. The screenshots
 are not rendered as a fake app: the text, inputs, buttons and navigation are
-real HTML controls. Artwork and common icon shapes are literal cropped source
-pixels in `reference/`, not another generated approximation or emoji atlas.
+real HTML controls. The follow-up replaces low-resolution screenshot crops
+with scalable SVG illustrations in `vector-art.js` and existing SVG tool icons.
+The reference layout, subjects, palette and mobile crown levels are retained.
 
 `interface.css` is now the active UI refinement stylesheet. Desktop has a
 190px sidebar, four course columns, a white metrics capsule and four right
@@ -99,19 +100,18 @@ the side panels hide and the grid adapts. Mobile has the first image's two
 course columns and four bottom items, not the second image's mobile design.
 The header crown opens Leaderboard; the desktop sidebar has five routes.
 
-`reference-art.js` chooses the correct mobile/desktop originals. The rings,
-crowns, locks, camera/gallery art, product/skin option images, navigation glyphs
-and decorative desktop podium come from the user references. Common masks use
-module-absolute URLs. Unpictured controls reuse the existing local SVG family.
+`reference-art.js` exposes the existing local SVG icon family and new scalable
+reference-style art. Rings, crowns, locks, camera/gallery art, header metrics
+and decorative desktop podium no longer enlarge tiny PNGs. Photo option tiles
+use the existing high-resolution `analysis-photos.png` instead of screen crops.
 The podium is decorative art, not invented accounts or real ranking results.
 No reference photos of actual people or complete screenshots are published.
 
 `scripts/extract-reference-assets.mjs` records deterministic crop coordinates
 and outputs `reference/manifest.json`. Rebuilding requires Sharp and the two
 original reference PNGs, passed as arguments; `SHARP_PATH` can select an existing
-Sharp installation. No image generation is used for these UI assets. Original
-resolution limits apply; replace them with original high-resolution exports
-if the user supplies those. Older generated atlases are retained but inactive.
+Sharp installation. This records the prior crop iteration, retained but inactive.
+No image generation was used for the vector follow-up.
 
 `Roboto.ttf` is self-hosted with `ROBOTO-OFL.txt`. The app does not fetch fonts
 or UI images from external servers at runtime.
@@ -132,3 +132,24 @@ local day. Empty health metrics stay empty, not copied from the mockup. See
 The original login remains reachable; guest access never creates a session.
 `soap-pump.mp3` remains the CC0 recorded dispenser. Source details and generation
 provenance are in `ASSET_CREDITS.md`.
+
+## Live Camera
+
+Camera opens a native modal with a muted, inline `getUserMedia` video preview,
+capture, front/rear switching when multiple cameras are available, Cancel,
+retry and a device-picker fallback. No audio permission is requested. Browser
+and operating-system camera permission are required; the published HTTPS site
+supports this, while some embedded browsers do not expose permission prompts.
+Starting is never represented as a ready preview until playback succeeds.
+
+`camera.js` owns stream acquisition, cancellation generations, constraint
+fallback and JPEG capture. Late permission responses after Cancel are stopped.
+Streams stop on capture, Close/Escape/backdrop, navigation out of Photo, page
+hide and document hiding. The selfie preview is mirrored; the saved frame is
+not flipped or cosmetically filtered. Frames enter the existing private draft
+and journal flow, not a remote upload or invented analysis.
+
+Run `node --test tests/camera.test.mjs tests/reference-art.test.mjs` for camera
+lifecycle/capture errors and scalable artwork checks. `tests/camera-browser.html`
+is a manual browser smoke test using synthetic canvas video only, never the
+hardware camera. Serve the repository with a normal static server to use it.

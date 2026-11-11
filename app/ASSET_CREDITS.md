@@ -1,8 +1,19 @@
 # Reference Refinement Assets
 
-## November 11: Literal User Reference Assets
+## November 11: Sharp Vector Follow-Up
 
-The current interface uses `reference/*.png`, deterministically extracted from
+The active interface now uses code-native SVG artwork in `vector-art.js`,
+redrawn around the user's reference subjects, silhouettes and colors. Navigation
+and controls extend the existing local SVG icon family. These contain no
+embedded screenshot pixels, third-party emoji, or generated image atlas.
+Rings, level crowns, locks and the decorative podium scale to Retina displays.
+Photo option illustrations reuse the existing higher-resolution generated
+`analysis-photos.png`, documented below. The introduction keeps its previously
+generated high-resolution dispenser. No new bitmap generation in this pass.
+
+## Earlier Literal User Reference Assets (Inactive)
+
+The earlier interface used `reference/*.png`, deterministically extracted from
 the two latest user-provided references. Mobile uses the ten-phone image.
 Desktop uses only the computer region of the computer/phone image. These assets
 were copied at the user's explicit request to reproduce the original elements,
